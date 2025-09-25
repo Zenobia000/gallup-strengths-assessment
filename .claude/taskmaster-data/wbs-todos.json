@@ -1,0 +1,272 @@
+{
+  "wbsInfo": {
+    "totalTasks": 28,
+    "completedTasks": 11,
+    "pendingTasks": 17,
+    "progressPercentage": 39.3,
+    "currentPhase": "Phase 3 - Week 1 開發階段",
+    "lastUpdated": "2025-09-25T19:02:00Z"
+  },
+  "currentTask": {
+    "id": "task-w1-001",
+    "title": "SQLite 資料庫設計與初始化",
+    "phase": "Week 1",
+    "status": "PENDING",
+    "description": "設計並初始化 SQLite 資料庫結構",
+    "estimatedHours": 6,
+    "hubSuggestion": "infrastructure-agent",
+    "priority": "HIGH",
+    "deliverables": [
+      "src/main/resources/database/schema.sql",
+      "src/main/resources/database/seed_data.sql",
+      "資料庫初始化腳本"
+    ]
+  },
+  "phaseBreakdown": {
+    "Phase 1": {
+      "name": "文檔生成階段",
+      "status": "COMPLETED",
+      "tasks": 3,
+      "completed": 3,
+      "progress": 100
+    },
+    "Phase 2": {
+      "name": "文檔完善階段",
+      "status": "COMPLETED",
+      "tasks": 3,
+      "completed": 3,
+      "progress": 100
+    },
+    "Phase 2.5": {
+      "name": "駕駛員審查閘道",
+      "status": "PENDING",
+      "tasks": 1,
+      "completed": 0,
+      "progress": 0,
+      "criticalGate": true
+    },
+    "Phase 3": {
+      "name": "Week 1 - 基礎架構",
+      "status": "BLOCKED",
+      "tasks": 7,
+      "completed": 4,
+      "progress": 57,
+      "blockedReason": "等待 Phase 2.5 審查"
+    },
+    "Phase 4": {
+      "name": "Week 2 - 計分引擎",
+      "status": "NOT_STARTED",
+      "tasks": 8,
+      "completed": 0,
+      "progress": 0
+    },
+    "Phase 5": {
+      "name": "Week 3 - 推薦系統",
+      "status": "NOT_STARTED",
+      "tasks": 7,
+      "completed": 0,
+      "progress": 0
+    },
+    "Phase 6": {
+      "name": "Week 4 - 品質保證",
+      "status": "NOT_STARTED",
+      "tasks": 6,
+      "completed": 0,
+      "progress": 0
+    }
+  },
+  "todos": [
+    {
+      "id": "task-init-001",
+      "title": "收集專案基礎資訊",
+      "status": "completed",
+      "activeForm": "收集專案基礎資訊中",
+      "phase": "Initialization",
+      "completedAt": "2025-09-25T17:55:00Z",
+      "estimatedHours": 0.5,
+      "actualHours": 0.5
+    },
+    {
+      "id": "task-init-002",
+      "title": "進行 VibeCoding 7問澄清",
+      "status": "completed",
+      "activeForm": "進行 VibeCoding 7問澄清中",
+      "phase": "Initialization",
+      "completedAt": "2025-09-25T18:35:00Z",
+      "estimatedHours": 1,
+      "actualHours": 0.75
+    },
+    {
+      "id": "task-init-003",
+      "title": "TaskMaster 智能分析和規劃",
+      "status": "completed",
+      "activeForm": "進行 TaskMaster 智能分析和規劃中",
+      "phase": "Initialization",
+      "completedAt": "2025-09-25T18:40:00Z",
+      "estimatedHours": 1,
+      "actualHours": 1
+    },
+    {
+      "id": "task-init-004",
+      "title": "建立專案結構和開發環境",
+      "status": "completed",
+      "activeForm": "建立專案結構和開發環境中",
+      "phase": "Initialization",
+      "completedAt": "2025-09-25T18:42:00Z",
+      "estimatedHours": 2,
+      "actualHours": 1.5
+    },
+    {
+      "id": "task-doc-001",
+      "title": "產生 PRD (產品需求文檔)",
+      "status": "completed",
+      "activeForm": "產生 PRD (產品需求文檔)中",
+      "phase": "Phase 1",
+      "completedAt": "2025-09-25T18:50:00Z",
+      "estimatedHours": 2,
+      "actualHours": 1.5,
+      "deliverable": "docs/PRD.md",
+      "hubSuggestion": "workflow-template-manager"
+    },
+    {
+      "id": "task-doc-002",
+      "title": "產生架構設計文檔",
+      "status": "completed",
+      "activeForm": "產生架構設計文檔中",
+      "phase": "Phase 2",
+      "completedAt": "2025-09-25T18:51:00Z",
+      "estimatedHours": 3,
+      "actualHours": 2,
+      "deliverable": "docs/ARCHITECTURE.md",
+      "hubSuggestion": "infrastructure-agent"
+    },
+    {
+      "id": "task-doc-003",
+      "title": "產生 API 設計規格",
+      "status": "completed",
+      "activeForm": "產生 API 設計規格中",
+      "phase": "Phase 2",
+      "completedAt": "2025-09-25T18:52:00Z",
+      "estimatedHours": 2,
+      "actualHours": 1.5,
+      "deliverable": "docs/API_DESIGN.md",
+      "hubSuggestion": "infrastructure-agent"
+    },
+    {
+      "id": "task-doc-004",
+      "title": "建立 TaskMaster 資料持久化",
+      "status": "completed",
+      "activeForm": "建立 TaskMaster 資料持久化中",
+      "phase": "Phase 2",
+      "completedAt": "2025-09-25T18:53:00Z",
+      "estimatedHours": 0.5,
+      "actualHours": 0.25
+    },
+    {
+      "id": "task-gate-001",
+      "title": "駕駛員審查關門 (Phase 2.5)",
+      "status": "pending",
+      "activeForm": "駕駛員審查關門 (Phase 2.5) 中",
+      "phase": "Phase 2.5",
+      "isGate": true,
+      "priority": "CRITICAL",
+      "reviewRequired": true,
+      "description": "人類駕駛員需要審查所有生成的文檔並確認開發方向",
+      "checklist": [
+        "審查 PRD 的業務目標和用戶故事",
+        "驗證架構設計的技術可行性",
+        "確認 API 設計符合心理測量需求",
+        "評估 4週 MVP 時程的現實性",
+        "批准進入開發階段"
+      ],
+      "blockingTasks": [
+        "task-w1-001", "task-w1-002", "task-w1-003",
+        "task-w1-004", "task-w1-005", "task-w1-006", "task-w1-007"
+      ]
+    },
+    {
+      "id": "task-w1-001",
+      "title": "SQLite 資料庫設計與初始化",
+      "status": "pending",
+      "activeForm": "初始化 SQLite 資料庫設計中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 6,
+      "hubSuggestion": "infrastructure-agent"
+    },
+    {
+      "id": "task-w1-002",
+      "title": "FastAPI 專案架構建置",
+      "status": "pending",
+      "activeForm": "建立 FastAPI 專案架構中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 8,
+      "hubSuggestion": "infrastructure-agent"
+    },
+    {
+      "id": "task-w1-003",
+      "title": "Mini-IPIP 題庫建立",
+      "status": "pending",
+      "activeForm": "建立 Mini-IPIP 題庫中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 4,
+      "hubSuggestion": "documentation-specialist"
+    },
+    {
+      "id": "task-w1-004",
+      "title": "基礎 API 端點實作",
+      "status": "pending",
+      "activeForm": "實作基礎 API 端點中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 10,
+      "hubSuggestion": "general-purpose"
+    },
+    {
+      "id": "task-w1-005",
+      "title": "用戶同意與隱私合規",
+      "status": "pending",
+      "activeForm": "實作用戶同意與隱私合規中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 6,
+      "hubSuggestion": "security-infrastructure-auditor"
+    },
+    {
+      "id": "task-w1-006",
+      "title": "測試框架建置",
+      "status": "pending",
+      "activeForm": "建置測試框架中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 4,
+      "hubSuggestion": "test-automation-engineer"
+    },
+    {
+      "id": "task-w1-007",
+      "title": "週末檢查點與整合",
+      "status": "pending",
+      "activeForm": "進行週末檢查點與整合中",
+      "phase": "Week 1",
+      "blockedBy": "task-gate-001",
+      "estimatedHours": 2,
+      "hubSuggestion": "code-quality-specialist"
+    }
+  ],
+  "hubAnalysis": {
+    "recommendedNextAction": "等待人類駕駛員完成 Phase 2.5 審查",
+    "confidence": 0.95,
+    "riskFactors": [
+      "文檔生成未經人類驗證",
+      "技術可行性需要確認",
+      "時程壓力較大"
+    ],
+    "suggestions": [
+      "仔細審查所有生成的文檔",
+      "確認技術架構的可實現性",
+      "評估 4週時程的現實性"
+    ]
+  }
+}
