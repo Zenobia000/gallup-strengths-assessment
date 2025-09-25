@@ -1,0 +1,18 @@
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+
+# --- 提交類型 (type) 規則 ---
+# feat:     新增功能 (feature)
+# fix:      修復錯誤 (bug fix)
+# docs:     僅文件變更 (documentation)
+# style:    不影響程式碼運行的格式變更
+# refactor: 程式碼重構
+# perf:     提升效能的變更
+# test:     新增或修改測試
+# chore:    建置流程或輔助工具的變動
+# ------------------------------------
+# 範圍 (scope) 為選填，用以說明此次提交影響的範圍
+# 主旨 (subject) 應簡潔描述變更
