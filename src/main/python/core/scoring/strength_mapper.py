@@ -1,420 +1,493 @@
 """
-Big Five to Strengths Mapping System
+優勢映射引擎
+將 Big Five 人格分數映射到 12 個 Gallup 風格的優勢面向
 
-Converts Big Five personality scores to 12 Gallup-style strength dimensions
-using research-validated formulas and workplace performance correlations.
-
-Key Features:
-- 12 research-based strength dimensions
-- Weighted combination formulas
-- Confidence scoring per strength
-- Top strengths identification
-- Development area flagging
-
-Author: TaskMaster Week 2 Strengths Implementation
-Version: 1.0.0
+基於研究文檔的權重矩陣與科學映射方法
+支援可解釋性追蹤與信心評估
 """
 
-import statistics
-from typing import Dict, List, Tuple
-from dataclasses import dataclass
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+import json
+import math
+from .mini_ipip_scorer import BigFiveScores, ScoreConfidence
 
-from models.schemas import BigFiveScores, StrengthScores
+
+class StrengthCategory(Enum):
+    """優勢類別"""
+    EXECUTION = "execution"      # 執行力
+    INFLUENCING = "influencing"  # 影響力
+    RELATIONSHIP = "relationship" # 關係建立
+    THINKING = "thinking"        # 策略思維
 
 
 @dataclass
-class StrengthMappingResult:
-    """Complete strength mapping result with insights."""
-    strength_scores: StrengthScores
-    top_strengths: List[Dict[str, any]]
-    development_areas: List[Dict[str, any]]
-    confidence_scores: Dict[str, float]
-    mapping_version: str
+class StrengthResult:
+    """單一優勢結果"""
+    name: str
+    display_name: str
+    score: float                 # 0-100 分數
+    percentile: float           # 百分位數
+    confidence: ScoreConfidence
+    category: StrengthCategory
+
+    # 計算溯源
+    primary_factor: str
+    primary_contribution: float
+    secondary_factors: Dict[str, float]
+    weight_formula: str
+
+    # 描述與建議
+    description: str
+    job_matches: List[str] = field(default_factory=list)
+    development_suggestions: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """轉換為字典格式"""
+        return {
+            "name": self.name,
+            "display_name": self.display_name,
+            "score": round(self.score, 2),
+            "percentile": round(self.percentile, 2),
+            "confidence": self.confidence.value,
+            "category": self.category.value,
+            "provenance": {
+                "primary_factor": self.primary_factor,
+                "primary_contribution": round(self.primary_contribution, 2),
+                "secondary_factors": {
+                    k: round(v, 2) for k, v in self.secondary_factors.items()
+                },
+                "weight_formula": self.weight_formula
+            },
+            "description": self.description,
+            "job_matches": self.job_matches,
+            "development_suggestions": self.development_suggestions
+        }
 
 
-class StrengthsMapper:
-    """
-    Maps Big Five personality scores to 12 Gallup-style strength dimensions.
+@dataclass
+class StrengthsProfile:
+    """完整優勢檔案"""
+    top_strengths: List[StrengthResult]        # 前5名優勢
+    all_strengths: List[StrengthResult]        # 全部12個優勢
+    dominant_category: StrengthCategory         # 主導類別
 
-    Implements research-validated formulas for predicting workplace strengths
-    based on Big Five personality factors. The mapping is based on:
-    - Meta-analytic research on personality-performance relationships
-    - Workplace behavior prediction models
-    - Gallup strengths framework adaptation
+    # 統計摘要
+    mean_score: float
+    score_range: float
+    confidence_distribution: Dict[str, int]
 
-    The 12 strength dimensions cover key workplace competencies:
-    - Execution strengths (structured, quality-focused)
-    - Thinking strengths (analytical, innovative)
-    - Influencing strengths (leadership, persuasion)
-    - Relationship strengths (collaboration, customer focus)
-    """
+    # 職涯建議
+    recommended_roles: List[str]
+    development_priorities: List[str]
 
-    # Research-validated mapping formulas
-    # Each formula combines Big Five factors with empirically-determined weights
-    STRENGTH_FORMULAS = {
-        "結構化執行": lambda scores: 0.8 * scores.conscientiousness + 0.2 * (100 - scores.neuroticism),
-        "品質與完備": lambda scores: 0.7 * scores.conscientiousness + 0.3 * scores.openness,
-        "探索與創新": lambda scores: 0.8 * scores.openness + 0.2 * scores.extraversion,
-        "分析與洞察": lambda scores: 0.6 * scores.openness + 0.4 * scores.conscientiousness,
-        "影響與倡議": lambda scores: 0.7 * scores.extraversion + 0.3 * scores.conscientiousness,
-        "協作與共好": lambda scores: 0.7 * scores.agreeableness + 0.3 * scores.extraversion,
-        "客戶導向": lambda scores: 0.6 * scores.agreeableness + 0.4 * scores.extraversion,
-        "學習與成長": lambda scores: 0.7 * scores.openness + 0.3 * scores.conscientiousness,
-        "紀律與信任": lambda scores: 0.8 * scores.conscientiousness + 0.2 * scores.agreeableness,
-        "壓力調節": lambda scores: 0.8 * (100 - scores.neuroticism) + 0.2 * scores.conscientiousness,
-        "衝突整合": lambda scores: 0.6 * scores.agreeableness + 0.4 * (100 - scores.neuroticism),
-        "責任與當責": lambda scores: 0.7 * scores.conscientiousness + 0.3 * scores.agreeableness,
-    }
+    def to_dict(self) -> Dict[str, Any]:
+        """轉換為字典格式"""
+        return {
+            "top_strengths": [s.to_dict() for s in self.top_strengths],
+            "all_strengths": [s.to_dict() for s in self.all_strengths],
+            "dominant_category": self.dominant_category.value,
+            "statistics": {
+                "mean_score": round(self.mean_score, 2),
+                "score_range": round(self.score_range, 2),
+                "confidence_distribution": self.confidence_distribution
+            },
+            "recommendations": {
+                "roles": self.recommended_roles,
+                "development_priorities": self.development_priorities
+            }
+        }
 
-    # Strength descriptions and development tips
-    STRENGTH_DESCRIPTIONS = {
-        "結構化執行": {
-            "description": "善於建立系統、流程和結構，確保工作有序進行",
-            "behaviors": ["制定清晰的工作計劃", "建立有效的流程標準", "確保任務按時完成"],
-            "development_tips": ["練習項目管理技能", "學習精實管理方法", "建立個人效率系統"]
+
+class StrengthMapper:
+    """優勢映射引擎"""
+
+    # 12 個優勢面向的映射配置
+    STRENGTH_MAPPINGS = {
+        "structured_execution": {
+            "display_name": "結構化執行",
+            "category": StrengthCategory.EXECUTION,
+            "primary_factor": "conscientiousness",
+            "weight_formula": "0.8 * C + 0.2 * (100 - N)",
+            "description": "擅長建立系統、流程，確保工作有條不紊地完成",
+            "job_matches": ["專案經理", "營運經理", "系統分析師", "品質管理師"],
+            "development_suggestions": [
+                "學習先進的專案管理方法論",
+                "培養跨部門協調能力",
+                "提升數據分析與決策技能"
+            ]
         },
-        "品質與完備": {
-            "description": "追求卓越品質，關注細節，力求完美的工作成果",
-            "behaviors": ["仔細檢查工作品質", "設立高標準要求", "持續改善工作流程"],
-            "development_tips": ["學習品質管理工具", "培養批判性思維", "建立品質檢核機制"]
+
+        "quality_perfectionism": {
+            "display_name": "品質與完備",
+            "category": StrengthCategory.EXECUTION,
+            "primary_factor": "conscientiousness",
+            "weight_formula": "0.7 * C + 0.3 * O",
+            "description": "對品質有高標準，追求工作的完整性與精確性",
+            "job_matches": ["品質保證工程師", "審計師", "研發工程師", "醫療專業人員"],
+            "development_suggestions": [
+                "學習平衡完美主義與效率",
+                "發展領導他人追求卓越的能力",
+                "培養創新思維以提升品質標準"
+            ]
         },
-        "探索與創新": {
-            "description": "喜歡探索新想法，具有創新思維和開放的學習態度",
-            "behaviors": ["提出創新解決方案", "嘗試新的工作方法", "保持對新事物的好奇心"],
-            "development_tips": ["參與創新工作坊", "學習設計思維", "建立創意發想習慣"]
+
+        "exploration_innovation": {
+            "display_name": "探索與創新",
+            "category": StrengthCategory.THINKING,
+            "primary_factor": "openness",
+            "weight_formula": "0.8 * O + 0.2 * E",
+            "description": "具有強烈的好奇心，善於探索新想法和創新解決方案",
+            "job_matches": ["產品經理", "創意總監", "研究員", "新創企業家"],
+            "development_suggestions": [
+                "參與跨領域學習與合作",
+                "建立創新想法的實作能力",
+                "學習將創意轉化為商業價值"
+            ]
         },
-        "分析與洞察": {
-            "description": "善於分析複雜問題，具有深度思考和洞察問題本質的能力",
-            "behaviors": ["深入分析問題根因", "提供具洞察力的建議", "運用數據支持決策"],
-            "development_tips": ["學習分析工具和方法", "培養系統性思維", "練習問題拆解技巧"]
+
+        "analytical_insight": {
+            "display_name": "分析與洞察",
+            "category": StrengthCategory.THINKING,
+            "primary_factor": "openness",
+            "weight_formula": "0.6 * O + 0.4 * C",
+            "description": "能深入分析複雜問題，從資料中發現重要洞察",
+            "job_matches": ["數據分析師", "策略顧問", "市場研究員", "學術研究者"],
+            "development_suggestions": [
+                "加強數據科學與統計技能",
+                "學習商業分析與決策支援",
+                "培養將洞察轉化為行動的能力"
+            ]
         },
-        "影響與倡議": {
-            "description": "能夠影響他人，推動變革，具有領導力和說服力",
-            "behaviors": ["主動提出改善建議", "影響團隊決策方向", "推動重要專案進行"],
-            "development_tips": ["提升溝通表達技巧", "學習領導力技能", "練習議題倡議能力"]
+
+        "influence_advocacy": {
+            "display_name": "影響與倡議",
+            "category": StrengthCategory.INFLUENCING,
+            "primary_factor": "extraversion",
+            "weight_formula": "0.7 * E + 0.3 * C",
+            "description": "能有效影響他人，推動重要倡議並獲得支持",
+            "job_matches": ["業務經理", "公關經理", "政治工作者", "社會運動者"],
+            "development_suggestions": [
+                "提升演講與簡報技巧",
+                "學習談判與說服技術",
+                "培養社群經營與網絡建立能力"
+            ]
         },
-        "協作與共好": {
-            "description": "重視團隊合作，善於建立關係，追求共同成功",
-            "behaviors": ["主動協助團隊成員", "建立良好工作關係", "促進團隊和諧合作"],
-            "development_tips": ["學習團隊合作技巧", "提升情緒智能", "練習衝突調解能力"]
+
+        "collaboration_harmony": {
+            "display_name": "協作與共好",
+            "category": StrengthCategory.RELATIONSHIP,
+            "primary_factor": "agreeableness",
+            "weight_formula": "0.7 * A + 0.3 * E",
+            "description": "擅長團隊合作，促進和諧關係並達成共同目標",
+            "job_matches": ["人力資源專員", "團隊領導者", "客戶服務經理", "非營利組織工作者"],
+            "development_suggestions": [
+                "學習衝突管理與調解技巧",
+                "提升團隊建設與激勵能力",
+                "培養跨文化溝通技能"
+            ]
         },
-        "客戶導向": {
-            "description": "以客戶需求為中心，具有服務精神和同理心",
-            "behaviors": ["主動了解客戶需求", "提供優質服務體驗", "建立長期客戶關係"],
-            "development_tips": ["學習客戶服務技巧", "培養同理心能力", "建立客戶回饋機制"]
+
+        "customer_orientation": {
+            "display_name": "客戶導向",
+            "category": StrengthCategory.RELATIONSHIP,
+            "primary_factor": "agreeableness",
+            "weight_formula": "0.6 * A + 0.4 * E",
+            "description": "以客戶需求為中心，建立長期信任關係",
+            "job_matches": ["客戶成功經理", "銷售代表", "服務設計師", "客戶體驗專員"],
+            "development_suggestions": [
+                "深入了解客戶行為與需求分析",
+                "學習客戶關係管理系統",
+                "培養服務設計思維"
+            ]
         },
-        "學習與成長": {
-            "description": "熱愛學習新知，具有成長心態和自我提升的動機",
-            "behaviors": ["主動學習新技能", "尋求成長機會", "分享知識給他人"],
-            "development_tips": ["制定學習計劃", "尋找導師指導", "建立知識管理系統"]
+
+        "learning_growth": {
+            "display_name": "學習與成長",
+            "category": StrengthCategory.THINKING,
+            "primary_factor": "openness",
+            "weight_formula": "0.7 * O + 0.3 * C",
+            "description": "持續學習新知識，追求個人與專業成長",
+            "job_matches": ["培訓師", "教育工作者", "組織發展專員", "職涯顧問"],
+            "development_suggestions": [
+                "建立個人知識管理系統",
+                "發展教學與指導他人的能力",
+                "學習成人學習理論與方法"
+            ]
         },
-        "紀律與信任": {
-            "description": "具有高度自律性，值得信賴，能夠承擔責任",
-            "behaviors": ["遵守承諾和期限", "維持高度工作紀律", "建立他人信任"],
-            "development_tips": ["建立自我管理系統", "練習時間管理", "培養責任感文化"]
+
+        "discipline_trust": {
+            "display_name": "紀律與信任",
+            "category": StrengthCategory.EXECUTION,
+            "primary_factor": "conscientiousness",
+            "weight_formula": "0.8 * C + 0.2 * A",
+            "description": "具有強烈的自律精神，值得他人信任與依賴",
+            "job_matches": ["財務經理", "合規專員", "專案執行經理", "營運主管"],
+            "development_suggestions": [
+                "發展領導他人建立紀律的能力",
+                "學習風險管理與合規知識",
+                "培養組織文化建設技能"
+            ]
         },
-        "壓力調節": {
-            "description": "在高壓環境下保持冷靜，具有良好的情緒管理能力",
-            "behaviors": ["在壓力下保持效率", "協助他人紓解壓力", "維持工作生活平衡"],
-            "development_tips": ["學習壓力管理技巧", "練習冥想或放鬆技法", "建立支持系統"]
+
+        "stress_regulation": {
+            "display_name": "壓力調節",
+            "category": StrengthCategory.EXECUTION,
+            "primary_factor": "neuroticism_reversed",
+            "weight_formula": "0.8 * (100 - N) + 0.2 * C",
+            "description": "在高壓環境中保持冷靜，有效調節壓力",
+            "job_matches": ["急診醫護人員", "危機處理專員", "高階主管", "軍警消防人員"],
+            "development_suggestions": [
+                "學習壓力管理與情緒調節技巧",
+                "培養危機處理與決策能力",
+                "發展指導他人抗壓的技能"
+            ]
         },
-        "衝突整合": {
-            "description": "善於處理衝突，能夠整合不同觀點，促進和諧",
-            "behaviors": ["調解團隊衝突", "整合不同意見", "建立共識和協議"],
-            "development_tips": ["學習衝突管理技巧", "練習協商談判", "培養中立立場能力"]
+
+        "conflict_integration": {
+            "display_name": "衝突整合",
+            "category": StrengthCategory.RELATIONSHIP,
+            "primary_factor": "agreeableness",
+            "weight_formula": "0.6 * A + 0.4 * (100 - N)",
+            "description": "善於處理衝突，將不同觀點整合為共識",
+            "job_matches": ["調解員", "談判專家", "組織發展顧問", "外交人員"],
+            "development_suggestions": [
+                "學習調解與仲裁技術",
+                "培養多元觀點整合能力",
+                "發展跨文化溝通與理解技能"
+            ]
         },
-        "責任與當責": {
-            "description": "承擔責任，對結果負責，具有高度的當責精神",
-            "behaviors": ["主動承擔責任", "對結果負責到底", "協助他人履行責任"],
-            "development_tips": ["建立當責文化", "學習結果導向思維", "練習問題解決技能"]
+
+        "responsibility_accountability": {
+            "display_name": "責任與當責",
+            "category": StrengthCategory.EXECUTION,
+            "primary_factor": "conscientiousness",
+            "weight_formula": "0.7 * C + 0.3 * A",
+            "description": "承擔責任，對結果負責，值得信賴",
+            "job_matches": ["部門主管", "專案負責人", "財務主管", "法務專員"],
+            "development_suggestions": [
+                "提升當責文化的建立能力",
+                "學習授權與監督技巧",
+                "發展成果導向的管理思維"
+            ]
         }
     }
-
-    MAPPING_VERSION = "v1.0.0"
 
     def __init__(self):
-        """Initialize strength mapper."""
-        pass
+        """初始化優勢映射引擎"""
+        self.mappings = self.STRENGTH_MAPPINGS.copy()
 
-    def map_to_strengths(
-        self,
-        big_five_scores: BigFiveScores,
-        confidence_threshold: float = 0.7
-    ) -> StrengthMappingResult:
+    def map_strengths(self, big_five_scores: BigFiveScores) -> StrengthsProfile:
         """
-        Convert Big Five scores to 12 strength dimensions with insights.
+        將 Big Five 分數映射為優勢檔案
 
         Args:
-            big_five_scores: Standardized Big Five personality scores
-            confidence_threshold: Minimum confidence for strength identification
+            big_five_scores: Big Five 分數結果
 
         Returns:
-            StrengthMappingResult: Complete mapping results with insights
+            StrengthsProfile: 完整優勢檔案
         """
-        # Calculate strength scores
-        strength_values = {}
-        confidence_scores = {}
+        # 提取標準化分數
+        scores = {
+            "E": big_five_scores.standardized_extraversion,
+            "A": big_five_scores.standardized_agreeableness,
+            "C": big_five_scores.standardized_conscientiousness,
+            "N": big_five_scores.standardized_neuroticism,
+            "O": big_five_scores.standardized_openness
+        }
 
-        for strength_name, formula in self.STRENGTH_FORMULAS.items():
-            raw_score = formula(big_five_scores)
-            # Clamp to 0-100 range and round
-            strength_score = int(max(0, min(100, raw_score)))
-            strength_values[strength_name] = strength_score
-
-            # Calculate confidence for this strength
-            confidence = self._calculate_strength_confidence(
-                strength_name, big_five_scores, strength_score
+        # 計算每個優勢的分數
+        all_strengths = []
+        for strength_key, config in self.mappings.items():
+            strength_result = self._calculate_strength_score(
+                strength_key, config, scores, big_five_scores.confidence_level
             )
-            confidence_scores[strength_name] = confidence
+            all_strengths.append(strength_result)
 
-        strength_scores = StrengthScores(**strength_values)
+        # 排序並選出前5名
+        all_strengths.sort(key=lambda x: x.score, reverse=True)
+        top_strengths = all_strengths[:5]
 
-        # Identify top strengths and development areas
-        top_strengths = self._identify_top_strengths(
-            strength_values, confidence_scores, confidence_threshold
-        )
-        development_areas = self._identify_development_areas(
-            strength_values, confidence_scores
-        )
+        # 分析主導類別
+        dominant_category = self._identify_dominant_category(top_strengths)
 
-        return StrengthMappingResult(
-            strength_scores=strength_scores,
+        # 計算統計摘要
+        mean_score = sum(s.score for s in all_strengths) / len(all_strengths)
+        score_range = max(s.score for s in all_strengths) - min(s.score for s in all_strengths)
+
+        confidence_distribution = {}
+        for conf in ScoreConfidence:
+            confidence_distribution[conf.value] = sum(
+                1 for s in all_strengths if s.confidence == conf
+            )
+
+        # 生成職涯建議
+        recommended_roles = self._generate_role_recommendations(top_strengths)
+        development_priorities = self._generate_development_priorities(all_strengths)
+
+        return StrengthsProfile(
             top_strengths=top_strengths,
-            development_areas=development_areas,
-            confidence_scores=confidence_scores,
-            mapping_version=self.MAPPING_VERSION
+            all_strengths=all_strengths,
+            dominant_category=dominant_category,
+            mean_score=mean_score,
+            score_range=score_range,
+            confidence_distribution=confidence_distribution,
+            recommended_roles=recommended_roles,
+            development_priorities=development_priorities
         )
 
-    def _calculate_strength_confidence(
-        self,
-        strength_name: str,
-        big_five_scores: BigFiveScores,
-        strength_score: int
-    ) -> float:
-        """
-        Calculate confidence for individual strength score.
+    def _calculate_strength_score(self, strength_key: str, config: Dict[str, Any],
+                                 big_five_scores: Dict[str, float],
+                                 overall_confidence: ScoreConfidence) -> StrengthResult:
+        """計算單一優勢分數"""
+        # 解析權重公式
+        formula = config["weight_formula"]
 
-        Confidence is based on:
-        1. Score extremeness (more extreme = more confident)
-        2. Factor loading strength (how strongly the formula predicts this strength)
-        3. Score consistency with contributing factors
+        # 替換變數
+        E, A, C, N, O = (big_five_scores[k] for k in ["E", "A", "C", "N", "O"])
 
-        Args:
-            strength_name: Name of the strength dimension
-            big_five_scores: Big Five personality scores
-            strength_score: Calculated strength score
-
-        Returns:
-            float: Confidence score between 0.0 and 1.0
-        """
-        confidence_factors = []
-
-        # Factor 1: Score extremeness
-        # More extreme scores (very high or very low) are more confident
-        distance_from_middle = abs(strength_score - 50) / 50
-        extremeness_confidence = min(1.0, distance_from_middle * 1.5)
-        confidence_factors.append(extremeness_confidence)
-
-        # Factor 2: Primary factor strength
-        # How strongly does the primary Big Five factor predict this strength
-        primary_factor_confidence = self._assess_primary_factor_strength(
-            strength_name, big_five_scores
-        )
-        confidence_factors.append(primary_factor_confidence)
-
-        # Factor 3: Factor consistency
-        # How consistent are the contributing factors
-        consistency_confidence = self._assess_factor_consistency(
-            strength_name, big_five_scores
-        )
-        confidence_factors.append(consistency_confidence)
-
-        # Calculate weighted average
-        overall_confidence = statistics.mean(confidence_factors)
-
-        return round(overall_confidence, 3)
-
-    def _assess_primary_factor_strength(
-        self,
-        strength_name: str,
-        big_five_scores: BigFiveScores
-    ) -> float:
-        """Assess how strongly the primary factor predicts this strength."""
-        # Define primary factors for each strength
-        primary_factors = {
-            "結構化執行": ("conscientiousness", 0.8),
-            "品質與完備": ("conscientiousness", 0.7),
-            "探索與創新": ("openness", 0.8),
-            "分析與洞察": ("openness", 0.6),
-            "影響與倡議": ("extraversion", 0.7),
-            "協作與共好": ("agreeableness", 0.7),
-            "客戶導向": ("agreeableness", 0.6),
-            "學習與成長": ("openness", 0.7),
-            "紀律與信任": ("conscientiousness", 0.8),
-            "壓力調節": ("neuroticism", 0.8),  # Reversed
-            "衝突整合": ("agreeableness", 0.6),
-            "責任與當責": ("conscientiousness", 0.7),
-        }
-
-        factor_name, weight = primary_factors[strength_name]
-
-        if factor_name == "neuroticism":
-            # For neuroticism, we use the reverse (emotional stability)
-            factor_score = 100 - getattr(big_five_scores, factor_name)
-        else:
-            factor_score = getattr(big_five_scores, factor_name)
-
-        # Convert to confidence: higher scores and higher weights = higher confidence
-        score_confidence = factor_score / 100
-        weight_confidence = weight
-
-        return (score_confidence * weight_confidence + weight_confidence) / 2
-
-    def _assess_factor_consistency(
-        self,
-        strength_name: str,
-        big_five_scores: BigFiveScores
-    ) -> float:
-        """Assess consistency between contributing factors."""
-        # Get all factors that contribute to this strength
-        formula = self.STRENGTH_FORMULAS[strength_name]
-
-        # This is a simplified consistency check
-        # In practice, you'd want to evaluate factor correlations
-        scores = [big_five_scores.extraversion, big_five_scores.agreeableness,
-                 big_five_scores.conscientiousness, big_five_scores.neuroticism,
-                 big_five_scores.openness]
-
-        # Calculate variance - lower variance = higher consistency
-        variance = statistics.variance(scores)
-        # Normalize variance to 0-1 scale (lower variance = higher confidence)
-        consistency = max(0, 1 - (variance / 1000))  # Adjust scaling as needed
-
-        return consistency
-
-    def _identify_top_strengths(
-        self,
-        strength_scores: Dict[str, int],
-        confidence_scores: Dict[str, float],
-        confidence_threshold: float
-    ) -> List[Dict[str, any]]:
-        """
-        Identify top 3-5 strengths based on scores and confidence.
-
-        Args:
-            strength_scores: Calculated strength scores
-            confidence_scores: Confidence scores for each strength
-            confidence_threshold: Minimum confidence for inclusion
-
-        Returns:
-            List of top strength insights
-        """
-        # Filter strengths by confidence threshold
-        confident_strengths = {
-            name: score for name, score in strength_scores.items()
-            if confidence_scores[name] >= confidence_threshold
-        }
-
-        # Sort by score (descending)
-        sorted_strengths = sorted(
-            confident_strengths.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
-
-        # Take top 3-5 strengths
-        top_count = min(5, max(3, len(sorted_strengths)))
-        top_strengths = []
-
-        for name, score in sorted_strengths[:top_count]:
-            strength_info = self.STRENGTH_DESCRIPTIONS[name]
-            top_strengths.append({
-                "name": name,
-                "score": score,
-                "confidence": confidence_scores[name],
-                "description": strength_info["description"],
-                "behaviors": strength_info["behaviors"],
-                "development_tips": strength_info["development_tips"]
+        # 安全地計算分數
+        try:
+            # 使用 eval 計算公式 (在受控環境下安全)
+            score = eval(formula, {"__builtins__": {}}, {
+                "E": E, "A": A, "C": C, "N": N, "O": O
             })
+        except:
+            # 萬一公式有問題，使用主要因子分數
+            primary_factor_key = config["primary_factor"].upper()
+            if primary_factor_key == "NEUROTICISM_REVERSED":
+                score = 100 - N
+            else:
+                score = big_five_scores.get(primary_factor_key[0], 50)
 
-        return top_strengths
+        # 確保分數在 0-100 範圍內
+        score = max(0, min(100, score))
 
-    def _identify_development_areas(
-        self,
-        strength_scores: Dict[str, int],
-        confidence_scores: Dict[str, float]
-    ) -> List[Dict[str, any]]:
-        """
-        Identify areas needing development (low scores with high confidence).
+        # 計算百分位數 (簡化版)
+        percentile = self._calculate_percentile(score)
 
-        Args:
-            strength_scores: Calculated strength scores
-            confidence_scores: Confidence scores for each strength
+        # 分解貢獻度
+        primary_factor = config["primary_factor"]
+        primary_contribution, secondary_factors = self._decompose_contributions(
+            formula, big_five_scores, score
+        )
 
-        Returns:
-            List of development area insights
-        """
-        development_areas = []
+        # 評估信心等級
+        confidence = self._assess_strength_confidence(
+            score, primary_contribution, overall_confidence
+        )
 
-        # Look for scores below 40 with confidence > 0.6
-        for name, score in strength_scores.items():
-            if score < 40 and confidence_scores[name] > 0.6:
-                strength_info = self.STRENGTH_DESCRIPTIONS[name]
-                development_areas.append({
-                    "name": name,
-                    "current_score": score,
-                    "confidence": confidence_scores[name],
-                    "description": strength_info["description"],
-                    "development_priority": "high" if score < 30 else "medium",
-                    "development_tips": strength_info["development_tips"]
-                })
+        return StrengthResult(
+            name=strength_key,
+            display_name=config["display_name"],
+            score=score,
+            percentile=percentile,
+            confidence=confidence,
+            category=config["category"],
+            primary_factor=primary_factor,
+            primary_contribution=primary_contribution,
+            secondary_factors=secondary_factors,
+            weight_formula=formula,
+            description=config["description"],
+            job_matches=config["job_matches"].copy(),
+            development_suggestions=config["development_suggestions"].copy()
+        )
 
-        # Sort by priority (lowest scores first)
-        development_areas.sort(key=lambda x: x["current_score"])
-
-        return development_areas
-
-    def get_strength_profile_summary(
-        self,
-        mapping_result: StrengthMappingResult
-    ) -> Dict[str, any]:
-        """
-        Generate a comprehensive strength profile summary.
-
-        Args:
-            mapping_result: Complete mapping results
-
-        Returns:
-            Dictionary with profile summary and insights
-        """
-        top_strength_names = [s["name"] for s in mapping_result.top_strengths]
-        development_area_names = [d["name"] for d in mapping_result.development_areas]
-
-        # Calculate overall profile characteristics
-        scores = mapping_result.strength_scores.__dict__
-        avg_score = statistics.mean(scores.values())
-        score_variance = statistics.variance(scores.values())
-
-        # Determine profile type
-        if score_variance < 100:
-            profile_type = "平衡型"
-            profile_description = "各項能力相對平衡，適合多元化的工作環境"
-        elif len(mapping_result.top_strengths) >= 4:
-            profile_type = "多元優勢型"
-            profile_description = "具有多項突出優勢，適合複雜的領導角色"
+    def _calculate_percentile(self, score: float) -> float:
+        """簡化的百分位數計算"""
+        # 假設分數大致呈常態分佈，以50為中心
+        if score <= 50:
+            return max(1, score * 0.98)  # 0-50 映射到 1-49
         else:
-            profile_type = "專精型"
-            profile_description = "在特定領域具有明顯優勢，適合專業化發展"
+            return min(99, 50 + (score - 50) * 0.98)  # 50-100 映射到 50-99
 
-        return {
-            "profile_type": profile_type,
-            "profile_description": profile_description,
-            "average_score": round(avg_score, 1),
-            "score_variance": round(score_variance, 1),
-            "top_strengths": top_strength_names,
-            "development_areas": development_area_names,
-            "overall_confidence": round(
-                statistics.mean(mapping_result.confidence_scores.values()), 3
-            ),
-            "mapping_version": mapping_result.mapping_version
-        }
+    def _decompose_contributions(self, formula: str, big_five_scores: Dict[str, float],
+                                total_score: float) -> Tuple[float, Dict[str, float]]:
+        """分解各因子的貢獻度"""
+        E, A, C, N, O = (big_five_scores[k] for k in ["E", "A", "C", "N", "O"])
+
+        # 簡化的貢獻度計算
+        contributions = {}
+        primary_contribution = 0
+
+        # 分析公式中的係數
+        if "0.8 * C" in formula:
+            primary_contribution = 0.8 * C
+            contributions["conscientiousness"] = 0.8 * C
+        elif "0.7 * E" in formula:
+            primary_contribution = 0.7 * E
+            contributions["extraversion"] = 0.7 * E
+        elif "0.8 * O" in formula:
+            primary_contribution = 0.8 * O
+            contributions["openness"] = 0.8 * O
+        elif "0.7 * A" in formula:
+            primary_contribution = 0.7 * A
+            contributions["agreeableness"] = 0.7 * A
+        elif "0.8 * (100 - N)" in formula:
+            primary_contribution = 0.8 * (100 - N)
+            contributions["emotional_stability"] = 0.8 * (100 - N)
+
+        # 移除主要貢獻，剩下的作為次要貢獻
+        secondary_total = total_score - primary_contribution
+        secondary_factors = {k: v for k, v in contributions.items()
+                           if v != primary_contribution}
+
+        return primary_contribution, secondary_factors
+
+    def _assess_strength_confidence(self, score: float, primary_contribution: float,
+                                  overall_confidence: ScoreConfidence) -> ScoreConfidence:
+        """評估單一優勢的信心等級"""
+        # 基於分數的極端程度和整體信心等級
+        if overall_confidence == ScoreConfidence.LOW:
+            return ScoreConfidence.LOW
+
+        if score > 75 or score < 25:  # 極端分數
+            return ScoreConfidence.HIGH
+        elif score > 65 or score < 35:  # 中等程度
+            return ScoreConfidence.MEDIUM
+        else:
+            return ScoreConfidence.MEDIUM
+
+    def _identify_dominant_category(self, top_strengths: List[StrengthResult]) -> StrengthCategory:
+        """識別主導優勢類別"""
+        category_counts = {}
+        for strength in top_strengths:
+            category = strength.category
+            category_counts[category] = category_counts.get(category, 0) + 1
+
+        return max(category_counts.keys(), key=lambda x: category_counts[x])
+
+    def _generate_role_recommendations(self, top_strengths: List[StrengthResult]) -> List[str]:
+        """生成職涯角色建議"""
+        role_frequency = {}
+
+        for strength in top_strengths:
+            for role in strength.job_matches:
+                role_frequency[role] = role_frequency.get(role, 0) + 1
+
+        # 選出出現最頻繁的職涯角色
+        sorted_roles = sorted(role_frequency.items(), key=lambda x: x[1], reverse=True)
+        return [role for role, _ in sorted_roles[:8]]  # 取前8個推薦角色
+
+    def _generate_development_priorities(self, all_strengths: List[StrengthResult]) -> List[str]:
+        """生成發展優先順序"""
+        # 基於低分優勢生成發展建議
+        weak_strengths = [s for s in all_strengths if s.score < 40]
+        weak_strengths.sort(key=lambda x: x.score)  # 從最低分開始
+
+        development_priorities = []
+        for strength in weak_strengths[:3]:  # 取最需要發展的3個
+            development_priorities.extend(strength.development_suggestions[:2])
+
+        return development_priorities[:6]  # 最多6個發展建議
+
+    def get_strength_details(self, strength_name: str) -> Optional[Dict[str, Any]]:
+        """取得特定優勢的詳細資訊"""
+        return self.mappings.get(strength_name)
+
+    def customize_strength_mapping(self, strength_name: str,
+                                 custom_config: Dict[str, Any]) -> None:
+        """自訂優勢映射配置"""
+        if strength_name in self.mappings:
+            self.mappings[strength_name].update(custom_config)

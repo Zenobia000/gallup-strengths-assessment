@@ -10,7 +10,10 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(cmd /c:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(python -m pytest test_scoring.py -v)",
+      "Bash(python -m pytest test_scoring.py --cov=../../main/python/core/scoring --cov-report=term-missing)",
+      "Bash(python -m pytest src/test/unit/test_scoring.py --cov=src.main.python.core.scoring --cov-report=term-missing -v)"
     ],
     "deny": [],
     "ask": []

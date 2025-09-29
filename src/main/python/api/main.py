@@ -30,7 +30,7 @@ from models.schemas import (
 )
 from services.assessment import AssessmentService
 from utils.database import get_db_connection
-from api.routes import consent, sessions
+from api.routes import consent, sessions, scoring
 
 
 # Initialize FastAPI with psychometric-focused configuration
@@ -142,6 +142,7 @@ async def health_check() -> HealthResponse:
 # Include route modules - Clean separation of concerns
 app.include_router(consent.router, prefix="/api/v1", tags=["Consent"])
 app.include_router(sessions.router, prefix="/api/v1", tags=["Sessions"])
+app.include_router(scoring.router, tags=["Scoring"])
 
 
 # Application startup event

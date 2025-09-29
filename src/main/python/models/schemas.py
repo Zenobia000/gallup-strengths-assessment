@@ -336,3 +336,79 @@ class SessionData(BaseModel):
     completed_at: Optional[datetime] = None
     raw_responses: Optional[List[int]] = None
     metadata: Optional[Dict[str, Any]] = None
+
+
+# New Scoring API Models
+class ResponseItem(BaseModel):
+    """Individual response item for scoring."""
+    question_id: int = Field(..., ge=1, le=20, description="Question identifier (1-20)")
+    response_value: int = Field(..., ge=1, le=7, description="Likert scale response (1-7)")
+
+
+class ScoringRequest(BaseModel):
+    """Big Five scoring request model."""
+    session_id: str = Field(..., description="Assessment session identifier")
+    responses: List[ResponseItem] = Field(..., min_items=20, max_items=20, description="20 Mini-IPIP responses")
+
+    @validator('responses')
+    def validate_complete_responses(cls, v):
+        """Ensure all 20 questions are answered."""
+        question_ids = {r.question_id for r in v}
+        expected_ids = set(range(1, 21))
+        if question_ids != expected_ids:
+            missing = expected_ids - question_ids
+            extra = question_ids - expected_ids
+            raise ValueError(f"Invalid question IDs. Missing: {missing}, Extra: {extra}")
+        return v
+
+
+class ScoringResponse(BaseModel):
+    """Big Five scoring response model."""
+    session_id: str = Field(..., description="Assessment session identifier")
+    big_five_scores: Dict[str, Any] = Field(..., description="Complete Big Five scores with metadata")
+    score_id: int = Field(..., description="Score record identifier")
+
+
+class StrengthsRequest(BaseModel):
+    """Strengths mapping request model."""
+    session_id: Optional[str] = Field(None, description="Session ID for existing scores")
+    big_five_scores: Optional[Dict[str, float]] = Field(None, description="Direct Big Five scores")
+    responses: Optional[List[ResponseItem]] = Field(None, description="Raw responses if no session_id")
+
+    @root_validator
+    def validate_request_data(cls, values):
+        """Ensure either session_id or scores+responses are provided."""
+        session_id = values.get('session_id')
+        big_five_scores = values.get('big_five_scores')
+        responses = values.get('responses')
+
+        if not session_id and not (big_five_scores and responses):
+            raise ValueError("Either session_id or big_five_scores with responses must be provided")
+        return values
+
+
+class StrengthsResponse(BaseModel):
+    """Strengths mapping response model."""
+    session_id: Optional[str] = Field(None, description="Assessment session identifier")
+    strengths_profile: Dict[str, Any] = Field(..., description="Complete strengths profile")
+
+
+class QualityCheckRequest(BaseModel):
+    """Response quality check request model."""
+    session_id: Optional[str] = Field(None, description="Session identifier")
+    responses: List[ResponseItem] = Field(..., min_items=20, max_items=20, description="20 Mini-IPIP responses")
+    completion_time_seconds: Optional[float] = Field(None, ge=0, description="Assessment completion time in seconds")
+
+
+class QualityCheckResponse(BaseModel):
+    """Response quality check response model."""
+    session_id: Optional[str] = Field(None, description="Session identifier")
+    quality_report: Dict[str, Any] = Field(..., description="Detailed quality analysis report")
+
+
+class ScoreResultResponse(BaseModel):
+    """Complete scoring results response model."""
+    session_id: str = Field(..., description="Assessment session identifier")
+    big_five_scores: Dict[str, Any] = Field(..., description="Big Five personality scores")
+    strengths_profile: Optional[Dict[str, Any]] = Field(None, description="Strengths profile if available")
+    metadata: Dict[str, Any] = Field(..., description="Scoring metadata and timestamps")
