@@ -19,16 +19,16 @@ if __name__ == "__main__":
     import uvicorn
     from api.main import app
 
-    print("🚀 Starting Gallup Strengths Assessment API")
-    print(f"📂 Project root: {project_root}")
-    print(f"🐍 Python path: {python_path}")
-    print("🔍 API docs: http://localhost:8000/api/v1/docs")
-    print("❤️  Health check: http://localhost:8000/api/v1/health")
+    print("Starting Gallup Strengths Assessment API")
+    print(f"Project root: {project_root}")
+    print(f"Python path: {python_path}")
+    print("API docs: http://localhost:8002/api/v1/docs")
+    print("Health check: http://localhost:8002/api/v1/health")
 
     uvicorn.run(
-        app,
+        "api.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8002,
         reload=True,
         log_level="info"
     )

@@ -4,7 +4,13 @@
       "Bash(git add:*)",
       "Bash(dir src)",
       "Bash(git commit:*)",
-      "Bash(dir docs)"
+      "Bash(dir docs)",
+      "Bash(git push:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(cmd /c:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

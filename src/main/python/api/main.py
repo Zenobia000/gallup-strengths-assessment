@@ -158,12 +158,12 @@ async def startup_event():
         with get_db_connection() as conn:
             conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
 
-        print("✅ FastAPI application started successfully")
-        print(f"📊 Psychometric assessment system ready")
-        print(f"🔍 API documentation: http://localhost:8000/api/v1/docs")
+        print("FastAPI application started successfully")
+        print(f"Psychometric assessment system ready")
+        print(f"API documentation: http://localhost:8002/api/v1/docs")
 
     except Exception as e:
-        print(f"❌ Startup failed: {e}")
+        print(f"Startup failed: {e}")
         raise
 
 
