@@ -336,3 +336,67 @@ class ScoringEngine:
             return True
         except ValueError:
             raise
+
+    def calculate_scores_from_api(
+        self,
+        response_values: List[int],
+        scale_type: str = "7-point"
+    ) -> Dict[str, float]:
+        """
+        Calculate Big Five scores from API response values.
+
+        This is an adapter method for API integration that handles:
+        - Scale conversion (7-point to 5-point)
+        - Response format transformation
+        - Dimension score calculation
+
+        Args:
+            response_values: List of 20 response values (1-7 for 7-point scale)
+            scale_type: Type of scale used ("7-point" or "5-point")
+
+        Returns:
+            Dictionary with dimension scores (4-20 range)
+
+        Raises:
+            ValueError: If input validation fails
+
+        Example:
+            >>> engine = ScoringEngine()
+            >>> # 7-point scale responses (1-7)
+            >>> responses_7pt = [5, 4, 6, 5, ...]  # 20 values
+            >>> scores = engine.calculate_scores_from_api(responses_7pt)
+            >>> scores["openness"]
+            17.0
+        """
+        # Validate input length
+        if len(response_values) != 20:
+            raise ValueError(
+                f"Expected 20 response values, got {len(response_values)}"
+            )
+
+        # Convert responses to QuestionResponse objects
+        if scale_type == "7-point":
+            # Convert 7-point scale (1-7) to 5-point scale (1-5)
+            # Linear transformation: 5-point = 1 + (7-point - 1) * 4/6
+            converted_responses = []
+            for i, value in enumerate(response_values, start=1):
+                if not (1 <= value <= 7):
+                    raise ValueError(
+                        f"7-point scale responses must be between 1 and 7, "
+                        f"got {value} for question {i}"
+                    )
+                # Linear conversion
+                converted_value = round(1 + (value - 1) * 4 / 6)
+                # Ensure result is in [1, 5] range
+                converted_value = max(1, min(5, converted_value))
+                converted_responses.append(
+                    QuestionResponse(question_id=i, score=converted_value)
+                )
+        else:  # 5-point scale
+            converted_responses = [
+                QuestionResponse(question_id=i, score=value)
+                for i, value in enumerate(response_values, start=1)
+            ]
+
+        # Calculate dimension scores
+        return self.calculate_all_dimensions(converted_responses)

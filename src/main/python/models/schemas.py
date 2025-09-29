@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Union, Any
 from enum import Enum
 
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, validator, root_validator, model_validator
 
 
 # Enums for controlled vocabularies
@@ -375,16 +375,12 @@ class StrengthsRequest(BaseModel):
     big_five_scores: Optional[Dict[str, float]] = Field(None, description="Direct Big Five scores")
     responses: Optional[List[ResponseItem]] = Field(None, description="Raw responses if no session_id")
 
-    @root_validator
-    def validate_request_data(cls, values):
+    @model_validator(mode='after')
+    def validate_request_data(self):
         """Ensure either session_id or scores+responses are provided."""
-        session_id = values.get('session_id')
-        big_five_scores = values.get('big_five_scores')
-        responses = values.get('responses')
-
-        if not session_id and not (big_five_scores and responses):
+        if not self.session_id and not (self.big_five_scores and self.responses):
             raise ValueError("Either session_id or big_five_scores with responses must be provided")
-        return values
+        return self
 
 
 class StrengthsResponse(BaseModel):

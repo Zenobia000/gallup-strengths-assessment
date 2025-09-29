@@ -21,29 +21,21 @@ from models.schemas import (
     ScoringRequest, ScoringResponse, StrengthsRequest, StrengthsResponse,
     QualityCheckRequest, QualityCheckResponse, ScoreResultResponse
 )
-from core.scoring import MiniIPIPScorer, ResponseQualityChecker, StrengthMapper
+from core.scoring import ScoringEngine
 
 router = APIRouter(prefix="/api/scoring", tags=["scoring"])
 
 # 依賴注入
 def get_scorer():
     """取得計分器實例"""
-    return MiniIPIPScorer(version="1.0")
-
-def get_quality_checker():
-    """取得品質檢查器實例"""
-    return ResponseQualityChecker()
-
-def get_strength_mapper():
-    """取得優勢映射器實例"""
-    return StrengthMapper()
+    return ScoringEngine()
 
 
 @router.post("/calculate", response_model=ScoringResponse)
 async def calculate_big_five_scores(
     request: ScoringRequest,
     db: Session = Depends(get_db),
-    scorer: MiniIPIPScorer = Depends(get_scorer)
+    scorer: ScoringEngine = Depends(get_scorer)
 ):
     """
     計算 Big Five 人格分數
@@ -51,7 +43,7 @@ async def calculate_big_five_scores(
     Args:
         request: 包含 session_id 和 responses 的請求
         db: 資料庫會話
-        scorer: Mini-IPIP 計分器
+        scorer: ScoringEngine 計分器
 
     Returns:
         ScoringResponse: Big Five 分數結果
@@ -75,40 +67,25 @@ async def calculate_big_five_scores(
                 detail=f"Expected 20 responses, got {len(request.responses)}"
             )
 
-        # 提取回答值
+        # 提取回答值 (7-point scale)
         response_values = [r.response_value for r in request.responses]
 
-        # 計算 Big Five 分數
-        big_five_scores = scorer.calculate_scores(response_values)
+        # 計算 Big Five 分數 (使用 7-point 轉 5-point 適配器)
+        dimension_scores = scorer.calculate_scores_from_api(
+            response_values,
+            scale_type="7-point"
+        )
 
-        # 儲存分數到資料庫
+        # 儲存分數到資料庫 (simplified format)
         score_record = Score(
             session_id=request.session_id,
-            raw_scores=json.dumps({
-                "extraversion": big_five_scores.raw_extraversion,
-                "agreeableness": big_five_scores.raw_agreeableness,
-                "conscientiousness": big_five_scores.raw_conscientiousness,
-                "neuroticism": big_five_scores.raw_neuroticism,
-                "openness": big_five_scores.raw_openness
-            }),
-            standardized_scores=json.dumps({
-                "extraversion": big_five_scores.standardized_extraversion,
-                "agreeableness": big_five_scores.standardized_agreeableness,
-                "conscientiousness": big_five_scores.standardized_conscientiousness,
-                "neuroticism": big_five_scores.standardized_neuroticism,
-                "openness": big_five_scores.standardized_openness
-            }),
-            percentiles=json.dumps({
-                "extraversion": big_five_scores.percentile_extraversion,
-                "agreeableness": big_five_scores.percentile_agreeableness,
-                "conscientiousness": big_five_scores.percentile_conscientiousness,
-                "neuroticism": big_five_scores.percentile_neuroticism,
-                "openness": big_five_scores.percentile_openness
-            }),
-            confidence_level=big_five_scores.confidence_level.value,
-            quality_flags=json.dumps(big_five_scores.quality_flags),
-            scoring_version=big_five_scores.scoring_version,
-            computation_time_ms=big_five_scores.computation_time_ms,
+            raw_scores=json.dumps(dimension_scores),
+            standardized_scores=json.dumps(dimension_scores),  # For now, raw = standardized
+            percentiles=json.dumps({}),  # TODO: Add percentile calculation
+            confidence_level="high",  # TODO: Add confidence assessment
+            quality_flags=json.dumps([]),  # TODO: Add quality checks
+            scoring_version="1.0.0-basic",
+            computation_time_ms=0,  # TODO: Add timing
             created_at=datetime.utcnow()
         )
 
@@ -118,7 +95,11 @@ async def calculate_big_five_scores(
 
         return ScoringResponse(
             session_id=request.session_id,
-            big_five_scores=big_five_scores.to_dict(),
+            big_five_scores={
+                "raw_scores": dimension_scores,
+                "scoring_version": "1.0.0-basic",
+                "timestamp": datetime.utcnow().isoformat()
+            },
             score_id=score_record.id
         )
 
@@ -134,12 +115,11 @@ async def calculate_big_five_scores(
         )
 
 
-@router.post("/strengths", response_model=StrengthsResponse)
-async def calculate_strengths_profile(
+# TODO: Re-implement strengths mapping after core functionality is stable
+# @router.post("/strengths", response_model=StrengthsResponse)
+async def calculate_strengths_profile_DISABLED(
     request: StrengthsRequest,
-    db: Session = Depends(get_db),
-    scorer: MiniIPIPScorer = Depends(get_scorer),
-    mapper: StrengthMapper = Depends(get_strength_mapper)
+    db: Session = Depends(get_db)
 ):
     """
     計算優勢檔案
@@ -296,10 +276,10 @@ async def get_scoring_results(
         )
 
 
-@router.post("/quality-check", response_model=QualityCheckResponse)
-async def check_response_quality(
-    request: QualityCheckRequest,
-    checker: ResponseQualityChecker = Depends(get_quality_checker)
+# TODO: Re-implement quality checking after core functionality is stable
+# @router.post("/quality-check", response_model=QualityCheckResponse)
+async def check_response_quality_DISABLED(
+    request: QualityCheckRequest
 ):
     """
     檢查回答品質
@@ -334,7 +314,7 @@ async def check_response_quality(
 
 @router.get("/metadata")
 async def get_scoring_metadata(
-    scorer: MiniIPIPScorer = Depends(get_scorer)
+    scorer: ScoringEngine = Depends(get_scorer)
 ):
     """
     取得計分引擎元資料
@@ -343,13 +323,22 @@ async def get_scoring_metadata(
         Dict: 計分引擎配置與元資料
     """
     return {
-        "scorer_metadata": scorer.get_scoring_metadata(),
+        "scorer_metadata": {
+            "engine": "ScoringEngine",
+            "version": "1.0.0-basic",
+            "dimensions": list(scorer.DIMENSION_QUESTIONS.keys()),
+            "questions_per_dimension": scorer.QUESTIONS_PER_DIMENSION,
+            "score_range": [scorer.MIN_DIMENSION_SCORE, scorer.MAX_DIMENSION_SCORE],
+            "scale_support": ["7-point (with conversion)", "5-point (native)"]
+        },
         "api_version": "1.0",
         "supported_endpoints": [
             "/api/scoring/calculate",
-            "/api/scoring/strengths",
             "/api/scoring/results/{session_id}",
-            "/api/scoring/quality-check",
             "/api/scoring/metadata"
+        ],
+        "disabled_endpoints": [
+            "/api/scoring/strengths (TODO)",
+            "/api/scoring/quality-check (TODO)"
         ]
     }
