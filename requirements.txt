@@ -1,0 +1,53 @@
+# FastAPI Backend Requirements - Gallup Strengths Assessment
+# Following MVP pragmatism principle: minimal but sufficient dependencies
+
+# Core Web Framework
+fastapi==0.104.1          # Modern, fast web framework with automatic OpenAPI
+uvicorn[standard]==0.24.0  # ASGI server with auto-reload for development
+
+# Data Validation and Serialization
+pydantic==2.4.2          # Data validation using Python type annotations
+pydantic-settings==2.0.3  # Settings management with environment variables
+
+# HTTP and CORS
+starlette==0.27.0        # ASGI framework (FastAPI dependency)
+python-multipart==0.0.6  # Form data parsing support
+
+# Database
+# SQLite is built into Python - no additional database driver needed
+
+# Development and Testing
+pytest==7.4.3           # Testing framework
+pytest-asyncio==0.21.1   # Async test support
+httpx==0.25.0            # HTTP client for testing FastAPI endpoints
+
+# Type Checking and Code Quality (optional but recommended)
+mypy==1.6.1              # Static type checking
+black==23.10.1           # Code formatting
+isort==5.12.0            # Import sorting
+
+# Utilities
+python-dateutil==2.8.2   # Enhanced date/time handling
+python-jose[cryptography]==3.3.0  # JWT token handling (for future auth)
+
+# Production Dependencies (commented for MVP)
+# gunicorn==21.2.0        # Production WSGI server
+# prometheus-client==0.18.0  # Metrics collection
+# structlog==23.2.0       # Structured logging
+
+# Week 2 Dependencies (scoring and ML)
+# numpy==1.24.3           # Numerical computing for psychometric algorithms
+# scipy==1.11.4           # Statistical functions
+# scikit-learn==1.3.2     # Machine learning utilities
+
+# Week 3 Dependencies (reporting)
+# reportlab==4.0.7        # PDF generation
+# Pillow==10.1.0          # Image processing for PDFs
+
+# Security (for production)
+# python-dotenv==1.0.0    # Environment variable loading
+# passlib[bcrypt]==1.7.4  # Password hashing (for future auth)
+
+# Documentation Generation
+# mkdocs==1.5.3          # Documentation generator
+# mkdocs-material==9.4.8  # Material theme for docs
