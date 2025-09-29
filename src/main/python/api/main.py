@@ -13,6 +13,7 @@ Key Principles:
 
 from datetime import datetime
 from typing import Dict, Any
+import uuid
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -27,7 +28,9 @@ from models.schemas import (
     SessionStartResponse,
     APIResponse
 )
-from services.assessment import AssessmentService
+# NOTE: AssessmentService temporarily disabled - uses legacy MiniIPIPScorer
+# TODO: Refactor AssessmentService to use ScoringEngine (Task: future)
+# from services.assessment import AssessmentService
 from utils.database import get_db_connection
 from api.routes import consent, sessions, scoring
 from api.middleware.error_handler import register_error_handlers

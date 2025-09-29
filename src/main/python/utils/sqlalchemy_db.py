@@ -16,7 +16,7 @@ from typing import Generator
 import os
 from pathlib import Path
 
-from core.config import get_settings, get_database_config
+from core.config import get_settings
 from models.database import Base
 
 # 全域變數
