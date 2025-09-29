@@ -1,0 +1,444 @@
+{
+  "description": "預期測試結果檔案 - 包含各種測試情境的標準答案",
+  "version": "1.0",
+  "created_date": "2025-09-30",
+  "validation_source": "基於 Donnellan et al. (2006) 與本土化研究",
+
+  "scoring_benchmarks": {
+    "description": "計分基準與常模資料",
+
+    "mini_ipip_norms": {
+      "description": "Mini-IPIP 常模資料",
+      "scale": "7-point Likert",
+      "sample_characteristics": {
+        "population": "台灣成年人",
+        "sample_size": 1000,
+        "age_range": "20-65歲",
+        "gender_balance": "50% 男性, 50% 女性"
+      },
+
+      "raw_score_norms": {
+        "extraversion": {
+          "mean": 16.0,
+          "std": 4.8,
+          "min": 4,
+          "max": 28,
+          "percentiles": {
+            "10": 10,
+            "25": 13,
+            "50": 16,
+            "75": 19,
+            "90": 22
+          }
+        },
+        "agreeableness": {
+          "mean": 18.2,
+          "std": 3.6,
+          "min": 4,
+          "max": 28,
+          "percentiles": {
+            "10": 13,
+            "25": 16,
+            "50": 18,
+            "75": 21,
+            "90": 23
+          }
+        },
+        "conscientiousness": {
+          "mean": 17.5,
+          "std": 4.2,
+          "min": 4,
+          "max": 28,
+          "percentiles": {
+            "10": 12,
+            "25": 15,
+            "50": 17,
+            "75": 20,
+            "90": 23
+          }
+        },
+        "neuroticism": {
+          "mean": 14.5,
+          "std": 5.4,
+          "min": 4,
+          "max": 28,
+          "percentiles": {
+            "10": 8,
+            "25": 11,
+            "50": 14,
+            "75": 18,
+            "90": 22
+          }
+        },
+        "openness": {
+          "mean": 16.8,
+          "std": 4.8,
+          "min": 4,
+          "max": 28,
+          "percentiles": {
+            "10": 11,
+            "25": 14,
+            "50": 17,
+            "75": 20,
+            "90": 23
+          }
+        }
+      }
+    },
+
+    "reliability_coefficients": {
+      "description": "內部一致性信度係數 (Cronbach's Alpha)",
+      "minimum_acceptable": 0.60,
+      "target_values": {
+        "extraversion": 0.77,
+        "agreeableness": 0.70,
+        "conscientiousness": 0.69,
+        "neuroticism": 0.68,
+        "openness": 0.65
+      }
+    }
+  },
+
+  "strengths_mapping": {
+    "description": "Big Five 人格向度映射到 Gallup 優勢的預期結果",
+
+    "mapping_weights": {
+      "結構化執行": {
+        "primary_factor": "conscientiousness",
+        "weight_formula": "0.8 * C + 0.2 * (100 - N)",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["conscientiousness", "neuroticism_reversed"]
+      },
+      "品質與完備": {
+        "primary_factor": "conscientiousness",
+        "weight_formula": "0.7 * C + 0.3 * O",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["conscientiousness", "openness"]
+      },
+      "探索與創新": {
+        "primary_factor": "openness",
+        "weight_formula": "0.8 * O + 0.2 * E",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["openness", "extraversion"]
+      },
+      "分析與洞察": {
+        "primary_factor": "openness",
+        "weight_formula": "0.6 * O + 0.4 * C",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["openness", "conscientiousness"]
+      },
+      "影響與倡議": {
+        "primary_factor": "extraversion",
+        "weight_formula": "0.7 * E + 0.3 * C",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["extraversion", "conscientiousness"]
+      },
+      "協作與共好": {
+        "primary_factor": "agreeableness",
+        "weight_formula": "0.7 * A + 0.3 * E",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["agreeableness", "extraversion"]
+      },
+      "客戶導向": {
+        "primary_factor": "agreeableness",
+        "weight_formula": "0.6 * A + 0.4 * E",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["agreeableness", "extraversion"]
+      },
+      "學習與成長": {
+        "primary_factor": "openness",
+        "weight_formula": "0.7 * O + 0.3 * C",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["openness", "conscientiousness"]
+      },
+      "紀律與信任": {
+        "primary_factor": "conscientiousness",
+        "weight_formula": "0.8 * C + 0.2 * A",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["conscientiousness", "agreeableness"]
+      },
+      "壓力調節": {
+        "primary_factor": "neuroticism_reversed",
+        "weight_formula": "0.8 * (100 - N) + 0.2 * C",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["neuroticism_reversed", "conscientiousness"]
+      },
+      "衝突整合": {
+        "primary_factor": "agreeableness",
+        "weight_formula": "0.6 * A + 0.4 * (100 - N)",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["agreeableness", "neuroticism_reversed"]
+      },
+      "責任與當責": {
+        "primary_factor": "conscientiousness",
+        "weight_formula": "0.7 * C + 0.3 * A",
+        "threshold_high": 75,
+        "threshold_medium": 50,
+        "confidence_factors": ["conscientiousness", "agreeableness"]
+      }
+    }
+  },
+
+  "test_case_expectations": {
+    "description": "具體測試案例的預期結果",
+
+    "high_extraversion_case": {
+      "input_profile": "high_extraversion",
+      "expected_big_five": {
+        "extraversion": 85,
+        "agreeableness": 65,
+        "conscientiousness": 70,
+        "neuroticism": 35,
+        "openness": 60
+      },
+      "expected_strengths_ranking": [
+        {
+          "rank": 1,
+          "strength": "影響與倡議",
+          "score": 78,
+          "confidence": "high"
+        },
+        {
+          "rank": 2,
+          "strength": "協作與共好",
+          "score": 72,
+          "confidence": "medium"
+        },
+        {
+          "rank": 3,
+          "strength": "品質與完備",
+          "score": 68,
+          "confidence": "medium"
+        }
+      ],
+      "job_recommendations": [
+        "業務經理",
+        "專案經理",
+        "客戶關係經理",
+        "團隊領導者"
+      ]
+    },
+
+    "high_conscientiousness_case": {
+      "input_profile": "high_conscientiousness",
+      "expected_big_five": {
+        "extraversion": 55,
+        "agreeableness": 65,
+        "conscientiousness": 90,
+        "neuroticism": 60,
+        "openness": 55
+      },
+      "expected_strengths_ranking": [
+        {
+          "rank": 1,
+          "strength": "結構化執行",
+          "score": 82,
+          "confidence": "high"
+        },
+        {
+          "rank": 2,
+          "strength": "品質與完備",
+          "score": 75,
+          "confidence": "high"
+        },
+        {
+          "rank": 3,
+          "strength": "紀律與信任",
+          "score": 74,
+          "confidence": "high"
+        }
+      ],
+      "job_recommendations": [
+        "專案管理師",
+        "品質管理師",
+        "會計師",
+        "行政主管"
+      ]
+    },
+
+    "balanced_profile_case": {
+      "input_profile": "balanced_profile",
+      "expected_big_five": {
+        "extraversion": 50,
+        "agreeableness": 50,
+        "conscientiousness": 50,
+        "neuroticism": 50,
+        "openness": 50
+      },
+      "expected_strengths_ranking": [
+        {
+          "rank": 1,
+          "strength": "學習與成長",
+          "score": 58,
+          "confidence": "medium"
+        },
+        {
+          "rank": 2,
+          "strength": "責任與當責",
+          "score": 56,
+          "confidence": "medium"
+        },
+        {
+          "rank": 3,
+          "strength": "品質與完備",
+          "score": 55,
+          "confidence": "medium"
+        }
+      ],
+      "job_recommendations": [
+        "人力資源專員",
+        "培訓師",
+        "顧問",
+        "研究員"
+      ]
+    }
+  },
+
+  "quality_assurance": {
+    "description": "品質保證標準與檢查點",
+
+    "response_quality_checks": {
+      "completion_rate": {
+        "threshold": 100,
+        "description": "必須完成所有 20 題"
+      },
+      "response_variance": {
+        "minimum_std": 0.5,
+        "description": "回答變異數不得過低"
+      },
+      "extreme_response_bias": {
+        "maximum_percentage": 0.8,
+        "description": "極端回答 (1或7) 不得超過80%"
+      },
+      "straight_line_detection": {
+        "consecutive_threshold": 5,
+        "description": "連續相同回答不得超過5題"
+      },
+      "completion_time": {
+        "minimum_seconds": 60,
+        "maximum_seconds": 1800,
+        "description": "完成時間應在合理範圍內"
+      }
+    },
+
+    "scoring_accuracy_checks": {
+      "reverse_scoring_validation": {
+        "items": [2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20],
+        "formula": "8 - original_response",
+        "description": "反向題必須正確計分"
+      },
+      "score_range_validation": {
+        "minimum_raw_score": 4,
+        "maximum_raw_score": 28,
+        "minimum_standardized": 0,
+        "maximum_standardized": 100,
+        "description": "分數必須在有效範圍內"
+      },
+      "factor_loading_validation": {
+        "minimum_correlation": 0.30,
+        "description": "題目與因子相關至少達0.30"
+      }
+    }
+  },
+
+  "performance_benchmarks": {
+    "description": "效能基準與要求",
+
+    "latency_requirements": {
+      "scoring_calculation": {
+        "target_ms": 10,
+        "maximum_acceptable_ms": 50,
+        "measurement_method": "單次計分時間"
+      },
+      "api_response_time": {
+        "target_ms": 200,
+        "maximum_acceptable_ms": 500,
+        "measurement_method": "端到端 API 回應"
+      },
+      "pdf_generation": {
+        "target_seconds": 1.0,
+        "maximum_acceptable_seconds": 3.0,
+        "measurement_method": "完整 PDF 生成時間"
+      }
+    },
+
+    "throughput_requirements": {
+      "concurrent_users": {
+        "target": 100,
+        "maximum_response_degradation": "10%",
+        "measurement_duration": "5分鐘"
+      },
+      "daily_assessments": {
+        "target": 10000,
+        "peak_hour_capacity": 2000,
+        "storage_requirement": "100MB/day"
+      }
+    }
+  },
+
+  "error_scenarios": {
+    "description": "錯誤情境與預期處理方式",
+
+    "invalid_input_handling": {
+      "missing_responses": {
+        "error_code": "INCOMPLETE_RESPONSES",
+        "http_status": 400,
+        "message": "測驗回答不完整，請完成所有題目"
+      },
+      "out_of_range_response": {
+        "error_code": "INVALID_RESPONSE_VALUE",
+        "http_status": 400,
+        "message": "回答值超出範圍 (1-7)"
+      },
+      "invalid_session": {
+        "error_code": "SESSION_NOT_FOUND",
+        "http_status": 404,
+        "message": "測驗會話不存在或已過期"
+      }
+    },
+
+    "system_error_handling": {
+      "database_connection_error": {
+        "error_code": "DATABASE_UNAVAILABLE",
+        "http_status": 503,
+        "message": "系統暫時無法使用，請稍後再試"
+      },
+      "pdf_generation_failure": {
+        "error_code": "REPORT_GENERATION_FAILED",
+        "http_status": 500,
+        "message": "報告生成失敗，請聯繫系統管理員"
+      },
+      "calculation_error": {
+        "error_code": "SCORING_CALCULATION_ERROR",
+        "http_status": 500,
+        "message": "計分處理發生錯誤"
+      }
+    }
+  },
+
+  "metadata": {
+    "last_updated": "2025-09-30",
+    "validation_status": "pending_implementation",
+    "coverage_target": {
+      "unit_tests": "85%",
+      "integration_tests": "70%",
+      "e2e_tests": "100% of critical paths"
+    },
+    "maintenance_schedule": {
+      "norms_update": "每年",
+      "weights_review": "每季",
+      "performance_benchmark": "每月"
+    }
+  }
+}

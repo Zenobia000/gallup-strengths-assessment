@@ -201,6 +201,35 @@ class DatabaseManager:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_scores_session_id ON scores(session_id)")
 
         self.seed_assessment_items()
+        self.apply_migrations()
+
+    def apply_migrations(self):
+        """Apply any pending database migrations."""
+        try:
+            from utils.migrations.migration_002_enhanced_scores import apply_migration
+
+            with self.get_connection() as conn:
+                # Check if migration 002 has been applied
+                cursor = conn.execute("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='table' AND name='migrations'
+                """)
+
+                if cursor.fetchone():
+                    cursor = conn.execute("""
+                        SELECT version FROM migrations
+                        WHERE version = '002'
+                    """)
+                    if not cursor.fetchone():
+                        apply_migration(conn)
+                else:
+                    apply_migration(conn)
+
+        except ImportError:
+            # Migration file doesn't exist yet, skip
+            pass
+        except Exception as e:
+            print(f"Migration error: {e}")
 
     def seed_assessment_items(self):
         """
@@ -348,6 +377,104 @@ class DatabaseManager:
                 scores_data["algorithm_version"],
                 scores_data["weights_version"]
             ))
+
+    def save_enhanced_scores(self, session_id: str, scores_data: Dict[str, Any]):
+        """Save enhanced scores with quality metrics and provenance."""
+        with self.get_connection() as conn:
+            conn.execute("""
+                INSERT OR REPLACE INTO scores
+                (session_id, extraversion, agreeableness, conscientiousness,
+                 neuroticism, openness, honesty_humility, strength_scores,
+                 provenance, algorithm_version, weights_version,
+                 scoring_confidence, response_quality_flags, raw_scores,
+                 percentiles, processing_time_ms, local_norms_version)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                session_id,
+                scores_data["extraversion"],
+                scores_data["agreeableness"],
+                scores_data["conscientiousness"],
+                scores_data["neuroticism"],
+                scores_data["openness"],
+                scores_data["honesty_humility"],
+                json.dumps(scores_data["strength_scores"]),
+                json.dumps(scores_data["provenance"]),
+                scores_data["algorithm_version"],
+                scores_data["weights_version"],
+                scores_data["scoring_confidence"],
+                json.dumps(scores_data["response_quality_flags"]),
+                json.dumps(scores_data["raw_scores"]),
+                json.dumps(scores_data["percentiles"]),
+                scores_data["processing_time_ms"],
+                scores_data.get("local_norms_version", "v1.0")
+            ))
+
+    def get_enhanced_scores(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get enhanced scores with all quality metrics."""
+        with self.get_connection() as conn:
+            cursor = conn.execute("""
+                SELECT * FROM scores WHERE session_id = ?
+            """, (session_id,))
+            row = cursor.fetchone()
+            if row:
+                result = dict(row)
+                # Parse JSON fields
+                if result.get("strength_scores"):
+                    result["strength_scores"] = json.loads(result["strength_scores"])
+                if result.get("provenance"):
+                    result["provenance"] = json.loads(result["provenance"])
+                if result.get("response_quality_flags"):
+                    result["response_quality_flags"] = json.loads(result["response_quality_flags"])
+                if result.get("raw_scores"):
+                    result["raw_scores"] = json.loads(result["raw_scores"])
+                if result.get("percentiles"):
+                    result["percentiles"] = json.loads(result["percentiles"])
+                return result
+            return None
+
+    def get_normative_data(self, version: str = "literature_v1.0") -> Dict[str, Dict[str, float]]:
+        """Get normative data for score standardization."""
+        with self.get_connection() as conn:
+            cursor = conn.execute("""
+                SELECT factor, mean_score, std_deviation
+                FROM normative_data
+                WHERE version = ?
+            """, (version,))
+
+            norms = {}
+            for row in cursor.fetchall():
+                norms[row["factor"]] = {
+                    "mean": row["mean_score"],
+                    "std": row["std_deviation"]
+                }
+
+            return norms
+
+    def update_normative_data(self, version: str, factor: str, sample_size: int,
+                            mean_score: float, std_deviation: float,
+                            metadata: Optional[Dict] = None):
+        """Update normative data with new population statistics."""
+        with self.get_connection() as conn:
+            conn.execute("""
+                INSERT OR REPLACE INTO normative_data
+                (version, factor, sample_size, mean_score, std_deviation,
+                 updated_at, metadata)
+                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+            """, (
+                version, factor, sample_size, mean_score, std_deviation,
+                json.dumps(metadata or {})
+            ))
+
+    def get_responses_for_session(self, session_id: str) -> List[Dict[str, Any]]:
+        """Get all responses for a session."""
+        with self.get_connection() as conn:
+            cursor = conn.execute("""
+                SELECT item_id, response, submitted_at
+                FROM responses
+                WHERE session_id = ?
+                ORDER BY submitted_at
+            """, (session_id,))
+            return [dict(row) for row in cursor.fetchall()]
 
 
 # Global database manager instance

@@ -1,0 +1,300 @@
+{
+  "description": "Mini-IPIP 測試檔案集合 - 包含多種人格類型的標準回答資料",
+  "version": "1.0",
+  "created_date": "2025-09-30",
+  "reference": "基於 Donnellan et al. (2006) Mini-IPIP 驗證研究",
+
+  "test_profiles": {
+    "high_extraversion": {
+      "description": "高外向性人格檔案 - 社交活躍、善於表達",
+      "participant_id": "test_001",
+      "responses": [7, 1, 7, 2, 6, 2, 5, 3, 6, 3, 5, 4, 4, 2, 3, 1, 5, 3, 2, 1],
+      "expected_raw_scores": {
+        "extraversion": 21,
+        "agreeableness": 18,
+        "conscientiousness": 18,
+        "neuroticism": 14,
+        "openness": 17
+      },
+      "expected_standardized_scores": {
+        "extraversion": 85,
+        "agreeableness": 65,
+        "conscientiousness": 70,
+        "neuroticism": 35,
+        "openness": 60
+      },
+      "expected_top_strengths": [
+        "影響與倡議",
+        "協作與共好",
+        "品質與完備"
+      ]
+    },
+
+    "high_conscientiousness": {
+      "description": "高嚴謹性人格檔案 - 組織性強、負責任",
+      "participant_id": "test_002",
+      "responses": [4, 4, 3, 5, 5, 3, 6, 4, 7, 1, 7, 2, 3, 5, 4, 6, 4, 4, 4, 4],
+      "expected_raw_scores": {
+        "extraversion": 16,
+        "agreeableness": 18,
+        "conscientiousness": 25,
+        "neuroticism": 18,
+        "openness": 16
+      },
+      "expected_standardized_scores": {
+        "extraversion": 55,
+        "agreeableness": 65,
+        "conscientiousness": 90,
+        "neuroticism": 60,
+        "openness": 55
+      },
+      "expected_top_strengths": [
+        "結構化執行",
+        "品質與完備",
+        "紀律與信任",
+        "責任與當責"
+      ]
+    },
+
+    "high_openness": {
+      "description": "高開放性人格檔案 - 創意思維、好奇心強",
+      "participant_id": "test_003",
+      "responses": [5, 3, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7, 1, 1, 2],
+      "expected_raw_scores": {
+        "extraversion": 16,
+        "agreeableness": 17,
+        "conscientiousness": 16,
+        "neuroticism": 16,
+        "openness": 25
+      },
+      "expected_standardized_scores": {
+        "extraversion": 55,
+        "agreeableness": 60,
+        "conscientiousness": 55,
+        "neuroticism": 55,
+        "openness": 90
+      },
+      "expected_top_strengths": [
+        "探索與創新",
+        "分析與洞察",
+        "學習與成長"
+      ]
+    },
+
+    "high_agreeableness": {
+      "description": "高和善性人格檔案 - 合作性強、同理心高",
+      "participant_id": "test_004",
+      "responses": [3, 5, 4, 4, 7, 1, 7, 1, 4, 4, 4, 4, 3, 5, 4, 6, 4, 4, 4, 4],
+      "expected_raw_scores": {
+        "extraversion": 16,
+        "agreeableness": 24,
+        "conscientiousness": 16,
+        "neuroticism": 18,
+        "openness": 16
+      },
+      "expected_standardized_scores": {
+        "extraversion": 55,
+        "agreeableness": 85,
+        "conscientiousness": 55,
+        "neuroticism": 60,
+        "openness": 55
+      },
+      "expected_top_strengths": [
+        "協作與共好",
+        "客戶導向",
+        "衝突整合"
+      ]
+    },
+
+    "low_neuroticism": {
+      "description": "低神經質 (高情緒穩定性) 人格檔案 - 冷靜、抗壓性強",
+      "participant_id": "test_005",
+      "responses": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 7, 1, 7, 4, 4, 4, 4],
+      "expected_raw_scores": {
+        "extraversion": 16,
+        "agreeableness": 16,
+        "conscientiousness": 16,
+        "neuroticism": 8,
+        "openness": 16
+      },
+      "expected_standardized_scores": {
+        "extraversion": 55,
+        "agreeableness": 55,
+        "conscientiousness": 55,
+        "neuroticism": 15,
+        "openness": 55
+      },
+      "expected_top_strengths": [
+        "壓力調節",
+        "責任與當責",
+        "紀律與信任"
+      ]
+    },
+
+    "balanced_profile": {
+      "description": "平衡型人格檔案 - 所有維度均為中等分數",
+      "participant_id": "test_006",
+      "responses": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+      "expected_raw_scores": {
+        "extraversion": 16,
+        "agreeableness": 16,
+        "conscientiousness": 16,
+        "neuroticism": 16,
+        "openness": 16
+      },
+      "expected_standardized_scores": {
+        "extraversion": 50,
+        "agreeableness": 50,
+        "conscientiousness": 50,
+        "neuroticism": 50,
+        "openness": 50
+      },
+      "expected_top_strengths": [
+        "學習與成長",
+        "責任與當責",
+        "品質與完備"
+      ]
+    },
+
+    "extreme_responses": {
+      "description": "極端回答模式檔案 - 測試邊界值處理",
+      "participant_id": "test_007",
+      "responses": [7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 1, 1],
+      "quality_flags": ["extreme_response_bias", "potential_rushed"],
+      "expected_raw_scores": {
+        "extraversion": 26,
+        "agreeableness": 26,
+        "conscientiousness": 26,
+        "neuroticism": 26,
+        "openness": 22
+      },
+      "expected_standardized_scores": {
+        "extraversion": 95,
+        "agreeableness": 95,
+        "conscientiousness": 95,
+        "neuroticism": 95,
+        "openness": 80
+      },
+      "quality_warning": true
+    }
+  },
+
+  "invalid_responses": {
+    "description": "無效回答模式 - 用於測試錯誤處理",
+
+    "missing_responses": {
+      "description": "缺少回答的情況",
+      "participant_id": "invalid_001",
+      "responses": [4, 4, null, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+      "expected_error": "incomplete_responses"
+    },
+
+    "out_of_range": {
+      "description": "超出範圍的回答",
+      "participant_id": "invalid_002",
+      "responses": [8, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+      "expected_error": "response_out_of_range"
+    },
+
+    "straight_line": {
+      "description": "一致性回答 (懷疑隨意填答)",
+      "participant_id": "invalid_003",
+      "responses": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+      "quality_flags": ["straight_line_response", "low_variance"],
+      "quality_warning": true
+    },
+
+    "too_fast": {
+      "description": "完成時間過短 (懷疑未認真作答)",
+      "participant_id": "invalid_004",
+      "responses": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+      "completion_time_seconds": 30,
+      "quality_flags": ["rushed_completion"],
+      "quality_warning": true
+    }
+  },
+
+  "cultural_variants": {
+    "description": "文化差異檔案 - 台灣本土化測試資料",
+
+    "taiwanese_moderate": {
+      "description": "台灣受試者典型回答模式 - 避免極端值",
+      "participant_id": "tw_001",
+      "responses": [5, 3, 4, 3, 5, 3, 5, 3, 5, 3, 5, 3, 3, 5, 4, 5, 4, 4, 4, 4],
+      "cultural_notes": "避免 1, 7 極端選項，偏好中間值",
+      "expected_raw_scores": {
+        "extraversion": 17,
+        "agreeableness": 18,
+        "conscientiousness": 18,
+        "neuroticism": 17,
+        "openness": 16
+      }
+    }
+  },
+
+  "benchmark_data": {
+    "description": "基準測試資料 - 用於效能測試",
+
+    "performance_test_batch": {
+      "description": "100 筆測試資料用於並發測試",
+      "count": 100,
+      "generation_rule": "隨機生成但符合正態分佈",
+      "use_case": "壓力測試與效能基準測試"
+    }
+  },
+
+  "metadata": {
+    "item_mapping": {
+      "description": "題目編號對應表",
+      "1": "extraversion_positive",
+      "2": "extraversion_negative",
+      "3": "extraversion_positive",
+      "4": "extraversion_negative",
+      "5": "agreeableness_positive",
+      "6": "agreeableness_negative",
+      "7": "agreeableness_positive",
+      "8": "agreeableness_negative",
+      "9": "conscientiousness_positive",
+      "10": "conscientiousness_negative",
+      "11": "conscientiousness_positive",
+      "12": "conscientiousness_negative",
+      "13": "neuroticism_positive",
+      "14": "neuroticism_negative",
+      "15": "neuroticism_positive",
+      "16": "neuroticism_negative",
+      "17": "openness_positive",
+      "18": "openness_negative",
+      "19": "openness_negative",
+      "20": "openness_negative"
+    },
+
+    "reverse_scored_items": [2, 4, 6, 8, 10, 12, 14, 16, 18, 19, 20],
+
+    "factor_composition": {
+      "extraversion": [1, 2, 3, 4],
+      "agreeableness": [5, 6, 7, 8],
+      "conscientiousness": [9, 10, 11, 12],
+      "neuroticism": [13, 14, 15, 16],
+      "openness": [17, 18, 19, 20]
+    },
+
+    "normative_data": {
+      "source": "Donnellan et al. (2006) + Taiwan localization",
+      "sample_size": 1000,
+      "means_5point": {
+        "extraversion": 3.2,
+        "agreeableness": 3.8,
+        "conscientiousness": 3.5,
+        "neuroticism": 2.9,
+        "openness": 3.4
+      },
+      "std_deviations_5point": {
+        "extraversion": 0.8,
+        "agreeableness": 0.6,
+        "conscientiousness": 0.7,
+        "neuroticism": 0.9,
+        "openness": 0.8
+      }
+    }
+  }
+}

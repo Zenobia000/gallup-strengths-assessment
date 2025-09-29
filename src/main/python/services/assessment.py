@@ -22,10 +22,13 @@ from models.schemas import (
     AssessmentItem,
     ItemResponse,
     SessionStatus,
-    HEXACOScores
+    HEXACOScores,
+    BigFiveScores,
+    StrengthScores
 )
 from utils.database import get_database_manager
 from core.config import get_settings, get_psychometric_settings
+from core.scoring import MiniIPIPScorer, StrengthsMapper
 
 
 class AssessmentError(Exception):
@@ -49,6 +52,11 @@ class AssessmentService:
         self.db_manager = get_database_manager()
         self.settings = get_settings()
         self.psych_settings = get_psychometric_settings()
+
+        # Initialize scoring components
+        normative_data = self.db_manager.get_normative_data()
+        self.scorer = MiniIPIPScorer(normative_data)
+        self.strengths_mapper = StrengthsMapper()
 
     def create_session(self, consent_id: str, instrument: str) -> SessionData:
         """
@@ -195,9 +203,9 @@ class AssessmentService:
         responses: List[ItemResponse],
         completion_time: int,
         metadata: Optional[Dict[str, Any]] = None
-    ) -> HEXACOScores:
+    ) -> Dict[str, Any]:
         """
-        Submit assessment responses and calculate basic scores.
+        Submit assessment responses and calculate comprehensive scores.
 
         Args:
             session_id: Session identifier
@@ -206,7 +214,7 @@ class AssessmentService:
             metadata: Additional metadata
 
         Returns:
-            HEXACOScores: Basic personality scores
+            Dict: Complete scoring results with quality metrics
 
         Raises:
             AssessmentError: If submission is invalid
@@ -223,7 +231,7 @@ class AssessmentService:
                     "SESSION_ALREADY_COMPLETED"
                 )
 
-            # Quality control checks
+            # Quality control checks (basic validation)
             self._validate_responses(responses, completion_time)
 
             # Save responses to database
@@ -231,13 +239,52 @@ class AssessmentService:
                 {"item_id": resp.item_id, "response": resp.response}
                 for resp in responses
             ]
-
             self.db_manager.save_responses(session_id, response_data)
 
-            # Calculate basic scores
-            basic_scores = self._calculate_basic_scores(responses)
+            # NEW: Comprehensive scoring pipeline
+            scoring_result = self.scorer.score_assessment(responses, completion_time)
 
-            return basic_scores
+            # Map Big Five to strengths
+            strength_mapping = self.strengths_mapper.map_to_strengths(
+                scoring_result.standardized_scores
+            )
+
+            # Calculate HEXACO scores for backwards compatibility
+            hexaco_scores = HEXACOScores(
+                extraversion=scoring_result.standardized_scores.extraversion,
+                agreeableness=scoring_result.standardized_scores.agreeableness,
+                conscientiousness=scoring_result.standardized_scores.conscientiousness,
+                neuroticism=scoring_result.standardized_scores.neuroticism,
+                openness=scoring_result.standardized_scores.openness,
+                honesty_humility=int((
+                    scoring_result.standardized_scores.agreeableness +
+                    scoring_result.standardized_scores.conscientiousness
+                ) / 2)
+            )
+
+            # Save enhanced scores to database
+            self._save_enhanced_scores(session_id, scoring_result, strength_mapping)
+
+            # Return comprehensive results
+            return {
+                "session_id": session_id,
+                "basic_scores": hexaco_scores,
+                "big_five_scores": scoring_result.standardized_scores,
+                "strength_scores": strength_mapping.strength_scores,
+                "top_strengths": strength_mapping.top_strengths,
+                "development_areas": strength_mapping.development_areas,
+                "quality_assessment": {
+                    "confidence": scoring_result.confidence,
+                    "quality_flags": scoring_result.quality_flags,
+                    "processing_time_ms": scoring_result.processing_time_ms
+                },
+                "provenance": {
+                    "algorithm_version": scoring_result.algorithm_version,
+                    "mapping_version": strength_mapping.mapping_version,
+                    "calculated_at": scoring_result.calculated_at.isoformat(),
+                    "percentiles": scoring_result.percentiles
+                }
+            }
 
         except AssessmentError:
             raise
@@ -332,66 +379,39 @@ class AssessmentService:
                     "PSYCH_002"
                 )
 
-    def _calculate_basic_scores(self, responses: List[ItemResponse]) -> HEXACOScores:
-        """
-        Calculate basic Big Five + Honesty-Humility scores.
-
-        This is a simplified implementation for Week 1 MVP.
-        Will be replaced with proper psychometric algorithms in Week 2.
-
-        Args:
-            responses: Item responses
-
-        Returns:
-            HEXACOScores: Calculated personality scores
-        """
-        # Convert to dictionary for easier lookup
-        response_dict = {resp.item_id: resp.response for resp in responses}
-
-        # Define item mappings (simplified for MVP)
-        dimension_items = {
-            "extraversion": ["ipip_001", "ipip_002", "ipip_003", "ipip_004"],
-            "agreeableness": ["ipip_005", "ipip_006", "ipip_007", "ipip_008"],
-            "conscientiousness": ["ipip_009", "ipip_010", "ipip_011", "ipip_012"],
-            "neuroticism": ["ipip_013", "ipip_014", "ipip_015", "ipip_016"],
-            "openness": ["ipip_017", "ipip_018", "ipip_019", "ipip_020"]
+    def _save_enhanced_scores(self, session_id: str, scoring_result, strength_mapping):
+        """Save enhanced scores with quality metrics and provenance."""
+        scores_data = {
+            "session_id": session_id,
+            "extraversion": scoring_result.standardized_scores.extraversion,
+            "agreeableness": scoring_result.standardized_scores.agreeableness,
+            "conscientiousness": scoring_result.standardized_scores.conscientiousness,
+            "neuroticism": scoring_result.standardized_scores.neuroticism,
+            "openness": scoring_result.standardized_scores.openness,
+            "honesty_humility": int((
+                scoring_result.standardized_scores.agreeableness +
+                scoring_result.standardized_scores.conscientiousness
+            ) / 2),
+            "strength_scores": strength_mapping.strength_scores.__dict__,
+            "scoring_confidence": scoring_result.confidence,
+            "response_quality_flags": scoring_result.quality_flags,
+            "raw_scores": scoring_result.raw_scores.__dict__,
+            "percentiles": scoring_result.percentiles,
+            "processing_time_ms": scoring_result.processing_time_ms,
+            "algorithm_version": scoring_result.algorithm_version,
+            "weights_version": strength_mapping.mapping_version,
+            "provenance": {
+                "scoring_method": "mini_ipip_validated",
+                "normative_data_version": "literature_v1.0",
+                "strength_mapping_version": strength_mapping.mapping_version,
+                "calculated_at": scoring_result.calculated_at.isoformat(),
+                "top_strengths": [s["name"] for s in strength_mapping.top_strengths],
+                "development_areas": [d["name"] for d in strength_mapping.development_areas],
+                "confidence_scores": strength_mapping.confidence_scores
+            }
         }
 
-        # Calculate dimension scores
-        dimension_scores = {}
-
-        for dimension, items in dimension_items.items():
-            total_score = 0
-            for item_id in items:
-                raw_response = response_dict.get(item_id, 4)  # Default to neutral
-
-                # Apply reverse scoring for even-numbered items (simplified)
-                if int(item_id.split("_")[1]) % 2 == 0:
-                    score = 8 - raw_response  # Reverse 1-7 scale
-                else:
-                    score = raw_response
-
-                total_score += score
-
-            # Convert to 0-100 scale
-            dimension_scores[dimension] = min(100, max(0, int(
-                (total_score / (len(items) * 7)) * 100
-            )))
-
-        # Calculate Honesty-Humility as combination of Agreeableness and Conscientiousness
-        honesty_humility = min(100, max(0, int(
-            (dimension_scores["agreeableness"] +
-             dimension_scores["conscientiousness"]) / 2
-        )))
-
-        return HEXACOScores(
-            extraversion=dimension_scores["extraversion"],
-            agreeableness=dimension_scores["agreeableness"],
-            conscientiousness=dimension_scores["conscientiousness"],
-            neuroticism=dimension_scores["neuroticism"],
-            openness=dimension_scores["openness"],
-            honesty_humility=honesty_humility
-        )
+        self.db_manager.save_enhanced_scores(session_id, scores_data)
 
     def get_session_status(self, session_id: str) -> Dict[str, Any]:
         """
@@ -433,6 +453,132 @@ class AssessmentService:
             raise
         except Exception as e:
             raise AssessmentError(f"Failed to get session status: {e}")
+
+    def get_enhanced_scores(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get enhanced scoring results for a session.
+
+        Args:
+            session_id: Session identifier
+
+        Returns:
+            Dict with complete scoring results or None if not found
+
+        Raises:
+            AssessmentError: If session not found or scores not available
+        """
+        try:
+            # Validate session exists
+            session = self.get_session(session_id)
+            if not session:
+                raise AssessmentError("Session not found", "SESSION_NOT_FOUND")
+
+            if session.status != SessionStatus.COMPLETED:
+                raise AssessmentError(
+                    "Session not completed - scores not available",
+                    "SCORES_NOT_AVAILABLE"
+                )
+
+            # Get enhanced scores from database
+            scores_data = self.db_manager.get_enhanced_scores(session_id)
+            if not scores_data:
+                raise AssessmentError(
+                    "Scores not found for completed session",
+                    "SCORES_NOT_FOUND"
+                )
+
+            return {
+                "session_id": session_id,
+                "big_five_scores": {
+                    "extraversion": scores_data["extraversion"],
+                    "agreeableness": scores_data["agreeableness"],
+                    "conscientiousness": scores_data["conscientiousness"],
+                    "neuroticism": scores_data["neuroticism"],
+                    "openness": scores_data["openness"]
+                },
+                "strength_scores": scores_data["strength_scores"],
+                "percentiles": scores_data.get("percentiles", {}),
+                "raw_scores": scores_data.get("raw_scores", {}),
+                "quality_assessment": {
+                    "confidence": scores_data.get("scoring_confidence", 0.0),
+                    "quality_flags": scores_data.get("response_quality_flags", []),
+                    "processing_time_ms": scores_data.get("processing_time_ms", 0.0)
+                },
+                "provenance": scores_data.get("provenance", {}),
+                "calculated_at": scores_data.get("calculated_at"),
+                "algorithm_version": scores_data.get("algorithm_version"),
+                "weights_version": scores_data.get("weights_version")
+            }
+
+        except AssessmentError:
+            raise
+        except Exception as e:
+            raise AssessmentError(f"Failed to get enhanced scores: {e}")
+
+    def recalculate_scores(self, session_id: str) -> Dict[str, Any]:
+        """
+        Recalculate scores for a completed session with latest algorithms.
+
+        Args:
+            session_id: Session identifier
+
+        Returns:
+            Dict: Updated scoring results
+
+        Raises:
+            AssessmentError: If session or responses not found
+        """
+        try:
+            # Validate session
+            session = self.get_session(session_id)
+            if not session:
+                raise AssessmentError("Session not found", "SESSION_NOT_FOUND")
+
+            if session.status != SessionStatus.COMPLETED:
+                raise AssessmentError(
+                    "Session not completed - cannot recalculate",
+                    "SESSION_NOT_COMPLETED"
+                )
+
+            # Get stored responses
+            response_data = self.db_manager.get_responses_for_session(session_id)
+            if len(response_data) != 20:
+                raise AssessmentError(
+                    "Incomplete response data - cannot recalculate",
+                    "INCOMPLETE_RESPONSES"
+                )
+
+            # Convert to ItemResponse objects
+            responses = [
+                ItemResponse(item_id=r["item_id"], response=r["response"])
+                for r in response_data
+            ]
+
+            # Calculate completion time from timestamps
+            timestamps = [datetime.fromisoformat(r["submitted_at"].replace("Z", ""))
+                         for r in response_data]
+            completion_time = int((max(timestamps) - min(timestamps)).total_seconds())
+
+            # Refresh normative data and reinitialize scorers
+            normative_data = self.db_manager.get_normative_data()
+            self.scorer = MiniIPIPScorer(normative_data)
+
+            # Recalculate scores
+            scoring_result = self.scorer.score_assessment(responses, completion_time)
+            strength_mapping = self.strengths_mapper.map_to_strengths(
+                scoring_result.standardized_scores
+            )
+
+            # Save updated scores
+            self._save_enhanced_scores(session_id, scoring_result, strength_mapping)
+
+            # Return updated results
+            return self.get_enhanced_scores(session_id)
+
+        except AssessmentError:
+            raise
+        except Exception as e:
+            raise AssessmentError(f"Failed to recalculate scores: {e}")
 
 
 # Convenience function for dependency injection
