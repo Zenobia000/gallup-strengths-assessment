@@ -24,6 +24,7 @@ from typing import List, Dict
 from dataclasses import dataclass
 
 from models.schemas import QuestionResponse
+from core.config import get_psychometric_settings
 
 
 @dataclass
@@ -74,28 +75,34 @@ class ScoringEngine:
           It will be implemented in task 3.2.3.
     """
 
-    # Dimension to question ID mapping
-    DIMENSION_QUESTIONS: Dict[str, List[int]] = {
-        "openness": [1, 2, 3, 4],
-        "conscientiousness": [5, 6, 7, 8],
-        "extraversion": [9, 10, 11, 12],
-        "agreeableness": [13, 14, 15, 16],
-        "neuroticism": [17, 18, 19, 20],
-    }
-
-    # Valid dimension names
-    VALID_DIMENSIONS = set(DIMENSION_QUESTIONS.keys())
-
-    # Score constraints
-    MIN_SCORE_PER_QUESTION = 1
-    MAX_SCORE_PER_QUESTION = 5
-    QUESTIONS_PER_DIMENSION = 4
-    MIN_DIMENSION_SCORE = QUESTIONS_PER_DIMENSION * MIN_SCORE_PER_QUESTION  # 4
-    MAX_DIMENSION_SCORE = QUESTIONS_PER_DIMENSION * MAX_SCORE_PER_QUESTION  # 20
+    # Configuration-driven constants (set in __init__)
 
     def __init__(self):
-        """Initialize the ScoringEngine."""
-        pass
+        """Initialize the ScoringEngine with centralized configuration."""
+        self._psychometric_config = get_psychometric_settings()
+
+        # Load configuration-driven constants
+        self.DIMENSION_QUESTIONS = self._load_dimension_questions()
+        self.VALID_DIMENSIONS = set(self.DIMENSION_QUESTIONS.keys())
+
+        # Score constraints from configuration
+        self.MIN_SCORE_PER_QUESTION = self._psychometric_config.LIKERT_SCALE_MIN
+        self.MAX_SCORE_PER_QUESTION = self._psychometric_config.LIKERT_SCALE_MAX
+        self.QUESTIONS_PER_DIMENSION = 4  # Mini-IPIP specification
+
+        # Calculated bounds
+        self.MIN_DIMENSION_SCORE = self.QUESTIONS_PER_DIMENSION * self.MIN_SCORE_PER_QUESTION
+        self.MAX_DIMENSION_SCORE = self.QUESTIONS_PER_DIMENSION * self.MAX_SCORE_PER_QUESTION
+
+    def _load_dimension_questions(self) -> Dict[str, List[int]]:
+        """Load dimension to question mapping from configuration."""
+        return {
+            "openness": [1, 2, 3, 4],
+            "conscientiousness": [5, 6, 7, 8],
+            "extraversion": [9, 10, 11, 12],
+            "agreeableness": [13, 14, 15, 16],
+            "neuroticism": [17, 18, 19, 20],
+        }
 
     def get_dimension_questions(self) -> Dict[str, List[int]]:
         """

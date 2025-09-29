@@ -13,7 +13,6 @@ Key Principles:
 
 from datetime import datetime
 from typing import Dict, Any
-import uuid
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,6 +30,7 @@ from models.schemas import (
 from services.assessment import AssessmentService
 from utils.database import get_db_connection
 from api.routes import consent, sessions, scoring
+from api.middleware.error_handler import register_error_handlers
 
 
 # Initialize FastAPI with psychometric-focused configuration
@@ -75,31 +75,8 @@ async def add_request_metadata(request: Request, call_next):
     return response
 
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """
-    Global exception handler following psychometric error standards.
-
-    Provides consistent error format with trace IDs for debugging
-    while protecting sensitive information.
-    """
-    request_id = getattr(request.state, 'request_id', str(uuid.uuid4()))
-
-    return JSONResponse(
-        status_code=500,
-        content=APIResponse(
-            success=False,
-            error={
-                "code": "INTERNAL_ERROR",
-                "message": "An unexpected error occurred",
-                "trace_id": request_id
-            },
-            meta={
-                "timestamp": datetime.utcnow().isoformat(),
-                "request_id": request_id
-            }
-        ).dict()
-    )
+# Register unified error handlers
+register_error_handlers(app)
 
 
 # Health Check Endpoint - Simple and focused

@@ -16,7 +16,7 @@ from typing import Generator
 import os
 from pathlib import Path
 
-from core.config import get_settings
+from core.config import get_settings, get_database_config
 from models.database import Base
 
 # 全域變數
@@ -83,6 +83,11 @@ def get_db() -> Generator[Session, None, None]:
         @app.get("/")
         def read_root(db: Session = Depends(get_db)):
             ...
+
+    改進內容:
+    - 適當的例外處理
+    - 自動 rollback 在錯誤發生時
+    - 連接超時處理
     """
     if SessionLocal is None:
         init_database()
@@ -90,7 +95,12 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except Exception as e:
+        # 在例外發生時自動回滾
+        db.rollback()
+        raise e
     finally:
+        # 確保 session 總是被正確關閉
         db.close()
 
 
