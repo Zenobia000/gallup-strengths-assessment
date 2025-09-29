@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="探索您的獨特優勢,開啟職涯新篇章 - Gallup 優勢測驗">
+  <meta name="keywords" content="Gallup, 優勢測驗, 人格測驗, 職涯規劃, Mini-IPIP">
+  <title>Gallup 優勢測驗 - 探索您的獨特優勢</title>
+
+  <!-- Preconnect to API -->
+  <link rel="preconnect" href="http://localhost:8002">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    /* Landing Page Specific Styles */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #E8F4FF 0%, #FFFFFF 100%);
+      padding: var(--spacing-2xl) var(--spacing-md);
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+    }
+
+    .hero-title {
+      font-size: var(--font-size-5xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-lg);
+      line-height: var(--line-height-tight);
+    }
+
+    .hero-subtitle {
+      font-size: var(--font-size-xl);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-2xl);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .hero-highlight {
+      color: var(--color-primary);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .trust-bar {
+      background: var(--bg-card);
+      padding: var(--spacing-xl) var(--spacing-md);
+      border-top: 1px solid var(--color-gray-200);
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .trust-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      max-width: var(--container-lg);
+      margin: 0 auto;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--color-gray-50);
+      border-radius: var(--radius-md);
+    }
+
+    .trust-icon {
+      font-size: var(--font-size-3xl);
+    }
+
+    .trust-text {
+      flex: 1;
+    }
+
+    .trust-label {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .trust-value {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+    }
+
+    .social-proof {
+      padding: var(--spacing-3xl) var(--spacing-md);
+      background: var(--bg-page);
+    }
+
+    .section-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      max-width: var(--container-lg);
+      margin: 0 auto var(--spacing-2xl);
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: var(--spacing-xl);
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      transition: var(--transition-transform);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-number {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+    }
+
+    .process-section {
+      padding: var(--spacing-3xl) var(--spacing-md);
+      background: var(--bg-card);
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-xl);
+      max-width: var(--container-lg);
+      margin: 0 auto;
+    }
+
+    .process-step {
+      position: relative;
+      padding: var(--spacing-xl);
+      text-align: center;
+    }
+
+    .process-step::after {
+      content: '→';
+      position: absolute;
+      top: 50%;
+      right: -20px;
+      transform: translateY(-50%);
+      font-size: var(--font-size-2xl);
+      color: var(--color-gray-300);
+    }
+
+    .process-step:last-child::after {
+      display: none;
+    }
+
+    .process-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background: var(--gradient-progress);
+      color: var(--text-inverse);
+      border-radius: 50%;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .process-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .process-desc {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .footer {
+      padding: var(--spacing-xl) var(--spacing-md);
+      background: var(--color-gray-800);
+      color: var(--color-gray-300);
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: var(--font-size-sm);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: var(--font-size-3xl);
+      }
+
+      .hero-subtitle {
+        font-size: var(--font-size-lg);
+      }
+
+      .process-step::after {
+        display: none;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-content {
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .stat-card {
+      animation: fadeInUp 0.8s ease-out;
+      animation-fill-mode: backwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+  </style>
+</head>
+<body>
+  <!-- Skip to main content (Accessibility) -->
+  <a href="#main-content" class="skip-to-main">跳到主要內容</a>
+
+  <!-- Hero Section -->
+  <section class="hero" id="main-content">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        探索您的 <span class="hero-highlight">獨特優勢</span><br>
+        開啟職涯新篇章
+      </h1>
+      <p class="hero-subtitle">
+        基於科學驗證的 Mini-IPIP 人格測驗,<br>
+        僅需 <strong>5 分鐘</strong>,即可獲得專業的優勢分析報告
+      </p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg" onclick="startAssessment()">
+          開始測驗
+        </button>
+        <p class="text-muted" style="font-size: var(--font-size-sm);">
+          完全免費 · 隱私保護 · 立即取得報告
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <section class="trust-bar">
+    <div class="container">
+      <div class="trust-items">
+        <div class="trust-item">
+          <div class="trust-icon">🔒</div>
+          <div class="trust-text">
+            <div class="trust-label">資料保護</div>
+            <div class="trust-value">GDPR 合規</div>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🎓</div>
+          <div class="trust-text">
+            <div class="trust-label">科學驗證</div>
+            <div class="trust-value">Mini-IPIP 量表</div>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">⚡</div>
+          <div class="trust-text">
+            <div class="trust-label">快速完成</div>
+            <div class="trust-value">僅需 5 分鐘</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Section -->
+  <section class="social-proof">
+    <div class="container">
+      <h2 class="section-title">超過 12,450 位用戶已完成測驗</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">12,450+</div>
+          <div class="stat-label">已完成測驗</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">4.8/5</div>
+          <div class="stat-label">用戶滿意度</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">92%</div>
+          <div class="stat-label">推薦採納率</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="process-section">
+    <div class="container">
+      <h2 class="section-title">簡單四步驟,了解您的優勢</h2>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="process-number">1</div>
+          <div class="process-title">同意條款</div>
+          <div class="process-desc">閱讀並同意隱私政策與使用條款,保障您的權益</div>
+        </div>
+        <div class="process-step">
+          <div class="process-number">2</div>
+          <div class="process-title">作答測驗</div>
+          <div class="process-desc">回答 20 道簡單問題,誠實作答以獲得準確結果</div>
+        </div>
+        <div class="process-step">
+          <div class="process-number">3</div>
+          <div class="process-title">分析優勢</div>
+          <div class="process-desc">系統自動計算您的 12 項優勢面向與排名</div>
+        </div>
+        <div class="process-step">
+          <div class="process-number">4</div>
+          <div class="process-title">取得報告</div>
+          <div class="process-desc">查看詳細分析與職涯建議,下載 PDF 報告</div>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: var(--spacing-2xl);">
+        <button class="btn btn-primary btn-lg" onclick="startAssessment()">
+          立即開始
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">
+      &copy; 2025 Gallup 優勢測驗. 基於 Mini-IPIP 公領域量表開發.
+    </p>
+    <p class="footer-text" style="margin-top: var(--spacing-sm);">
+      本測驗僅供參考,不作為醫療或心理診斷依據.
+    </p>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { storage } from '/js/storage.js';
+    import { api } from '/js/api.js';
+
+    // Global function to start assessment
+    window.startAssessment = async function() {
+      try {
+        // Check if user has valid session
+        if (storage.hasValidSession()) {
+          const sessionId = storage.getSession();
+
+          // Check if user has consent
+          if (storage.hasConsent()) {
+            // Check if answers exist
+            const answers = storage.getAnswers();
+            if (answers.length > 0) {
+              // Resume assessment
+              if (confirm('您有尚未完成的測驗,是否繼續?')) {
+                window.location.href = '/pages/assessment.html';
+                return;
+              } else {
+                // Start new session
+                storage.clearSession();
+              }
+            } else {
+              // Go to assessment
+              window.location.href = '/pages/assessment.html';
+              return;
+            }
+          }
+        }
+
+        // Go to consent page for new assessment
+        window.location.href = '/pages/consent.html';
+      } catch (error) {
+        console.error('Start assessment error:', error);
+        alert('發生錯誤,請稍後再試');
+      }
+    };
+
+    // Check API health on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await api.healthCheck();
+        console.log('API health check: OK');
+      } catch (error) {
+        console.warn('API health check failed:', error);
+        // Show warning banner (optional)
+      }
+    });
+  </script>
+</body>
+</html>

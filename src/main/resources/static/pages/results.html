@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>您的優勢分析 - Gallup 優勢測驗</title>
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    .results-page {
+      min-height: 100vh;
+      background: var(--bg-page);
+    }
+
+    .results-header {
+      background: linear-gradient(135deg, #4A90E2 0%, #52C41A 100%);
+      color: var(--text-inverse);
+      padding: var(--spacing-3xl) var(--spacing-md);
+      text-align: center;
+    }
+
+    .results-header-content {
+      max-width: var(--container-md);
+      margin: 0 auto;
+    }
+
+    .results-title {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .results-subtitle {
+      font-size: var(--font-size-lg);
+      opacity: 0.9;
+    }
+
+    .results-main {
+      padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .results-content {
+      max-width: var(--container-lg);
+      margin: 0 auto;
+    }
+
+    .section {
+      margin-bottom: var(--spacing-3xl);
+    }
+
+    .section-heading {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-xl);
+      text-align: center;
+    }
+
+    .top-strengths {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-xl);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .strength-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: var(--spacing-2xl);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: revealStrength 0.5s ease;
+      animation-fill-mode: backwards;
+    }
+
+    .strength-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: var(--gradient-progress);
+    }
+
+    .strength-card:nth-child(1) {
+      animation-delay: 0.2s;
+    }
+
+    .strength-card:nth-child(2) {
+      animation-delay: 0.4s;
+    }
+
+    .strength-card:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes revealStrength {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .strength-rank {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      background: var(--gradient-progress);
+      color: var(--text-inverse);
+      border-radius: 50%;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 50px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .strength-name {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .strength-score {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .strength-description {
+      font-size: var(--font-size-base);
+      color: var(--text-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .all-strengths {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-xl);
+    }
+
+    .strength-item {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .strength-item:last-child {
+      border-bottom: none;
+    }
+
+    .strength-item-rank {
+      width: 40px;
+      height: 40px;
+      background: var(--color-gray-100);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-weight-bold);
+      color: var(--text-secondary);
+      margin-right: var(--spacing-md);
+    }
+
+    .strength-item-info {
+      flex: 1;
+    }
+
+    .strength-item-name {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .strength-item-score {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+    }
+
+    .strength-bar {
+      width: 200px;
+      height: 8px;
+      background: var(--color-gray-200);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-left: var(--spacing-md);
+    }
+
+    .strength-bar-fill {
+      height: 100%;
+      background: var(--gradient-progress);
+      border-radius: var(--radius-full);
+      transition: width var(--transition-slow) var(--ease-out);
+    }
+
+    .actions-section {
+      text-align: center;
+      padding: var(--spacing-2xl);
+      background: var(--color-primary-light);
+      border-radius: var(--radius-lg);
+    }
+
+    .actions-buttons {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .loading-screen {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-page);
+      z-index: var(--z-modal);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .loading-screen.hidden {
+      display: none;
+    }
+
+    .loading-message {
+      margin-top: var(--spacing-xl);
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .strength-bar {
+        width: 100%;
+        margin-left: 0;
+        margin-top: var(--spacing-sm);
+      }
+
+      .strength-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .actions-buttons {
+        flex-direction: column;
+      }
+
+      .actions-buttons .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="spinner spinner-lg"></div>
+    <p class="loading-message">正在分析您的優勢...</p>
+  </div>
+
+  <div id="results-page" class="results-page" style="display: none;">
+    <!-- Header -->
+    <header class="results-header">
+      <div class="results-header-content">
+        <h1 class="results-title">🎉 恭喜您完成測驗!</h1>
+        <p class="results-subtitle">以下是您的優勢分析結果</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="results-main">
+      <div class="results-content">
+        <!-- Top 3 Strengths -->
+        <section class="section">
+          <h2 class="section-heading">您的前三大優勢</h2>
+          <div id="top-strengths" class="top-strengths">
+            <!-- Top strengths will be inserted here -->
+          </div>
+        </section>
+
+        <!-- All Strengths -->
+        <section class="section">
+          <h2 class="section-heading">完整優勢排名</h2>
+          <div id="all-strengths" class="all-strengths">
+            <!-- All strengths will be inserted here -->
+          </div>
+        </section>
+
+        <!-- Actions -->
+        <section class="section">
+          <div class="actions-section">
+            <h2 class="section-heading">接下來...</h2>
+            <p style="color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+              下載 PDF 報告以獲得完整的優勢分析與職涯建議
+            </p>
+            <div class="actions-buttons">
+              <button class="btn btn-primary btn-lg" onclick="downloadReport()">
+                📄 下載 PDF 報告
+              </button>
+              <button class="btn btn-outline" onclick="shareResults()">
+                🔗 分享結果
+              </button>
+              <button class="btn btn-ghost" onclick="startNew()">
+                重新測驗
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { storage } from '/js/storage.js';
+    import { api, APIError } from '/js/api.js';
+
+    // Get session ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session');
+
+    // Elements
+    const loadingScreen = document.getElementById('loading-screen');
+    const resultsPage = document.getElementById('results-page');
+    const topStrengthsContainer = document.getElementById('top-strengths');
+    const allStrengthsContainer = document.getElementById('all-strengths');
+
+    // Strength display names (Chinese)
+    const strengthNames = {
+      'achiever': '成就',
+      'activator': '行動',
+      'adaptability': '適應',
+      'analytical': '分析',
+      'arranger': '統籌',
+      'belief': '信仰',
+      'command': '統率',
+      'communication': '溝通',
+      'competition': '競爭',
+      'connectedness': '關聯',
+      'consistency': '公平',
+      'context': '回顧'
+    };
+
+    // Initialize
+    async function initialize() {
+      try {
+        if (!sessionId) {
+          alert('無效的會話 ID');
+          window.location.href = '/index.html';
+          return;
+        }
+
+        // Fetch results from API
+        const response = await api.getResults(sessionId);
+        const results = response.data;
+
+        // Display results
+        displayResults(results);
+
+        // Hide loading, show results
+        loadingScreen.classList.add('hidden');
+        resultsPage.style.display = 'block';
+
+        // Animate strength bars
+        setTimeout(() => {
+          animateStrengthBars();
+        }, 800);
+      } catch (error) {
+        console.error('Load results error:', error);
+        alert('載入結果失敗,請稍後再試');
+        window.location.href = '/index.html';
+      }
+    }
+
+    // Display results
+    function displayResults(results) {
+      const strengths = results.strengths || [];
+
+      // Sort by score
+      strengths.sort((a, b) => b.score - a.score);
+
+      // Display top 3
+      const top3 = strengths.slice(0, 3);
+      topStrengthsContainer.innerHTML = top3.map((strength, index) => `
+        <div class="strength-card">
+          <div class="strength-rank">${index + 1}</div>
+          <h3 class="strength-name">${strengthNames[strength.name] || strength.name}</h3>
+          <p class="strength-score">分數: ${strength.score.toFixed(2)}</p>
+          <p class="strength-description">${strength.description || ''}</p>
+        </div>
+      `).join('');
+
+      // Display all strengths
+      allStrengthsContainer.innerHTML = strengths.map((strength, index) => {
+        const percentage = (strength.score / 100) * 100;
+        return `
+          <div class="strength-item">
+            <div class="strength-item-rank">${index + 1}</div>
+            <div class="strength-item-info">
+              <div class="strength-item-name">${strengthNames[strength.name] || strength.name}</div>
+              <div class="strength-item-score">分數: ${strength.score.toFixed(2)}</div>
+            </div>
+            <div class="strength-bar">
+              <div class="strength-bar-fill" data-width="${percentage}%" style="width: 0%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Animate strength bars
+    function animateStrengthBars() {
+      const bars = document.querySelectorAll('.strength-bar-fill');
+      bars.forEach((bar, index) => {
+        setTimeout(() => {
+          const width = bar.getAttribute('data-width');
+          bar.style.width = width;
+        }, index * 100);
+      });
+    }
+
+    // Download report
+    window.downloadReport = async function() {
+      try {
+        const blob = await api.generateReport(sessionId);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gallup-strengths-report-${sessionId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('下載失敗,請稍後再試');
+      }
+    };
+
+    // Share results
+    window.shareResults = async function() {
+      try {
+        const response = await api.getShareLink(sessionId);
+        const shareUrl = response.data.share_url;
+
+        if (navigator.share) {
+          await navigator.share({
+            title: 'Gallup 優勢測驗結果',
+            text: '我完成了 Gallup 優勢測驗!',
+            url: shareUrl
+          });
+        } else {
+          // Fallback: copy to clipboard
+          await navigator.clipboard.writeText(shareUrl);
+          alert('分享連結已複製到剪貼簿');
+        }
+      } catch (error) {
+        console.error('Share error:', error);
+        alert('分享失敗');
+      }
+    };
+
+    // Start new assessment
+    window.startNew = function() {
+      if (confirm('開始新測驗將清除目前資料,確定繼續?')) {
+        storage.clear();
+        window.location.href = '/index.html';
+      }
+    };
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', initialize);
+  </script>
+</body>
+</html>

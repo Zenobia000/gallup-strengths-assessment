@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>進行測驗 - Gallup 優勢測驗</title>
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    .assessment-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-page);
+    }
+
+    .assessment-header {
+      background: var(--bg-card);
+      padding: var(--spacing-lg) var(--spacing-md);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sticky);
+    }
+
+    .assessment-header-content {
+      max-width: var(--container-md);
+      margin: 0 auto;
+    }
+
+    .header-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .assessment-main {
+      flex: 1;
+      padding: var(--spacing-2xl) var(--spacing-md);
+    }
+
+    .assessment-content {
+      max-width: var(--container-md);
+      margin: 0 auto;
+    }
+
+    .question-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: var(--spacing-2xl);
+      margin-bottom: var(--spacing-xl);
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .question-number {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      margin-bottom: var(--spacing-md);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .question-text {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-primary);
+      line-height: var(--line-height-relaxed);
+      margin-bottom: var(--spacing-2xl);
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .likert-scale {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    .likert-option {
+      display: flex;
+      align-items: center;
+      padding: var(--spacing-lg);
+      border: var(--border-width-thick) solid var(--color-gray-300);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition-all);
+      user-select: none;
+    }
+
+    .likert-option:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+
+    .likert-option.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .likert-option input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin-right: var(--spacing-md);
+      cursor: pointer;
+      accent-color: var(--color-primary);
+    }
+
+    .likert-label {
+      flex: 1;
+      font-size: var(--font-size-base);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .likert-value {
+      font-size: var(--font-size-sm);
+      color: var(--text-tertiary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .navigation-buttons {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-xl);
+    }
+
+    .navigation-buttons .btn {
+      flex: 1;
+    }
+
+    .milestone-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: var(--z-modal);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .milestone-modal.show {
+      display: flex;
+    }
+
+    .milestone-content {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-3xl);
+      max-width: 500px;
+      text-align: center;
+      animation: bounceIn 0.5s ease;
+    }
+
+    .milestone-emoji {
+      font-size: 80px;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .milestone-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .milestone-message {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.9);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .loading-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-page);
+      z-index: var(--z-modal);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .loading-screen.show {
+      display: flex;
+    }
+
+    .loading-message {
+      margin-top: var(--spacing-xl);
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .question-text {
+        font-size: var(--font-size-xl);
+      }
+
+      .milestone-emoji {
+        font-size: 60px;
+      }
+
+      .milestone-title {
+        font-size: var(--font-size-2xl);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="assessment-page">
+    <!-- Header with Progress -->
+    <header class="assessment-header">
+      <div class="assessment-header-content">
+        <h1 class="header-title">Gallup 優勢測驗</h1>
+        <div class="progress-text">
+          <span>進度</span>
+          <span id="progress-label">0 / 20</span>
+        </div>
+        <div class="progress">
+          <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="assessment-main">
+      <div class="assessment-content">
+        <div id="question-card" class="question-card">
+          <div class="question-number" id="question-number">題目 1 / 20</div>
+          <div class="question-text" id="question-text">
+            載入中...
+          </div>
+          <div class="likert-scale" id="likert-scale">
+            <!-- Options will be inserted here -->
+          </div>
+          <div class="navigation-buttons">
+            <button id="prev-button" class="btn btn-outline" onclick="previousQuestion()" disabled>
+              上一題
+            </button>
+            <button id="next-button" class="btn btn-primary" onclick="nextQuestion()" disabled>
+              下一題
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Milestone Modal -->
+  <div id="milestone-modal" class="milestone-modal">
+    <div class="milestone-content">
+      <div class="milestone-emoji" id="milestone-emoji">🎉</div>
+      <h2 class="milestone-title" id="milestone-title">很好!</h2>
+      <p class="milestone-message" id="milestone-message">已完成 25%</p>
+      <button class="btn btn-primary" onclick="closeMilestone()">繼續</button>
+    </div>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="spinner spinner-lg"></div>
+    <p class="loading-message">正在提交您的答案...</p>
+  </div>
+
+  <script type="module">
+    import { storage } from '/js/storage.js';
+    import { api, APIError } from '/js/api.js';
+
+    // State
+    let questions = [];
+    let currentIndex = 0;
+    let answers = [];
+    let sessionId = null;
+
+    // Elements
+    const questionNumber = document.getElementById('question-number');
+    const questionText = document.getElementById('question-text');
+    const likertScale = document.getElementById('likert-scale');
+    const progressBar = document.getElementById('progress-bar');
+    const progressLabel = document.getElementById('progress-label');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    const milestoneModal = document.getElementById('milestone-modal');
+    const loadingScreen = document.getElementById('loading-screen');
+
+    // Initialize
+    async function initialize() {
+      try {
+        // Check session
+        sessionId = storage.getSession();
+        if (!sessionId || !storage.hasValidSession()) {
+          alert('會話已過期,請重新開始');
+          window.location.href = '/index.html';
+          return;
+        }
+
+        // Check consent
+        if (!storage.hasConsent()) {
+          alert('請先同意使用條款');
+          window.location.href = '/pages/consent.html';
+          return;
+        }
+
+        // Load questions
+        const response = await api.getQuestions();
+        questions = response.data.questions;
+
+        // Load saved progress
+        const savedAnswers = storage.getAnswers();
+        if (savedAnswers.length > 0) {
+          answers = savedAnswers;
+          const progress = storage.getProgress();
+          if (progress) {
+            currentIndex = progress.currentIndex || 0;
+          }
+        }
+
+        // Render first question
+        renderQuestion();
+      } catch (error) {
+        console.error('Initialization error:', error);
+        alert('載入問題失敗,請稍後再試');
+        window.location.href = '/index.html';
+      }
+    }
+
+    // Render current question
+    function renderQuestion() {
+      const question = questions[currentIndex];
+      const totalQuestions = questions.length;
+
+      // Update question display
+      questionNumber.textContent = `題目 ${currentIndex + 1} / ${totalQuestions}`;
+      questionText.textContent = question.text;
+
+      // Update progress
+      const progressPercent = ((currentIndex + 1) / totalQuestions) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+      progressLabel.textContent = `${currentIndex + 1} / ${totalQuestions}`;
+
+      // Render Likert scale
+      renderLikertScale(question);
+
+      // Update navigation buttons
+      prevButton.disabled = currentIndex === 0;
+      updateNextButton();
+    }
+
+    // Render Likert scale options
+    function renderLikertScale(question) {
+      const options = [
+        { value: 1, label: '非常不同意' },
+        { value: 2, label: '不同意' },
+        { value: 3, label: '普通' },
+        { value: 4, label: '同意' },
+        { value: 5, label: '非常同意' },
+      ];
+
+      // Check if answer exists
+      const savedAnswer = answers.find(a => a.question_id === question.id);
+
+      likertScale.innerHTML = options.map(option => `
+        <label class="likert-option ${savedAnswer?.score === option.value ? 'selected' : ''}">
+          <input
+            type="radio"
+            name="question-${question.id}"
+            value="${option.value}"
+            ${savedAnswer?.score === option.value ? 'checked' : ''}
+            onchange="handleAnswer(${question.id}, ${option.value})"
+          >
+          <span class="likert-label">
+            <span>${option.label}</span>
+            <span class="likert-value">${option.value}</span>
+          </span>
+        </label>
+      `).join('');
+    }
+
+    // Handle answer selection
+    window.handleAnswer = function(questionId, score) {
+      // Update answer
+      const existingIndex = answers.findIndex(a => a.question_id === questionId);
+      if (existingIndex >= 0) {
+        answers[existingIndex].score = score;
+      } else {
+        answers.push({ question_id: questionId, score });
+      }
+
+      // Save to storage
+      storage.saveAnswers(answers);
+      storage.saveProgress({ currentIndex, total: questions.length });
+
+      // Update selected style
+      document.querySelectorAll('.likert-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      event.target.closest('.likert-option').classList.add('selected');
+
+      // Enable next button
+      updateNextButton();
+    };
+
+    // Update next button state
+    function updateNextButton() {
+      const question = questions[currentIndex];
+      const hasAnswer = answers.some(a => a.question_id === question.id);
+      nextButton.disabled = !hasAnswer;
+
+      // Update button text for last question
+      if (currentIndex === questions.length - 1) {
+        nextButton.textContent = '提交測驗';
+      } else {
+        nextButton.textContent = '下一題';
+      }
+    }
+
+    // Previous question
+    window.previousQuestion = function() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    };
+
+    // Next question
+    window.nextQuestion = async function() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+        checkMilestone();
+      } else {
+        // Submit all answers
+        await submitAssessment();
+      }
+    };
+
+    // Check milestone
+    function checkMilestone() {
+      const progress = (currentIndex + 1) / questions.length;
+
+      const milestones = {
+        0.25: { emoji: '🎉', title: '很好!', message: '已完成 1/4' },
+        0.50: { emoji: '⭐', title: '太棒了!', message: '已過半!' },
+        0.75: { emoji: '🚀', title: '快完成了!', message: '加油!' },
+      };
+
+      const milestone = milestones[progress];
+      if (milestone) {
+        showMilestone(milestone);
+      }
+    }
+
+    // Show milestone modal
+    function showMilestone(milestone) {
+      document.getElementById('milestone-emoji').textContent = milestone.emoji;
+      document.getElementById('milestone-title').textContent = milestone.title;
+      document.getElementById('milestone-message').textContent = milestone.message;
+      milestoneModal.classList.add('show');
+    }
+
+    // Close milestone
+    window.closeMilestone = function() {
+      milestoneModal.classList.remove('show');
+    };
+
+    // Submit assessment
+    async function submitAssessment() {
+      try {
+        loadingScreen.classList.add('show');
+
+        // Submit to API
+        await api.submitAllAnswers(sessionId, answers);
+
+        // Clear storage
+        storage.clearProgress();
+        storage.clearSession();
+
+        // Redirect to results
+        setTimeout(() => {
+          window.location.href = `/pages/results.html?session=${sessionId}`;
+        }, 1500);
+      } catch (error) {
+        console.error('Submit error:', error);
+        loadingScreen.classList.remove('show');
+        alert('提交失敗,請稍後再試');
+      }
+    }
+
+    // Prevent accidental navigation
+    window.addEventListener('beforeunload', (e) => {
+      if (answers.length > 0 && answers.length < questions.length) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', initialize);
+  </script>
+</body>
+</html>
