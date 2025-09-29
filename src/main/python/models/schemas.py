@@ -145,6 +145,19 @@ class ItemsResponse(BaseModel):
 
 
 # Response Submission Models
+class QuestionResponse(BaseModel):
+    """Mini-IPIP question response model for scoring engine."""
+    question_id: int = Field(..., ge=1, le=20, description="Question ID (1-20)")
+    score: int = Field(..., ge=1, le=5, description="Likert scale score (1-5)")
+
+    @validator('score')
+    def validate_score_range(cls, v):
+        """Validate score is within Mini-IPIP range."""
+        if not 1 <= v <= 5:
+            raise ValueError("Score must be between 1 and 5 (inclusive)")
+        return v
+
+
 class ItemResponse(BaseModel):
     """Individual item response model."""
     item_id: str = Field(..., description="Assessment item identifier")
