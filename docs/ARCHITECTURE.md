@@ -1,507 +1,247 @@
-# 整合性架構與設計文件 - Gallup 優勢測驗
+# Gallup 優勢測驗 - 架構與設計文件
 
 ---
 
-**文件版本 (Document Version):** `v1.0`
-**最後更新 (Last Updated):** `2025-09-25`
-**主要作者 (Lead Author):** `TaskMaster Hub (AI Architecture Analyst)`
-**審核者 (Reviewers):** `Sunny (Project Lead), Claude Code AI`
-**狀態 (Status):** `草稿 (Draft) - Phase 2 文檔生成`
+**文件版本:** v1.0
+**最後更新:** 2025-09-30
+**主要作者:** 技術架構師
+**狀態:** 審核中 (In Review)
 
 ---
 
-## 目錄 (Table of Contents)
+## 目錄
 
-- [第 1 部分：架構總覽](#第-1-部分架構總覽-architecture-overview)
-  - [1.1 系統情境與目標](#11-系統情境與目標)
-  - [1.2 架構指導原則](#12-架構指導原則)
-  - [1.3 技術選型決策](#13-技術選型決策)
-- [第 2 部分：系統架構設計](#第-2-部分系統架構設計)
-  - [2.1 C4 模型：分層架構視圖](#21-c4-模型分層架構視圖)
-  - [2.2 心理測量系統核心](#22-心理測量系統核心)
-  - [2.3 資料流與狀態管理](#23-資料流與狀態管理)
-- [第 3 部分：詳細設計](#第-3-部分詳細設計)
-  - [3.1 MVP 模組優先級](#31-mvp-模組優先級)
-  - [3.2 核心模組設計](#32-核心模組設計)
-  - [3.3 非功能性需求實現](#33-非功能性需求實現)
+1. [架構總覽](#1-架構總覽)
+2. [需求摘要](#2-需求摘要)
+3. [技術選型](#3-技術選型)
+4. [數據架構](#4-數據架構)
+5. [部署架構](#5-部署架構)
 
 ---
 
-**目的**: 本文件將 Gallup 優勢測驗的業務需求轉化為完整的技術架構藍圖，重點關注心理測量學的準確性、系統的可解釋性，以及 4 週 MVP 的可實現性。
+## 1. 架構總覽
 
----
+### 1.1 系統情境
 
-## 第 1 部分：架構總覽 (Architecture Overview)
+Gallup 優勢測驗系統是一個基於人格評估的職涯建議工具，協助用戶透過標準化問卷發現自身優勢面向。
 
-### 1.1 系統情境與目標
+### 1.2 架構模式
 
-**系統類型**: 心理測量與決策支援系統
-**核心價值**: 將公領域人格量表轉化為可執行的決策建議
+**選定模式:** 模組化單體架構 (Modular Monolith)
+
+**選擇理由:**
+- MVP 階段需要快速迭代
+- 團隊規模小，微服務維運成本過高
+- 業務邏輯清晰，適合模組化設計
+- 未來可拆分為微服務
+
+### 1.3 C4 模型 - 系統情境圖
 
 ```mermaid
 graph TD
-    subgraph "外部使用者"
-        User[測驗使用者]
-        Coach[企業教練/HR]
-        Admin[系統管理者]
-    end
-
-    subgraph "Gallup 優勢測驗系統"
-        WebUI[響應式網頁介面]
-        API[FastAPI 核心服務]
-        DB[(SQLite 資料庫)]
-        PDFGen[PDF 報告生成器]
-    end
-
-    subgraph "外部依賴"
-        Browser[使用者瀏覽器]
-        FileSystem[本地檔案系統]
-    end
-
-    User -->|測驗流程| WebUI
-    Coach -->|結果查看| WebUI
-    Admin -->|系統管理| WebUI
-
-    WebUI -->|API 調用| API
-    API -->|資料讀寫| DB
-    API -->|報告生成| PDFGen
-    PDFGen -->|輸出檔案| FileSystem
+    User[測驗使用者] --> WebApp[Web 應用程式]
+    WebApp --> APIServer[FastAPI 伺服器]
+    APIServer --> SQLite[(SQLite 資料庫)]
+    APIServer --> PDFGen[PDF 報告生成器]
 ```
 
-### 1.2 架構指導原則
+### 1.4 Clean Architecture 分層
 
-**1. 心理測量學優先 (Psychometrics First)**
-- 所有計分演算法必須可追蹤和可解釋
-- 權重系統可配置和版本控制
-- 測驗信效度可驗證
-
-**2. MVP 務實主義 (MVP Pragmatism)**
-- 單機部署，SQLite 滿足初期需求
-- 同步處理，避免複雜的異步架構
-- 簡單可靠，優於過度設計
-
-**3. 可解釋性設計 (Explainability by Design)**
-- 每個建議都可回溯到具體分數和規則
-- 完整 Provenance 追蹤
-- 審計軌跡完整記錄
-
-**4. 隱私與合規 (Privacy & Compliance)**
-- 資料最小化原則
-- 明確同意機制
-- 限時分享和自動清理
-
-### 1.3 技術選型決策
-
-| 技術領域 | 選用技術 | 選擇理由 | 風險與緩解 |
-|----------|----------|----------|------------|
-| **後端框架** | FastAPI (Python 3.11+) | • 快速開發和自動文檔<br>• 豐富的科學計算生態<br>• 類型安全和異步支援 | • 風險: Python GIL 限制<br>• 緩解: 單機 MVP 足夠 |
-| **資料庫** | SQLite (WAL 模式) | • 零配置部署<br>• 事務 ACID 保證<br>• 檔案級備份簡單 | • 風險: 並發限制<br>• 緩解: 適合 MVP 規模 |
-| **前端** | 響應式 HTML + 原生 JS | • 簡單可靠<br>• 無複雜 build 過程<br>• 跨瀏覽器相容 | • 風險: 開發效率<br>• 緩解: MVP 功能簡單 |
-| **PDF 生成** | ReportLab (Python) | • 強大的 PDF 生成能力<br>• Python 生態整合<br>• 中文支援良好 | • 風險: 記憶體消耗<br>• 緩解: 同步生成可控 |
-
----
-
-## 第 2 部分：系統架構設計
-
-### 2.1 C4 模型：分層架構視圖
-
-**Level 2 - 容器圖 (Container Diagram)**
-
-```mermaid
-graph TB
-    subgraph "使用者層"
-        Browser[瀏覽器]
-    end
-
-    subgraph "應用層"
-        FastAPI[FastAPI 應用]
-        Static[靜態檔案服務]
-    end
-
-    subgraph "資料層"
-        SQLite[(SQLite DB)]
-        Files[(檔案系統)]
-    end
-
-    subgraph "處理層"
-        PsychoEngine[心理測量引擎]
-        RuleEngine[規則引擎]
-        PDFGenerator[PDF 生成器]
-    end
-
-    Browser -->|HTTPS| FastAPI
-    Browser -->|靜態資源| Static
-    FastAPI -->|SQL| SQLite
-    FastAPI -->|檔案 I/O| Files
-    FastAPI -->|計分| PsychoEngine
-    FastAPI -->|決策| RuleEngine
-    FastAPI -->|報告| PDFGenerator
-
-    PsychoEngine -->|權重查詢| SQLite
-    RuleEngine -->|規則查詢| SQLite
-    PDFGenerator -->|資料查詢| SQLite
-    PDFGenerator -->|檔案輸出| Files
 ```
-
-**Level 3 - 元件圖 (Component Diagram)**
-
-```mermaid
-graph TB
-    subgraph "FastAPI 應用內部"
-        subgraph "API 層"
-            ConsentAPI[同意 API]
-            SessionAPI[會話 API]
-            AssessmentAPI[測驗 API]
-            DecisionAPI[決策 API]
-            ReportAPI[報告 API]
-        end
-
-        subgraph "服務層"
-            ConsentService[同意服務]
-            AssessmentService[測驗服務]
-            ScoringService[計分服務]
-            RecommendationService[推薦服務]
-            ReportService[報告服務]
-        end
-
-        subgraph "領域層"
-            User[使用者實體]
-            Session[會話實體]
-            Response[回應實體]
-            Score[分數實體]
-            Report[報告實體]
-        end
-
-        subgraph "基礎設施層"
-            SQLiteRepo[SQLite 儲存庫]
-            FileRepo[檔案儲存庫]
-            PDFGen[PDF 生成器]
-        end
-    end
-
-    ConsentAPI --> ConsentService
-    SessionAPI --> AssessmentService
-    AssessmentAPI --> AssessmentService
-    DecisionAPI --> RecommendationService
-    ReportAPI --> ReportService
-
-    ConsentService --> User
-    AssessmentService --> Session
-    ScoringService --> Score
-    RecommendationService --> Score
-    ReportService --> Report
-
-    ConsentService --> SQLiteRepo
-    AssessmentService --> SQLiteRepo
-    ScoringService --> SQLiteRepo
-    RecommendationService --> SQLiteRepo
-    ReportService --> SQLiteRepo
-    ReportService --> FileRepo
-    ReportService --> PDFGen
-```
-
-### 2.2 心理測量系統核心
-
-**計分引擎架構**
-
-```mermaid
-flowchart TD
-    subgraph "心理測量流程"
-        RawResponses[原始回答 1-7 李克特量表]
-        ReverseScore[反向題目校正]
-        BigFive[Big Five 計分 E/A/C/N/O]
-        HEXACO[HEXACO 擴展 +H]
-        Normalization[標準化 0-100]
-
-        RawResponses --> ReverseScore
-        ReverseScore --> BigFive
-        BigFive --> HEXACO
-        HEXACO --> Normalization
-    end
-
-    subgraph "優勢映射系統"
-        WeightMatrix[12x6 權重矩陣]
-        LinearTransform[線性轉換]
-        StrengthScores[12個優勢面向分數]
-
-        Normalization --> LinearTransform
-        WeightMatrix --> LinearTransform
-        LinearTransform --> StrengthScores
-    end
-
-    subgraph "決策引擎"
-        RuleEngine[職缺規則引擎]
-        ImprovementEngine[改善建議引擎]
-        RankingSystem[排序系統]
-
-        StrengthScores --> RuleEngine
-        StrengthScores --> ImprovementEngine
-        RuleEngine --> RankingSystem
-        ImprovementEngine --> RankingSystem
-    end
-```
-
-**12 個優勢面向權重系統**
-
-```python
-# 權重矩陣範例 (簡化)
-STRENGTH_WEIGHTS = {
-    "結構化執行": {"C": +0.50, "N": -0.30, "A": +0.10, "E": 0, "O": 0, "H": 0},
-    "品質與完備": {"C": +0.40, "A": +0.30, "N": -0.25, "E": 0, "O": +0.05, "H": 0},
-    "探索與創新": {"O": +0.55, "E": +0.25, "N": -0.10, "C": -0.05, "A": 0, "H": 0},
-    "分析與洞察": {"O": +0.50, "N": -0.20, "C": +0.15, "E": 0, "A": 0, "H": +0.05},
-    "影響與倡議": {"E": +0.55, "N": -0.25, "O": +0.10, "C": 0, "A": 0, "H": 0},
-    "協作與共好": {"A": +0.45, "H": +0.30, "E": +0.15, "N": -0.10, "C": 0, "O": 0},
-    # ... 其餘 6 個面向
-}
-```
-
-### 2.3 資料流與狀態管理
-
-**核心資料流程**
-
-```mermaid
-sequenceDiagram
-    participant U as 使用者
-    participant API as FastAPI
-    participant DB as SQLite
-    participant PE as 心理測量引擎
-    participant RE as 規則引擎
-    participant PDF as PDF生成器
-
-    U->>API: POST /consent (同意條款)
-    API->>DB: 記錄同意時間和內容
-    DB-->>API: 確認記錄
-    API-->>U: 同意確認
-
-    U->>API: POST /session/start (開始測驗)
-    API->>DB: 創建會話記錄
-    DB-->>API: 返回 session_id
-    API-->>U: 測驗題目和會話ID
-
-    U->>API: POST /session/submit (提交答案)
-    API->>DB: 保存原始回答
-    API->>PE: 計算 Big Five + 12 面向
-    PE->>DB: 查詢權重配置
-    DB-->>PE: 返回當前權重版本
-    PE-->>API: 返回標準化分數
-    API->>DB: 保存計分結果和 provenance
-    API-->>U: 顯示個人優勢分析
-
-    U->>API: POST /decision/{session_id} (獲取建議)
-    API->>RE: 執行職缺推薦邏輯
-    RE->>DB: 查詢職缺規則
-    RE-->>API: 返回推薦結果
-    API->>DB: 保存決策記錄
-    API-->>U: 職缺推薦和改善建議
-
-    U->>API: GET /report/{session_id}.pdf (下載報告)
-    API->>PDF: 生成個人化 PDF
-    PDF->>DB: 查詢完整會話資料
-    PDF-->>API: 返回 PDF 檔案
-    API-->>U: PDF 下載
+┌─────────────────────────────────────┐
+│  Infrastructure Layer               │
+│  (API Routes, Database, PDF)       │
+├─────────────────────────────────────┤
+│  Application Layer                  │
+│  (Use Cases, Services)             │
+├─────────────────────────────────────┤
+│  Domain Layer                       │
+│  (Entities, Business Rules)        │
+└─────────────────────────────────────┘
 ```
 
 ---
 
-## 第 3 部分：詳細設計 (Detailed Design)
+## 2. 需求摘要
 
-### 3.1 MVP 模組優先級
+### 2.1 功能性需求
 
-**Week 1: 基礎架構模組 (P0 - 必須)**
-- `ConsentModule`: 隱私同意和資料治理
-- `SessionModule`: 測驗會話管理
-- `AssessmentModule`: Mini-IPIP 測驗引擎
-- `DatabaseModule`: SQLite 資料存取層
+| ID | 需求描述 | 優先級 |
+|:---|:---------|:------|
+| FR-1 | 用戶同意與隱私合規 | P0 |
+| FR-2 | Mini-IPIP 人格量表測驗 (20題) | P0 |
+| FR-3 | 五大人格向度計分 | P0 |
+| FR-4 | 12 個 Gallup 優勢面向映射 | P0 |
+| FR-5 | 職缺推薦引擎 | P1 |
+| FR-6 | 改善建議生成 | P1 |
+| FR-7 | PDF 報告生成與分享 | P0 |
 
-**Week 2: 計分引擎模組 (P0 - 必須)**
-- `ScoringModule`: Big Five/HEXACO 計分
-- `StrengthModule`: 12 面向優勢映射
-- `ProvenanceModule`: 可解釋性追蹤
-- `ValidationModule`: 資料驗證和清理
+### 2.2 非功能性需求
 
-**Week 3: 決策系統模組 (P0 - 必須)**
-- `RuleEngineModule`: 職缺推薦規則
-- `RecommendationModule`: 改善建議系統
-- `ReportModule`: PDF 報告生成
-- `SharingModule`: 一次性分享機制
+| NFR 分類 | 具體需求 | 目標值 |
+|:---------|:---------|:-------|
+| **性能** | 測驗完成到報告生成時間 | < 5 秒 |
+| **可用性** | 系統可用性 | > 99% |
+| **可擴展性** | 支援用戶數 | 1000+ 並發 |
+| **安全性** | 資料傳輸加密 | HTTPS/TLS 1.3 |
+| **合規性** | 個人資料保護 | GDPR 基本合規 |
 
-**Week 4: 品質保證模組 (P1 - 重要)**
-- `AuditModule`: 審計軌跡
-- `MonitoringModule`: 系統監控
-- `TestModule`: 端到端測試
-- `DeploymentModule`: 部署自動化
+---
 
-### 3.2 核心模組設計
+## 3. 技術選型
 
-#### 模組: ScoringModule (計分引擎)
+### 3.1 技術選型原則
 
-**職責**: 將使用者的 Mini-IPIP 回答轉換為標準化的優勢面向分數
+1. **優先 Python 生態:** 團隊熟悉，開發效率高
+2. **選用成熟工具:** 降低技術風險
+3. **本地優先:** MVP 階段避免雲端依賴
+4. **輕量部署:** 單一可執行檔，易於分發
 
-**核心演算法流程**:
-```python
-def calculate_strength_scores(responses: List[int], instrument_version: str) -> Dict[str, Any]:
-    """
-    計算優勢面向分數的核心演算法
+### 3.2 技術棧
 
-    Args:
-        responses: 1-7 李克特量表回答 (20題)
-        instrument_version: 使用的量表版本
+| 分類 | 技術 | 選擇理由 | 備選方案 |
+|:-----|:-----|:---------|:---------|
+| **後端框架** | FastAPI | 高性能異步、自動文檔 | Flask (功能較弱) |
+| **資料庫** | SQLite | 零配置、檔案式、嵌入式 | PostgreSQL (過度設計) |
+| **ORM** | SQLAlchemy 2.0 | 成熟、類型安全 | Peewee (社群較小) |
+| **PDF 生成** | ReportLab | 功能完整、中文支援 | WeasyPrint (CSS 佈局複雜) |
+| **驗證** | Pydantic v2 | 自動驗證、FastAPI 原生 | Marshmallow (較舊) |
+| **測試** | Pytest | 標準工具、fixture 強大 | Unittest (功能較弱) |
 
-    Returns:
-        包含分數、權重版本、計算時間的完整結果
-    """
-    # Step 1: 反向題目校正
-    corrected_responses = apply_reverse_scoring(responses, REVERSE_ITEMS)
+---
 
-    # Step 2: 計算 Big Five 原始分數
-    big_five_raw = calculate_big_five_raw(corrected_responses)
+## 4. 數據架構
 
-    # Step 3: 標準化到 0-100 範圍
-    big_five_normalized = normalize_scores(big_five_raw, NORMALIZATION_PARAMS)
+### 4.1 核心實體關係圖
 
-    # Step 4: 擴展到 HEXACO (添加 Honesty-Humility)
-    hexaco_scores = extend_to_hexaco(big_five_normalized)
+```mermaid
+erDiagram
+    AssessmentSession ||--o{ Response : contains
+    AssessmentSession ||--|| ScoreResult : produces
+    ScoreResult ||--o{ StrengthScore : contains
+    Question ||--o{ Response : answered_in
 
-    # Step 5: 應用權重矩陣得到 12 個優勢面向
-    strength_scores = apply_weight_matrix(hexaco_scores, CURRENT_WEIGHTS)
-
-    # Step 6: 記錄 Provenance
-    provenance = {
-        "instrument_version": instrument_version,
-        "weights_version": WEIGHTS_VERSION,
-        "algorithm_version": ALGORITHM_VERSION,
-        "calculation_timestamp": datetime.utcnow(),
-        "raw_responses": corrected_responses,
-        "intermediate_scores": {
-            "big_five": big_five_normalized,
-            "hexaco": hexaco_scores
-        }
+    AssessmentSession {
+        string session_id PK
+        datetime created_at
+        datetime completed_at
+        boolean consent_given
     }
 
-    return {
-        "strength_scores": strength_scores,
-        "provenance": provenance,
-        "confidence_intervals": calculate_confidence_intervals(strength_scores)
+    Question {
+        int question_id PK
+        string text
+        string dimension
+        int reverse_scored
+    }
+
+    Response {
+        int response_id PK
+        string session_id FK
+        int question_id FK
+        int score
+    }
+
+    ScoreResult {
+        int result_id PK
+        string session_id FK
+        json dimension_scores
+        datetime calculated_at
+    }
+
+    StrengthScore {
+        int strength_id PK
+        int result_id FK
+        string strength_name
+        float score
+        int rank
     }
 ```
 
-**資料模型設計**:
-```sql
--- 計分結果表
-CREATE TABLE scores (
-    id INTEGER PRIMARY KEY,
-    session_id INTEGER REFERENCES sessions(id),
+### 4.2 資料一致性策略
 
-    -- Big Five 分數 (0-100)
-    extraversion INTEGER CHECK(extraversion >= 0 AND extraversion <= 100),
-    agreeableness INTEGER CHECK(agreeableness >= 0 AND agreeableness <= 100),
-    conscientiousness INTEGER CHECK(conscientiousness >= 0 AND conscientiousness <= 100),
-    neuroticism INTEGER CHECK(neuroticism >= 0 AND neuroticism <= 100),
-    openness INTEGER CHECK(openness >= 0 AND openness <= 100),
-    honesty_humility INTEGER CHECK(honesty_humility >= 0 AND honesty_humility <= 100),
+- **強一致性:** 測驗結果計算使用 ACID 事務
+- **最終一致性:** PDF 報告異步生成（未來優化）
 
-    -- 12 個優勢面向分數 (JSON)
-    strength_scores JSON NOT NULL,
+### 4.3 資料生命週期
 
-    -- 可解釋性追蹤 (JSON)
-    provenance JSON NOT NULL,
-
-    -- 系統欄位
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    algorithm_version VARCHAR(10) NOT NULL,
-    weights_version VARCHAR(10) NOT NULL
-);
-```
-
-#### 模組: RuleEngineModule (規則引擎)
-
-**職責**: 基於優勢面向分數推薦職缺和改善建議
-
-**規則定義架構**:
-```python
-@dataclass
-class JobRecommendationRule:
-    """職缺推薦規則"""
-    rule_id: str
-    job_category: str
-    required_strengths: Dict[str, int]  # 面向名稱 -> 最低分數
-    bonus_strengths: Dict[str, float]   # 面向名稱 -> 加權係數
-    description: str
-    confidence_threshold: float = 0.7
-
-# 範例規則配置
-JOB_RULES = [
-    JobRecommendationRule(
-        rule_id="PM_EXPLORER",
-        job_category="產品策略/PM",
-        required_strengths={
-            "探索與創新": 70,
-            "分析與洞察": 60,
-            "影響與倡議": 60
-        },
-        bonus_strengths={
-            "學習與成長": 1.2,
-            "客戶導向": 1.1
-        },
-        description="適合探索型產品經理，需要創新思維和影響力"
-    ),
-    # ... 更多規則
-]
-```
-
-### 3.3 非功能性需求實現
-
-**性能需求 (Performance)**
-- **目標**: 測驗完成 ≤5分鐘，PDF生成 <1秒
-- **實現**:
-  - SQLite WAL 模式提升並發性能
-  - 權重矩陣預載入記憶體
-  - PDF 模板預編譯
-  - 計分演算法向量化計算
-
-**安全性 (Security)**
-- **目標**: 資料最小化、同意記錄、審計軌跡
-- **實現**:
-  - 所有 API 端點輸入驗證
-  - SQL 注入防護 (參數化查詢)
-  - 敏感資料欄位加密存儲
-  - 完整操作日誌記錄
-
-**可解釋性 (Explainability)**
-- **目標**: 所有建議可回溯到分數權重和規則
-- **實現**:
-  - 完整 Provenance 鏈追蹤
-  - 權重和規則版本控制
-  - 決策過程 JSON 記錄
-  - 圖形化解釋介面
-
-**可擴展性準備 (Scalability Readiness)**
-- **目標**: 架構支援未來水平擴展
-- **實現**:
-  - 無狀態 API 設計
-  - 資料庫抽象層 (Repository Pattern)
-  - 配置外部化
-  - 容器化部署準備
+| 資料類型 | 分類 | 保留期限 | 加密策略 |
+|:---------|:-----|:---------|:---------|
+| 問卷回答 | 個人資料 | 30天 | SQLite encryption extension |
+| 分析結果 | 匿名統計 | 永久 | N/A |
+| 分享連結 | 暫時性 | 7天 | Token-based |
 
 ---
 
-## 風險評估與緩解策略
+## 5. 部署架構
 
-| 風險類別 | 具體風險 | 可能性 | 影響 | 緩解措施 |
-|----------|----------|--------|------|----------|
-| **技術風險** | SQLite 並發限制影響多用戶 | 中 | 中 | WAL 模式 + 連接池管理 |
-| **業務風險** | 12 面向權重缺乏心理學驗證 | 高 | 高 | 文獻調研 + A/B 測試 |
-| **時程風險** | 4週時程過於緊湊 | 中 | 高 | MVP 範圍嚴格控制 |
-| **合規風險** | 隱私條款不符合 GDPR | 低 | 高 | 法務顧問審查 |
+### 5.1 部署視圖
+
+```
+┌─────────────────────────────────┐
+│  Local Development              │
+│  • uvicorn --reload             │
+│  • SQLite file-based DB         │
+└─────────────────────────────────┘
+         ↓ (Docker build)
+┌─────────────────────────────────┐
+│  Production Container           │
+│  • Gunicorn + Uvicorn workers   │
+│  • Volume-mounted SQLite        │
+│  • Nginx reverse proxy          │
+└─────────────────────────────────┘
+```
+
+### 5.2 環境策略
+
+| 環境 | 用途 | 資料庫 | 配置 |
+|:-----|:-----|:-------|:-----|
+| Development | 本地開發 | `dev.db` | `.env.dev` |
+| Testing | CI/CD | In-memory | `.env.test` |
+| Production | 正式環境 | `prod.db` (backup) | `.env.prod` |
+
+### 5.3 成本效益分析
+
+**MVP 階段成本（月）:**
+- 雲端虛擬機: $5-10 (Digital Ocean Droplet)
+- 網域 + SSL: $1-2
+- 總計: < $15/月
+
+**優化策略:**
+- 使用 SQLite 避免資料庫託管費用
+- 靜態資源 CDN 化（未來）
+- 容器化部署，易於遷移
 
 ---
 
-**架構審查檢查清單**:
-- [ ] 心理測量學演算法是否可驗證？
-- [ ] 系統可解釋性是否完整？
-- [ ] 4週 MVP 範圍是否可行？
-- [ ] 非功能性需求是否有明確實現方案？
-- [ ] 風險緩解措施是否充分？
+## 6. 風險與緩解
 
-**由 TaskMaster Phase 2 架構生成系統產生** 🏗️🤖
+| 風險 | 可能性 | 影響 | 緩解策略 |
+|:-----|:-------|:-----|:---------|
+| SQLite 並發限制 | 中 | 中 | 使用 WAL 模式，考慮 PostgreSQL 遷移路徑 |
+| 單點故障 | 高 | 高 | 定期備份，實作健康檢查 |
+| PDF 生成阻塞 | 中 | 低 | 異步任務隊列（Phase 2） |
+
+---
+
+## 7. 架構演進路線圖
+
+### Phase 1: MVP (當前)
+- ✅ 基礎架構建立
+- 🔄 核心功能開發
+- ⏳ 測試與文檔
+
+### Phase 2: 優化 (3-6個月)
+- 異步報告生成
+- Redis 快取層
+- 監控與告警
+
+### Phase 3: 擴展 (6-12個月)
+- PostgreSQL 遷移
+- 微服務拆分（選擇性）
+- 多租戶支援
+
+---
+
+**架構審核:** 待團隊 review
+**相關文檔:** [專案結構指南](../structure_guide.md), [API 規格](../api/api_specification.md)
