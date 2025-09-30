@@ -1,595 +1,627 @@
-# 優勢天賦評測系統 - UI/UX 設計規範
+# 優勢評測系統 UI/UX 設計規範
 
----
+**版本**: 4.0
+**更新日期**: 2025-09-30
+**狀態**: 深度整合認知心理學與說服力設計
 
-**文件版本:** v3.0 - 商業轉換優化版
-**最後更新:** 2025-09-30
-**主要作者:** UX/UI 設計師 + 商業策略團隊
-**審核者:** 產品經理, 前端開發, 心理學顧問, 行銷總監
-**狀態:** 商業導向優化完成 (Business-Optimized)
-**理論基礎:** 網站設計第一性原理 + 轉換率優化 + Thurstonian IRT模型
+## 1. 品牌定位與使命
 
----
+### 核心價值主張
+「發現你獨特的優勢組合，開啟專屬成功路徑」
 
-## 目錄
+### 認知心理學基礎
 
-1. [商業願景與設計哲學](#1-商業願景與設計哲學)
-2. [三層信任架構體系](#2-三層信任架構體系)
-3. [轉換漏斗優化設計](#3-轉換漏斗優化設計)
-4. [視覺層次與品牌語言](#4-視覺層次與品牌語言)
-5. [響應式設計與效能優化](#5-響應式設計與效能優化)
-6. [核心頁面設計規範](#6-核心頁面設計規範)
-7. [設計系統與元件庫](#7-設計系統與元件庫)
-8. [A/B測試與成長策略](#8-ab測試與成長策略)
+#### Hick's Law 應用
+- **首頁**: 單一明確 CTA，降低決策摩擦
+- **評測頁**: 每次只顯示一個區塊，避免選擇過載
+- **結果頁**: 分層展示，先總覽後細節
 
----
+#### 認知負荷理論
+- **分塊處理**: 15個區塊分次展示，每次專注一個決策
+- **視覺分組**: 相關資訊群組化，減少工作記憶負擔
+- **漸進揭露**: 複雜資訊逐步展開，避免資訊過載
 
-## 1. 商業願景與設計哲學
+#### 峰終定律 (Peak-End Rule)
+- **峰值體驗**: 發現優勢時的動畫慶祝
+- **終值優化**: 完成評測後的個人化報告是高潮結尾
 
-### 1.1 品牌使命宣言
+## 2. 信任架構體系
 
-**「讓每個人發現並發揮獨特天賦，創造更有意義的職涯」**
+### 三層信任建立
+1. **即時可見層**: SSL加密、用戶數量、評價星級
+2. **權威專業層**: 科學方法、專家背書、數據支撐
+3. **社會認同層**: 成功案例、用戶見證、即時動態
 
-我們相信每個人都有獨特的優勢組合，透過科學化的評測與個人化的建議，幫助用戶找到最適合的發展路徑。
+## 3. 用戶旅程設計
 
-### 1.2 第一性原理：從轉換出發
+### 3.1 完整用戶流程圖
 
 ```
-根本目標分解：
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-為什麼存在？ → 解決職涯迷茫問題 → 提供科學化的天賦識別
-誰是用戶？   → 25-35歲職場人士 → 追求自我實現的知識工作者
-如何成功？   → 高轉換率 × 高客戶終身價值 = 持續成長
-商業模式？   → 免費測評 → 付費報告 → 職涯諮詢服務
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[首頁] → [評測說明] → [評測進行] → [結果展示] → [深度報告] → [行動方案]
+   ↓           ↓            ↓            ↓            ↓           ↓
+[信任建立] [期待設定] [進度反饋] [價值確認] [付費轉換] [持續互動]
 ```
 
-### 1.3 設計核心策略
+### 3.2 頁面導航架構
 
-**「吸引 → 信任 → 體驗 → 驚喜 → 轉換」**
+#### 主要頁面
+1. **landing.html** - 轉換導向首頁
+2. **assessment-intro.html** - 評測說明頁【新增】
+3. **assessment.html** - 評測執行頁
+4. **results.html** - 基礎結果頁
+5. **report-detail.html** - 深度報告頁【新增】
+6. **action-plan.html** - 行動方案頁【新增】
+7. **profile.html** - 個人檔案頁【新增】
 
-| 階段 | 目標 | 設計重點 | 成功指標 |
+#### 導航邏輯
+- **前進路徑**: 線性引導，每步都有明確下一步
+- **返回機制**: 麵包屑導航 + 進度儲存
+- **跳出預防**: 離開提醒 + 進度自動儲存
+
+### 3.3 AIDA 轉換漏斗
+
+| 階段 | 頁面 | 設計重點 | 轉換目標 |
 |:-----|:-----|:---------|:---------|
-| **吸引** | 3秒內抓住注意力 | 強視覺衝擊、清晰價值主張 | 跳出率 < 15% |
-| **信任** | 建立專業權威感 | 科學背書、社會認同、安全保障 | 停留時間 > 2分鐘 |
-| **體驗** | 創造心流狀態 | 簡潔介面、即時反饋、進度可視 | 完成率 > 85% |
-| **驚喜** | 超越期待的洞察 | 個性化分析、視覺化呈現 | NPS > 70 |
-| **轉換** | 促進付費行動 | 價值錨定、稀缺性、低摩擦 | 轉換率 > 10% |
+| **Attention** | landing.html | 強視覺衝擊、清晰標題 | 100% → 85% |
+| **Interest** | assessment-intro.html | 價值展示、流程說明 | 85% → 70% |
+| **Desire** | results.html | 部分揭露、價值證明 | 70% → 40% |
+| **Action** | report-detail.html | 深度價值、付費轉換 | 40% → 10% |
 
----
+## 4. 核心頁面設計
 
-## 2. 三層信任架構體系
-
-### 2.1 第一層：即時可見的信任信號
-
-```html
-<!-- 頁面頂部信任帶 -->
-<div class="trust-bar">
-  🔒 SSL加密保護 | 📊 基於100萬+樣本數據 | 🏆 2024最佳評測工具
-</div>
-```
-
-### 2.2 第二層：權威性與專業度
-
-```html
-<!-- 科學方法展示區 -->
-<section class="methodology">
-  <h2>智能天賦識別引擎™</h2>
-  <div class="tech-highlights">
-    <div class="feature">
-      <icon>🧬</icon>
-      <h3>Thurstonian IRT模型</h3>
-      <p>諾貝爾經濟學獎理論支持，精準度提升47%</p>
-    </div>
-    <div class="feature">
-      <icon>🎯</icon>
-      <h3>12維度全面分析</h3>
-      <p>涵蓋認知、情感、行為三大領域</p>
-    </div>
-    <div class="feature">
-      <icon>📈</icon>
-      <h3>動態常模對比</h3>
-      <p>實時與同齡層、同行業對比分析</p>
-    </div>
-  </div>
-</section>
-```
-
-### 2.3 第三層：社會認同與成功案例
-
-```html
-<!-- 動態社會認同 -->
-<div class="social-proof-dynamic">
-  <!-- 實時數據展示 -->
-  <div class="live-stats">
-    <span class="pulse-dot"></span>
-    <span>目前有 <strong>127</strong> 人正在測評</span>
-  </div>
-
-  <!-- 成功故事輪播 -->
-  <div class="success-stories">
-    <blockquote>
-      "測評幫我找到了真正的職業方向，薪資提升了40%"
-      <cite>- Sarah Chen, 從會計轉型產品經理</cite>
-    </blockquote>
-  </div>
-</div>
-```
-
----
-
-## 3. 轉換漏斗優化設計
-
-### 3.1 AIDA模型實施
-
-| 階段 | 設計策略 | 具體實施 | 轉換目標 |
-|:-----|:---------|:---------|:---------|
-| **Attention** | 視覺衝擊 + 好奇心 | 大膽標題、動畫入場、倒計時 | 100% → 85% |
-| **Interest** | 價值展示 + 互動 | 互動式Demo、即時預覽結果 | 85% → 70% |
-| **Desire** | 個性化 + 稀缺性 | "專屬報告"、"限時優惠" | 70% → 40% |
-| **Action** | 摩擦最小化 | 一鍵開始、社交登錄、進度保存 | 40% → 10% |
-
-### 3.2 微轉換路徑設計
-
-```
-首頁著陸 → 價值認知 → 免費體驗 → 部分結果 → 完整報告購買
-   ↓          ↓          ↓          ↓            ↓
-  3秒       30秒       2分鐘      5分鐘        付費
-```
-
-### 3.3 西奧迪尼六大原則應用
-
-1. **互惠原則**: 提供免費的基礎分析報告
-2. **承諾一致**: 從簡單問題開始，逐步深入
-3. **社會認同**: 展示用戶數量、評價、案例
-4. **喜好原則**: 親切的語言、個性化稱呼
-5. **權威原則**: 專家背書、科學方法論
-6. **稀缺原則**: 限時優惠、專屬報告
-
----
-
-## 4. 視覺層次與品牌語言
-
-### 4.1 視覺設計系統
-
-#### 色彩心理學應用
-
-```css
-:root {
-  /* 主色：信任與專業 */
-  --primary-blue: #2563EB;     /* 主行動色 */
-  --trust-navy: #1E3A8A;       /* 權威感 */
-
-  /* 輔助色：活力與成長 */
-  --growth-green: #10B981;     /* 成功狀態 */
-  --energy-orange: #F59E0B;    /* 強調重點 */
-
-  /* 中性色：清晰層次 */
-  --text-primary: #111827;     /* 主文字 */
-  --text-secondary: #6B7280;   /* 次要文字 */
-  --background: #FFFFFF;       /* 純淨背景 */
-  --surface: #F9FAFB;         /* 卡片背景 */
-}
-```
-
-#### 字體層級系統
-
-```css
-/* 標題層級 - 建立清晰的視覺層次 */
-.h1 {
-  font-size: 3.5rem;   /* 56px - 主標題 */
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.h2 {
-  font-size: 2.25rem;  /* 36px - 區塊標題 */
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.body {
-  font-size: 1.125rem; /* 18px - 易讀性優先 */
-  line-height: 1.7;
-}
-```
-
-### 4.2 品牌語言與文案
-
-#### 專業術語大眾化轉換表
-
-| 技術術語 | 用戶友好表達 | 價值傳遞 |
-|:---------|:------------|:---------|
-| Thurstonian IRT模型 | 智能天賦識別引擎 | "更精準地了解真實的你" |
-| 潛在特質向量 | 優勢指數 | "發現你的獨特競爭力" |
-| 百分位排名 | 優勢等級 | "了解你在人群中的位置" |
-| 多維度強迫選擇 | 智能配對問答 | "更真實的選擇，更準確的結果" |
-
----
-
-## 5. 響應式設計與效能優化
-
-### 5.1 行動優先響應式策略
-
-```scss
-// 斷點系統
-$breakpoints: (
-  'mobile': 320px,   // 最小支援
-  'tablet': 768px,   // 平板
-  'desktop': 1024px, // 桌面
-  'wide': 1440px     // 大屏
-);
-
-// 行動優先媒體查詢
-@mixin respond-to($breakpoint) {
-  @media (min-width: map-get($breakpoints, $breakpoint)) {
-    @content;
-  }
-}
-```
-
-### 5.2 效能預算與優化
-
-| 指標 | 目標值 | 優化策略 |
-|:-----|:-------|:---------|
-| **首次內容繪製(FCP)** | < 1.0s | 關鍵CSS內聯、預載入字體 |
-| **最大內容繪製(LCP)** | < 2.5s | 圖片懶加載、CDN加速 |
-| **首次輸入延遲(FID)** | < 100ms | 代碼分割、Web Worker |
-| **累積佈局偏移(CLS)** | < 0.1 | 預設尺寸、字體預載 |
-| **總頁面大小** | < 1.5MB | 圖片優化、Gzip壓縮 |
-
-### 5.3 漸進式增強策略
-
-```javascript
-// 核心功能優先載入
-const criticalFeatures = async () => {
-  // 1. 基礎交互
-  await loadModule('./core-interaction.js');
-
-  // 2. 漸進增強
-  if ('IntersectionObserver' in window) {
-    await loadModule('./lazy-loading.js');
-  }
-
-  // 3. 豐富體驗
-  if (window.matchMedia('(min-width: 768px)').matches) {
-    await loadModule('./desktop-enhancements.js');
-  }
-};
-```
-
----
-
-## 6. 核心頁面設計規範
-
-### 6.1 首頁 - 轉換引擎
-
-#### 頁面目標
-- **主要**: 3秒內傳達核心價值，促進開始測評
-- **次要**: 建立信任、展示專業性
-
-#### 關鍵區塊設計
-
-```html
-<!-- Hero區 - 注意力捕獲 -->
-<section class="hero">
-  <h1 class="headline">
-    發現你的<span class="highlight">天賦優勢</span>
-    <br>開啟理想職涯
-  </h1>
-  <p class="subheadline">
-    5分鐘科學測評，獲得專屬的12維度天賦分析報告
-  </p>
-  <button class="cta-primary">
-    免費開始測評 →
-    <span class="micro-copy">已有125,847人完成</span>
-  </button>
-</section>
-
-<!-- 價值主張 - 興趣建立 -->
-<section class="value-props">
-  <div class="prop-grid">
-    <div class="prop-card">
-      <span class="icon">🎯</span>
-      <h3>精準識別</h3>
-      <p>基於百萬數據樣本的AI分析</p>
-    </div>
-    <div class="prop-card">
-      <span class="icon">⚡</span>
-      <h3>快速簡單</h3>
-      <p>僅需5分鐘，立即獲得結果</p>
-    </div>
-    <div class="prop-card">
-      <span class="icon">🎁</span>
-      <h3>免費體驗</h3>
-      <p>基礎報告完全免費</p>
-    </div>
-  </div>
-</section>
-```
-
-### 6.2 測評頁面 - 心流體驗
+### 4.1 首頁（Landing Page）
 
 #### 設計原則
-- **專注性**: 一次只顯示一個問題
-- **進度感**: 實時進度條 + 預估剩餘時間
-- **即時性**: 選擇後立即過渡，無需確認
+- **F-Pattern 佈局**: 左上角 logo，右上角 CTA
+- **視覺階層**: 標題 > 副標題 > 正文 > 細節
+- **對比原則**: CTA 按鈕使用高對比色
 
+#### 必要元素
 ```html
-<!-- 測評界面 -->
-<div class="assessment-container">
-  <!-- 進度指示器 -->
-  <div class="progress-header">
-    <div class="progress-bar">
-      <div class="progress-fill" style="width: 35%"></div>
-    </div>
-    <div class="progress-info">
-      <span>問題 7/20</span>
-      <span>預計剩餘 3 分鐘</span>
-    </div>
-  </div>
+<!-- 頂部導航 -->
+<nav>
+  - Logo (點擊返回首頁)
+  - 關於我們
+  - 如何運作
+  - 科學依據
+  - 登入/註冊
+</nav>
 
-  <!-- 問題展示 -->
-  <div class="question-card">
-    <h2 class="question-text">
-      在團隊合作中，你更傾向於...
-    </h2>
-    <div class="choices">
-      <button class="choice-card">
-        <span class="choice-label">A</span>
-        <p>主動提出創新想法並推動實施</p>
-      </button>
-      <button class="choice-card">
-        <span class="choice-label">B</span>
-        <p>仔細分析方案並提供改進建議</p>
-      </button>
-    </div>
-  </div>
+<!-- 英雄區塊 -->
+<section class="hero">
+  - 主標題：發現你的優勢DNA
+  - 副標題：3分鐘科學評測，解鎖專屬成功密碼
+  - CTA按鈕：立即開始免費測評
+  - 信任標誌：100萬+用戶 | 科學驗證 | 3分鐘完成
+</section>
 
-  <!-- 鼓勵性反饋 -->
-  <div class="encouragement">
-    💪 保持真實，沒有對錯之分
-  </div>
-</div>
+<!-- 價值說明 -->
+<section class="value-props">
+  - 圖標化三大價值
+  - 互動式優勢展示
+  - 用戶見證輪播
+</section>
 ```
 
-### 6.3 結果頁面 - 價值展示與轉換
+### 4.2 評測說明頁（Assessment Intro）【新增】
 
-#### 漸進式揭示策略
+#### 設計目的
+- 設定正確期待
+- 降低評測焦慮
+- 提高完成率
 
+#### 頁面內容
+```html
+<!-- 評測預覽 -->
+<section class="assessment-preview">
+  - 評測時長：約3-5分鐘
+  - 題目數量：15個選擇題
+  - 評測方式：選出最像和最不像你的描述
+  - 視覺化流程圖
+</section>
+
+<!-- 注意事項 -->
+<section class="guidelines">
+  - 沒有對錯答案
+  - 憑直覺選擇
+  - 確保環境安靜
+  - 進度會自動保存
+</section>
+
+<!-- 開始按鈕 -->
+<button class="start-assessment">
+  我準備好了，開始評測
+</button>
+```
+
+### 4.3 評測執行頁（Assessment）
+
+#### 設計要點
+- **專注設計**: 一次一個區塊，減少干擾
+- **進度可視化**: 進度條 + 數字指示（3/15）
+- **即時反饋**: 選擇後的視覺確認
+- **時間壓力平衡**: 顯示預估剩餘時間，但不倒數計時
+
+#### 交互細節
 ```javascript
-// 結果揭示動畫序列
-const revealSequence = [
-  { delay: 0, element: '.overall-score', animation: 'fadeInUp' },
-  { delay: 500, element: '.top-strengths', animation: 'slideIn' },
-  { delay: 1000, element: '.radar-chart', animation: 'draw' },
-  { delay: 1500, element: '.unlock-prompt', animation: 'pulse' }
-];
-```
-
-#### 免費vs付費內容策略
-
-```html
-<!-- 免費內容 - 提供價值 -->
-<section class="free-results">
-  <h2>你的優勢天賦 TOP 3</h2>
-  <div class="strength-cards">
-    <!-- 展示前3項優勢 -->
-  </div>
-</section>
-
-<!-- 付費引導 - 創造慾望 -->
-<section class="premium-teaser">
-  <div class="blurred-content">
-    <!-- 模糊化的深度分析內容 -->
-  </div>
-  <div class="unlock-overlay">
-    <h3>解鎖完整分析報告</h3>
-    <ul class="premium-features">
-      <li>✓ 12維度詳細分析</li>
-      <li>✓ 職業發展建議</li>
-      <li>✓ 個性化成長計劃</li>
-      <li>✓ 終身免費更新</li>
-    </ul>
-    <div class="pricing">
-      <span class="original-price">¥199</span>
-      <span class="current-price">¥99</span>
-      <span class="discount-label">限時5折</span>
-    </div>
-    <button class="cta-purchase">
-      立即解鎖完整報告
-    </button>
-    <p class="guarantee">
-      🛡️ 7天無條件退款保證
-    </p>
-  </div>
-</section>
-```
-
----
-
-## 7. 設計系統與元件庫
-
-### 7.1 原子設計方法論
-
-```
-原子 → 分子 → 組織 → 模板 → 頁面
-Atoms → Molecules → Organisms → Templates → Pages
-```
-
-### 7.2 核心元件規範
-
-#### 按鈕系統
-
-```scss
-// 按鈕變體
-.btn {
-  // 基礎樣式
-  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200;
-
-  // 主要按鈕 - 轉換行動
-  &--primary {
-    @apply bg-primary-blue text-white;
-    @apply hover:bg-primary-blue-dark hover:shadow-lg hover:scale-105;
+// 選擇反饋
+function handleSelection(type, index) {
+  // 視覺反饋
+  element.classList.add('selected');
+  // 觸覺反饋（移動端）
+  navigator.vibrate(50);
+  // 聲音反饋（可選）
+  playSound('select');
+  // 自動進入下一題（延遲800ms）
+  if (bothSelected()) {
+    setTimeout(nextBlock, 800);
   }
+}
 
-  // 次要按鈕 - 輔助行動
-  &--secondary {
-    @apply bg-white text-primary-blue border-2 border-primary-blue;
-    @apply hover:bg-primary-blue hover:text-white;
-  }
-
-  // 幽靈按鈕 - 低優先級
-  &--ghost {
-    @apply text-gray-600 hover:text-primary-blue;
+// 返回處理
+function handleBack() {
+  if (confirm('確定要離開嗎？您的進度會被保存')) {
+    saveProgress();
+    navigateBack();
   }
 }
 ```
 
-#### 卡片組件
+### 4.4 基礎結果頁（Results）
 
+#### 設計要點
+- **峰值體驗**: 動畫展示前5大優勢
+- **數據可視化**: 雷達圖 + 條形圖組合
+- **層次信息**: 總覽 → 優勢 → 細節 → 行動
+- **社交分享**: 一鍵生成優勢卡片
+
+#### 內容結構
 ```html
-<article class="card">
-  <div class="card__image">
-    <img src="..." loading="lazy" alt="...">
-  </div>
-  <div class="card__content">
-    <h3 class="card__title">標題</h3>
-    <p class="card__description">描述內容</p>
-  </div>
-  <div class="card__actions">
-    <button class="btn btn--primary">行動按鈕</button>
-  </div>
-</article>
+<!-- 優勢揭曉動畫 -->
+<section class="strength-reveal">
+  - 逐一展示動畫
+  - 優勢標籤雲
+  - 一句話總結
+</section>
+
+<!-- 詳細分析 -->
+<section class="detailed-analysis">
+  - 12維度雷達圖
+  - Top 5 優勢深度解析
+  - 發展建議（具體可行）
+</section>
+
+<!-- 後續行動 -->
+<section class="next-steps">
+  <button>下載完整報告</button>
+  <button>獲取行動方案</button>
+  <button>分享我的優勢</button>
+  <button>重新測評</button>
+</section>
 ```
 
-### 7.3 微交互設計
+### 4.5 深度報告頁（Report Detail）【新增】
 
-```javascript
-// 按鈕點擊反饋
-class MicroInteractions {
-  static buttonClick(button) {
-    // 觸覺反饋（移動端）
-    if ('vibrate' in navigator) {
-      navigator.vibrate(10);
+#### 設計目的
+- 提供付費轉換價值
+- 展示專業深度
+- 個性化建議
+
+#### 報告內容
+1. **優勢組合分析**
+   - 優勢間的協同效應
+   - 獨特性指數
+   - 同類型成功案例
+
+2. **職業發展建議**
+   - 適合的職業方向（具體職位）
+   - 技能發展路徑圖
+   - 學習資源推薦
+
+3. **人際互動指南**
+   - 溝通風格建議
+   - 團隊協作模式
+   - 領導力發展方向
+
+4. **個人成長計劃**
+   - 30/60/90天行動計劃
+   - 優勢強化練習
+   - 盲點改善建議
+
+### 4.6 行動方案頁（Action Plan）【新增】
+
+#### 智能化建議系統
+```python
+def generate_action_plan(profile):
+    """
+    基於用戶優勢組合生成個性化行動方案
+    """
+    plan = {
+        "immediate_actions": [],  # 立即可做
+        "short_term_goals": [],   # 1個月內
+        "long_term_vision": [],   # 3-6個月
+        "resources": [],          # 具體資源
+        "milestones": []         # 檢查點
     }
 
-    // 視覺反饋
-    button.classList.add('clicked');
+    # 基於優勢類型匹配方案
+    if "戰略思維" in profile.top_strengths:
+        plan["immediate_actions"].append({
+            "action": "開始寫策略分析日記",
+            "how": "每天花10分鐘分析一個商業案例",
+            "tool": "推薦應用：Notion策略模板"
+        })
 
-    // 漣漪效果
-    const ripple = document.createElement('span');
-    ripple.classList.add('ripple');
-    button.appendChild(ripple);
+    return plan
+```
 
-    setTimeout(() => {
-      ripple.remove();
-      button.classList.remove('clicked');
-    }, 600);
+## 5. 視覺設計系統
+
+### 5.1 格式塔原則應用
+
+#### 鄰近性 (Proximity)
+- 相關功能按鈕組合
+- 優勢卡片分組展示
+- 表單欄位邏輯分區
+
+#### 相似性 (Similarity)
+- 統一的卡片樣式
+- 一致的按鈕形狀
+- 重複的圖標系統
+
+#### 連續性 (Continuity)
+- 流暢的頁面過渡
+- 進度條的視覺延續
+- 步驟指示的連接線
+
+#### 閉合性 (Closure)
+- 進度環的完成感
+- 評測完成的視覺閉環
+- 優勢拼圖的完整性
+
+### 5.2 響應式設計策略
+
+#### 移動優先原則
+```css
+/* 基礎移動端樣式 */
+.container {
+  width: 100%;
+  padding: 16px;
+}
+
+/* 平板增強 */
+@media (min-width: 768px) {
+  .container {
+    max-width: 750px;
+    padding: 24px;
+  }
+}
+
+/* 桌面優化 */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1200px;
+    padding: 32px;
   }
 }
 ```
 
----
+## 6. 交互設計規範
 
-## 8. A/B測試與成長策略
+### 6.1 微交互設計
 
-### 8.1 測試框架
+#### 按鈕狀態
+```css
+.btn {
+  /* 默認 */
+  transition: all 0.3s ease;
 
-```javascript
-// A/B測試配置
-const experiments = {
-  'hero-cta-text': {
-    control: '免費開始測評',
-    variants: [
-      '發現你的天賦',
-      '5分鐘了解自己',
-      '開始免費測評'
-    ],
-    metric: 'click_through_rate'
-  },
-  'pricing-anchor': {
-    control: { original: 199, discounted: 99 },
-    variants: [
-      { original: 299, discounted: 99 },
-      { original: 199, discounted: 79 },
-      { original: null, discounted: 99 }
-    ],
-    metric: 'conversion_rate'
+  /* 懸停 */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
+
+  /* 點擊 */
+  &:active {
+    transform: translateY(0);
+  }
+
+  /* 載入中 */
+  &.loading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+}
+```
+
+#### 頁面過渡
+```javascript
+// 平滑過渡
+function pageTransition(targetPage) {
+  // 淡出當前頁面
+  currentPage.style.opacity = '0';
+
+  // 載入動畫
+  showLoader();
+
+  // 載入新頁面
+  setTimeout(() => {
+    window.location.href = targetPage;
+  }, 300);
+}
+```
+
+### 6.2 錯誤處理與反饋
+
+#### 錯誤預防
+- 實時驗證
+- 智能提示
+- 操作確認
+
+#### 錯誤恢復
+```javascript
+function handleError(error) {
+  // 保存當前狀態
+  saveState();
+
+  // 友好錯誤提示
+  showToast({
+    type: 'error',
+    message: '哎呀，出了點問題',
+    action: '重試',
+    onAction: () => retry()
+  });
+
+  // 自動恢復機制
+  setTimeout(() => {
+    autoRecover();
+  }, 3000);
+}
+```
+
+## 7. 深度內容策略
+
+### 7.1 個性化內容生成
+
+#### 優勢解讀模板
+```javascript
+const strengthTemplates = {
+  '戰略思維': {
+    definition: '你擅長看到大局，理解複雜系統間的關聯',
+    workplace: '在工作中，你能快速理解商業模式，預見潛在問題',
+    examples: [
+      '制定長期規劃',
+      '分析市場趨勢',
+      '優化業務流程'
+    ],
+    famousPeople: ['比爾·蓋茨', '馬雲'],
+    developmentTips: [
+      '練習系統思考：使用思維導圖工具',
+      '案例分析：每週研究一個商業案例',
+      '寫作輸出：記錄你的策略思考'
+    ]
+  },
+  // ... 其他11個維度
 };
 ```
 
-### 8.2 關鍵績效指標 (KPIs)
-
-| 指標類別 | 具體指標 | 目標值 | 測量方法 |
-|:---------|:---------|:-------|:---------|
-| **獲取** | 跳出率 | < 15% | GA4 |
-| **激活** | 測評完成率 | > 85% | 自定義事件 |
-| **留存** | 7日回訪率 | > 30% | Cohort分析 |
-| **收入** | 付費轉換率 | > 10% | 交易追蹤 |
-| **推薦** | NPS分數 | > 70 | 問卷調查 |
-
-### 8.3 持續優化流程
-
-```mermaid
-graph LR
-    A[數據收集] --> B[假設形成]
-    B --> C[實驗設計]
-    C --> D[A/B測試]
-    D --> E[結果分析]
-    E --> F[決策實施]
-    F --> A
+#### 組合效應分析
+```javascript
+const synergyAnalysis = {
+  ['戰略思維', '溝通']: {
+    synergy: '策略傳播者',
+    description: '你不僅能制定優秀策略，還能清晰傳達願景',
+    careers: ['產品經理', '創業家', '管理顧問'],
+    advice: '考慮需要同時運用分析和表達能力的角色'
+  },
+  // ... 其他組合
+};
 ```
 
----
+### 7.2 行動建議深化
 
-## 實施路線圖
+#### 具體化建議框架
+```python
+class ActionRecommendation:
+    def __init__(self, strength, context):
+        self.strength = strength
+        self.context = context  # 用戶背景
 
-### Phase 1: 基礎建設 (Week 1-2)
-- [ ] 設計系統搭建
-- [ ] 核心頁面開發
-- [ ] 響應式適配
+    def generate_actions(self):
+        actions = {
+            'daily_practice': self._get_daily_practice(),
+            'skill_building': self._get_skills_to_learn(),
+            'project_ideas': self._get_project_suggestions(),
+            'reading_list': self._get_book_recommendations(),
+            'online_courses': self._get_course_links(),
+            'community': self._get_community_suggestions()
+        }
+        return actions
 
-### Phase 2: 體驗優化 (Week 3-4)
-- [ ] 微交互實現
-- [ ] 動畫效果
-- [ ] 性能優化
+    def _get_daily_practice(self):
+        # 每日可執行的小練習
+        if self.strength == '學習力':
+            return [
+                '費曼技巧：向他人解釋今天學到的一個概念',
+                '康奈爾筆記：用此方法記錄一次會議',
+                '間隔重複：使用Anki復習重要知識點'
+            ]
+```
 
-### Phase 3: 轉換優化 (Week 5-6)
-- [ ] A/B測試框架
-- [ ] 數據追蹤埋點
-- [ ] 轉換漏斗優化
+### 7.3 進度追蹤系統
 
-### Phase 4: 持續迭代 (Ongoing)
-- [ ] 數據驅動優化
-- [ ] 用戶反饋整合
-- [ ] 新功能實驗
+#### 返回引導機制
+```javascript
+class ProgressTracker {
+  constructor() {
+    this.checkpoints = [
+      'landing_viewed',
+      'assessment_started',
+      'assessment_50_complete',
+      'assessment_completed',
+      'results_viewed',
+      'report_downloaded'
+    ];
+  }
 
----
+  saveProgress(checkpoint, data) {
+    localStorage.setItem('progress', JSON.stringify({
+      checkpoint,
+      data,
+      timestamp: Date.now()
+    }));
+  }
 
-## 附錄：設計檢查清單
+  getReturnPath() {
+    const progress = JSON.parse(localStorage.getItem('progress'));
 
-### 每個頁面必須滿足
+    if (!progress) return '/landing.html';
 
-- [ ] 3秒內傳達核心價值
-- [ ] 明確的主要行動呼籲 (CTA)
-- [ ] 至少3個信任信號
-- [ ] 移動端完美適配
-- [ ] 頁面加載 < 2秒
-- [ ] 可訪問性 WCAG 2.1 AA 標準
+    // 根據進度返回適當頁面
+    switch(progress.checkpoint) {
+      case 'assessment_started':
+      case 'assessment_50_complete':
+        return '/assessment.html?resume=true';
+      case 'assessment_completed':
+        return `/results.html?session=${progress.data.sessionId}`;
+      default:
+        return '/landing.html';
+    }
+  }
 
-### 轉換優化檢查
+  showReturnPrompt() {
+    const lastVisit = localStorage.getItem('lastVisit');
+    if (lastVisit && Date.now() - lastVisit < 86400000) { // 24小時內
+      showToast({
+        message: '歡迎回來！要繼續上次的進度嗎？',
+        actions: [
+          { text: '繼續', onClick: () => this.resume() },
+          { text: '重新開始', onClick: () => this.restart() }
+        ]
+      });
+    }
+  }
+}
+```
 
-- [ ] 價值主張清晰可見
-- [ ] 社會認同元素
-- [ ] 降低感知風險的保證
-- [ ] 緊急性或稀缺性元素
-- [ ] 簡化的操作流程
-- [ ] 清晰的進度指示
+## 8. 技術規格
 
----
+### 8.1 性能指標
+- FCP (First Contentful Paint) < 1.0s
+- LCP (Largest Contentful Paint) < 2.5s
+- FID (First Input Delay) < 100ms
+- CLS (Cumulative Layout Shift) < 0.1
 
-**文檔維護說明**: 本規範為活文檔，將根據A/B測試結果、用戶反饋和業務目標持續更新優化。
+### 8.2 瀏覽器支援
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-**下次更新計劃**: 2025-10-15 (整合首輪A/B測試結果)
+### 8.3 響應式斷點
+- Mobile: 320px - 767px
+- Tablet: 768px - 1023px
+- Desktop: 1024px - 1439px
+- Wide: 1440px+
+
+## 9. 性能優化
+
+### 9.1 載入優化
+- 關鍵 CSS 內聯
+- JavaScript 延遲載入
+- 圖片懶載入
+- 預連接關鍵域名
+
+### 9.2 運行時優化
+- 虛擬滾動
+- 防抖節流
+- Web Workers
+- 請求快取
+
+## 10. 文案指南
+
+### 10.1 語氣與風格
+- **專業但親切**: 避免過於學術的表達
+- **積極正向**: 強調優勢和可能性
+- **行動導向**: 使用動詞開頭的句子
+
+### 10.2 術語轉換
+| 技術術語 | 用戶友好表達 |
+|:---------|:------------|
+| Thurstonian IRT | 智能優勢識別 |
+| 四選二強迫選擇 | 優勢配對選擇 |
+| 常模參照 | 同齡人對比 |
+
+## 11. 實施檢查清單
+
+### 11.1 頁面完整性檢查
+
+- [ ] **landing.html** - 首頁實現
+  - [ ] 信任標誌顯示
+  - [ ] CTA 按鈕醒目
+  - [ ] 價值主張清晰
+  - [ ] 響應式適配
+
+- [ ] **assessment-intro.html** - 評測說明頁【待開發】
+  - [ ] 流程說明清楚
+  - [ ] 期待設定恰當
+  - [ ] 開始按鈕明確
+
+- [ ] **assessment.html** - 評測頁優化
+  - [ ] 進度保存功能
+  - [ ] 返回提醒機制
+  - [ ] 自動下一題
+
+- [ ] **results.html** - 結果頁增強
+  - [ ] 動畫效果流暢
+  - [ ] 數據視覺化
+  - [ ] 後續引導清晰
+
+- [ ] **report-detail.html** - 深度報告【待開發】
+  - [ ] 內容個性化
+  - [ ] 建議具體化
+  - [ ] 下載功能
+
+- [ ] **action-plan.html** - 行動方案【待開發】
+  - [ ] 計劃可執行
+  - [ ] 資源連結有效
+  - [ ] 進度追蹤
+
+- [ ] **profile.html** - 個人檔案【待開發】
+  - [ ] 歷史記錄
+  - [ ] 進步追蹤
+  - [ ] 分享功能
+
+### 11.2 用戶流程驗證
+
+- [ ] 新用戶完整流程順暢
+- [ ] 返回用戶恢復機制完善
+- [ ] 錯誤處理友好
+- [ ] 載入狀態明確
+- [ ] 離開確認提醒
+
+## 12. 總結
+
+本規範（v4.0）深度整合了認知心理學原理、格式塔設計原則、AIDA模型和Cialdini說服力原則，解決了以下關鍵問題：
+
+### 已解決問題
+1. ✅ **頁面功能缺失** - 新增5個關鍵頁面完善用戶旅程
+2. ✅ **內容空泛問題** - 建立深度個性化內容生成系統
+3. ✅ **導航斷層** - 設計完整的進度追蹤與返回機制
+4. ✅ **認知負荷** - 應用Hick's Law簡化決策流程
+5. ✅ **轉換優化** - AIDA模型貫穿全流程
+
+### 核心改進
+- **系統化**: 從單點優化到全流程設計
+- **科學化**: 每個決策都有心理學依據
+- **個性化**: 從通用建議到定制化方案
+- **可執行**: 從概念到具體實施細節
+
+### 下一步行動
+1. 實施新增頁面開發
+2. 整合深度內容系統
+3. 部署進度追蹤機制
+4. A/B測試優化轉換
+
+透過這次全面升級，系統將真正實現「發現優勢 → 理解價值 → 採取行動」的完整閉環。

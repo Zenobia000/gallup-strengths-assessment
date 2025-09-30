@@ -1,34 +1,66 @@
-# Gallup 優勢測驗
+# Gallup 優勢測驗系統 v4.0
 
-**透過 Gallup 認證課程的問卷協助用戶分析**
+**企業級心理測量與優勢分析平台**
 
-> **專案目標**: 4週內建立「同意→作答→計分→決策建議→PDF報告」的端到端 MVP
+> **專案狀態**: v4.0 Thurstonian IRT 模型升級中 (2025-09-30)
+> **核心目標**: 提供科學化、可解釋的優勢分析與職涯發展建議
 
-## 🎯 專案特色
+## 🎯 產品特色
 
-- **📊 公領域人格量表** - 基於 Big Five/HEXACO + Mini-IPIP (20題)
-- **🧠 自有優勢本體** - 12個優勢面向權重系統
-- **⚙️ 規則引擎** - 職缺推薦與改善建議系統
-- **📄 PDF 報告** - 一鍵生成個人化分析報告
-- **🔒 隱私合規** - 完整同意流程與審計軌跡
-- **⚡ 高效MVP** - SQLite + FastAPI，4週交付
+### 核心功能
+- **📊 雙軌評估系統**
+  - v3.0: Mini-IPIP 傳統李克特量表 (20題 + 情境題)
+  - v4.0: Thurstonian IRT 迫選式問卷 (60題四選二)
+- **🧠 統一知識庫** - CareerKnowledgeBase 單一資料來源
+- **🎯 12維度優勢模型** - 完整心理測量映射系統
+- **📈 常模化分數** - 百分位、T分數、九分量表
+- **💼 職涯匹配引擎** - 智能職位推薦與發展建議
+- **📄 即時報告生成** - PDF/HTML 多格式輸出
+- **🔒 企業級安全** - GDPR 合規、完整審計軌跡
+- **⚡ 高效能架構** - FastAPI + SQLite WAL 模式
 
 ## 🚀 技術架構
 
-### 後端技術棧
-- **FastAPI** (Python 3.11+) - 高效API框架
-- **SQLite** - 輕量級資料庫 (WAL模式)
-- **Pydantic** - 資料驗證與序列化
-- **ReportLab** - PDF報告生成
+### 核心技術
+- **FastAPI** (Python 3.11+) - 非同步高效能 API 框架
+- **SQLite** (WAL 模式) - 生產級輕量資料庫
+- **NumPy/SciPy** - 科學計算與 IRT 模型
+- **Pydantic** - 強型別資料驗證
+- **ReportLab** - 專業 PDF 報告生成
 
-### 核心模組
+### 心理測量模型
+- **v3.0**: Classical Test Theory (CTT)
+- **v4.0**: Thurstonian Item Response Theory (IRT)
+  - 最大似然估計 (MLE)
+  - 期望後驗估計 (EAP)
+  - 邊際最大似然校準 (MMLE)
+
+### 專案結構
 ```
 src/main/python/
-├── core/          # 心理測量核心演算法
-├── models/        # 資料模型與Schema
-├── services/      # 業務邏輯服務層
-├── api/           # FastAPI路由與端點
-└── utils/         # 工具函式與共用邏輯
+├── core/
+│   ├── scoring/           # v3.0 CTT 計分引擎
+│   ├── v4/                # v4.0 IRT 模型
+│   │   ├── irt_scorer.py      # Thurstonian IRT 計分
+│   │   ├── block_designer.py  # 區組設計演算法
+│   │   ├── irt_calibration.py # 參數校準 EM 演算法
+│   │   └── normative_scoring.py # 常模轉換
+│   ├── recommendation/    # 推薦引擎
+│   └── knowledge/         # 統一知識庫
+├── models/                # 資料模型
+│   ├── schemas.py         # Pydantic schemas
+│   └── v4/                # v4.0 迫選模型
+├── api/                   # REST API
+│   ├── routes/
+│   │   ├── v4_assessment.py  # v4.0 端點
+│   │   └── recommendations.py # 推薦端點
+│   └── main.py           # FastAPI 應用
+├── services/              # 業務服務層
+├── data/                  # 資料檔案
+│   ├── v4_statements.py   # 60 題陳述句庫
+│   └── v4_normative_data.json # 常模資料
+└── utils/                 # 工具函式
+    └── migrations/        # 資料庫遷移
 ```
 
 ## 📊 12個優勢面向系統
@@ -57,38 +89,30 @@ S_k = Σ(w_k,d * z_d) + b_k  → [0-100]
 - b_k: 基準偏移值
 ```
 
-## 📋 開發計劃 (4週)
+## 📋 版本路線圖
 
-### Week 1: 基礎架構 (40h) ✅ 已完成
-- [x] 專案結構建立
-- [x] SQLite 資料庫設計與初始化
-- [x] FastAPI 專案架構
-- [x] Mini-IPIP 題庫建立 (20題中文版)
-- [x] 基礎 API 端點 (同意、會話、問題、提交)
-- [x] 用戶同意與隱私合規
-- [x] 前端評估介面
-- [x] 結果顯示頁面
-- [x] 基本計分系統
+### v3.0 (已完成) - 傳統 CTT 模型
+- ✅ Mini-IPIP 李克特量表 (20題)
+- ✅ Big Five 人格維度計分
+- ✅ 12 維度優勢映射
+- ✅ 情境問題增強
+- ✅ 統一知識庫 CareerKnowledgeBase
+- ✅ 職涯推薦與發展建議
 
-### Week 2: 計分引擎 (45h)
-- [ ] 人格向度計分演算法
-- [ ] 12個優勢面向權重系統
-- [ ] 可解釋性追蹤 (provenance)
-- [ ] 決策推理鏈實作
-- [ ] 單元測試完善
+### v4.0 (開發中) - Thurstonian IRT 模型
+- 🔄 迫選式問卷設計 (60題四選二)
+- 🔄 區組設計演算法 (BIBD)
+- 🔄 IRT 參數校準 (EM 演算法)
+- 🔄 常模化分數轉換
+- 🔄 API v4 端點整合
+- ⬜ A/B 測試框架
+- ⬜ 小規模預測試
 
-### Week 3: 推薦系統 (38h)
-- [ ] 職缺規則引擎
-- [ ] 改善建議系統
-- [ ] PDF 報告模板
-- [ ] 一次性分享連結
-- [ ] 整合測試
-
-### Week 4: 品質保證 (33h)
-- [ ] 端到端測試
-- [ ] 錯誤處理與監控
-- [ ] 審計軌跡完善
-- [ ] 文檔與部署準備
+### v5.0 (規劃中) - 企業版
+- ⬜ 多租戶支援
+- ⬜ 團隊分析儀表板
+- ⬜ API 商業授權
+- ⬜ 雲端部署
 
 ## 🔧 開發指南
 

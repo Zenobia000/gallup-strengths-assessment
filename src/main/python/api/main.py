@@ -230,8 +230,9 @@ from api.routes import cache_admin
 app.include_router(cache_admin.router, prefix="/api/v1", tags=["Cache"])
 
 # V4.0 Thurstonian IRT routes
-from api.routes import v4_assessment
+from api.routes import v4_assessment, v4_data_collection
 app.include_router(v4_assessment.router, tags=["V4 Assessment"])
+app.include_router(v4_data_collection.router, tags=["V4 Data Collection"])
 
 # Mount static files for frontend
 import os
@@ -277,6 +278,21 @@ async def assessment_page():
         return FileResponse(assessment_file)
     else:
         raise HTTPException(status_code=404, detail="Assessment page not found")
+
+# V4 Pilot test frontend endpoint
+@app.get("/v4-pilot", include_in_schema=False)
+async def v4_pilot_page():
+    """Serve the v4 pilot test frontend page."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    pilot_file = os.path.join(static_dir, "v4_pilot_test.html")
+
+    if os.path.exists(pilot_file):
+        return FileResponse(pilot_file)
+    else:
+        raise HTTPException(status_code=404, detail="V4 pilot test page not found")
 
 # Root endpoint redirect
 @app.get("/", include_in_schema=False)

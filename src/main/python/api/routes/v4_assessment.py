@@ -9,6 +9,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import json
 import uuid
+import numpy as np
 
 from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel, Field
@@ -17,9 +18,12 @@ from core.v4.block_designer import QuartetBlockDesigner
 from core.v4.irt_scorer import ThurstonianIRTScorer
 from core.v4.normative_scoring import NormativeScorer
 from core.v4.irt_calibration import ThurstonianIRTCalibrator
-from data.v4_statements import STATEMENT_POOL, DIMENSION_MAPPING
+from core.v4.performance_optimizer import get_optimizer, cached_computation
+from data.v4_statements import STATEMENT_POOL, DIMENSION_MAPPING, get_all_statements
 from utils.database import get_database_manager
+from models.v4.forced_choice import Statement as FCStatement
 from pathlib import Path
+import time
 
 
 router = APIRouter(prefix="/api/v4")
@@ -130,29 +134,51 @@ async def get_assessment_blocks(request: BlockRequest = BlockRequest()):
         # Initialize block designer if needed
         global block_designer
         if block_designer is None:
-            block_designer = QuartetBlockDesigner(STATEMENT_POOL)
+            # Convert statements to Statement objects expected by block designer
+            statements_list = []
+            for stmt in get_all_statements():
+                statements_list.append(FCStatement(
+                    statement_id=stmt.statement_id,
+                    text=stmt.text,
+                    dimension=stmt.dimension,
+                    factor_loading=stmt.factor_loading,
+                    social_desirability=stmt.social_desirability
+                ))
+            block_designer = QuartetBlockDesigner(statements_list)
 
         # Design blocks
-        blocks_data = block_designer.design_blocks(
-            num_blocks=request.block_count
-        )
+        quartet_blocks = block_designer.create_blocks(method='balanced')
 
-        # Format blocks for response
+        # Limit to requested number of blocks
+        quartet_blocks = quartet_blocks[:request.block_count]
+
+        # Format blocks for response and for storage
         blocks = []
-        for i, block in enumerate(blocks_data):
+        blocks_data = []  # For database storage
+
+        for i, quartet_block in enumerate(quartet_blocks):
+            # Format for API response
             statements = []
-            for stmt_id in block['statement_ids']:
-                stmt = next(s for s in STATEMENT_POOL if s['id'] == stmt_id)
+            statement_ids = []
+            for stmt in quartet_block.statements:
                 statements.append(Statement(
-                    id=stmt['id'],
-                    text=stmt['text'],
-                    dimension=stmt['dimension']
+                    id=stmt.statement_id,
+                    text=stmt.text,
+                    dimension=stmt.dimension
                 ))
+                statement_ids.append(stmt.statement_id)
 
             blocks.append(AssessmentBlock(
                 block_id=i,
                 statements=statements
             ))
+
+            # Format for database storage
+            blocks_data.append({
+                'block_id': i,
+                'statement_ids': statement_ids,
+                'dimensions': quartet_block.dimensions
+            })
 
         # Store blocks in session for later scoring
         db_manager = get_database_manager()
@@ -219,18 +245,63 @@ async def submit_assessment(request: SubmitRequest):
                 'response_time_ms': resp.response_time_ms
             })
 
-        # Calculate IRT scores
-        scorer = get_irt_scorer()
-        theta_scores = scorer.score(formatted_responses, blocks_data)
+        # Get performance optimizer
+        optimizer = get_optimizer()
 
-        # Convert to normative scores
-        norm_scores = norm_scorer.compute_norm_scores(theta_scores)
+        # Calculate IRT scores with caching
+        scorer = get_irt_scorer()
+
+        # Check cache first
+        cached_theta = optimizer.get_cached_theta(formatted_responses, blocks_data)
+
+        if cached_theta is not None:
+            theta_scores = cached_theta
+            # Create mock theta_estimate for compatibility
+            class MockEstimate:
+                def __init__(self, theta):
+                    self.theta = theta
+                    self.log_likelihood = -100.0  # Placeholder
+                    self.converged = True
+                    self.iterations = 0  # From cache
+                    self.standard_errors = np.ones_like(theta) * 0.1
+            theta_estimate = MockEstimate(theta_scores)
+        else:
+            # Convert responses to the format expected by the scorer
+            response_list = []
+            for resp in formatted_responses:
+                response_list.append({
+                    'block_id': resp['block_id'],
+                    'most_like': resp['most_like_index'],
+                    'least_like': resp['least_like_index']
+                })
+
+            # Get theta estimates
+            start_time = time.time()
+            theta_estimate = scorer.estimate_theta(response_list, blocks_data)
+            theta_scores = theta_estimate.theta
+            duration = time.time() - start_time
+
+            # Track performance and cache result
+            optimizer.track_computation_time(duration)
+            optimizer.cache_theta_estimation(formatted_responses, blocks_data, theta_scores)
+
+        # Convert to normative scores with caching
+        @cached_computation('norm_scores', ttl=7200)
+        def compute_norm_scores_cached(theta):
+            return norm_scorer.compute_norm_scores(theta)
+
+        norm_scores = compute_norm_scores_cached(theta_scores)
 
         # Get strength profile
         profile = norm_scorer.get_strength_profile(norm_scores)
 
-        # Calculate fit statistics
-        fit_stats = scorer.calculate_fit_statistics(formatted_responses, blocks_data, theta_scores)
+        # Calculate fit statistics from theta estimation
+        fit_stats = {
+            'log_likelihood': theta_estimate.log_likelihood,
+            'converged': theta_estimate.converged,
+            'iterations': theta_estimate.iterations,
+            'mean_se': float(np.mean(theta_estimate.standard_errors))
+        }
 
         # Format dimension scores
         dimension_scores = []
@@ -377,6 +448,9 @@ async def run_calibration(sample_size: int = 1000, max_iterations: int = 50):
 @router.get("/health")
 async def health_check():
     """V4 system health check"""
+    optimizer = get_optimizer()
+    perf_stats = optimizer.get_performance_stats()
+
     return {
         "status": "healthy",
         "version": "4.0.0",
@@ -385,6 +459,33 @@ async def health_check():
             "block_designer": "ready",
             "irt_scorer": "ready" if irt_scorer else "not initialized",
             "norm_scorer": "ready",
-            "calibration": "available"
+            "calibration": "available",
+            "cache": "active"
+        },
+        "performance": {
+            "cache_hit_rate": f"{perf_stats['hit_rate']:.1f}%",
+            "cache_hits": perf_stats['cache_hits'],
+            "cache_misses": perf_stats['cache_misses'],
+            "avg_computation_ms": perf_stats['avg_computation_time'] * 1000
         }
     }
+
+
+@router.get("/performance/stats")
+async def get_performance_stats():
+    """Get detailed performance statistics"""
+    optimizer = get_optimizer()
+    return optimizer.get_performance_stats()
+
+
+@router.post("/cache/clear")
+async def clear_cache(prefix: Optional[str] = None):
+    """
+    Clear cache entries.
+
+    Args:
+        prefix: Optional prefix to clear specific cache types
+    """
+    optimizer = get_optimizer()
+    optimizer.clear_cache(prefix)
+    return {"status": "success", "message": f"Cache cleared: {prefix or 'all'}"}

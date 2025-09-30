@@ -567,7 +567,7 @@
             try {
                 showLoading();
                 // Load assessment blocks from API
-                const response = await fetch('/api/v4/assessment/blocks');
+                const response = await fetch('http://localhost:8004/api/v4/assessment/blocks');
                 const data = await response.json();
                 assessmentData.blocks = data.blocks;
                 hideLoading();
@@ -838,7 +838,7 @@
             // Submit results
             try {
                 showLoading();
-                const response = await fetch('/api/v4/assessment/submit', {
+                const response = await fetch('http://localhost:8004/api/v4/assessment/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

@@ -590,23 +590,47 @@
         // Initialize Assessment
         async function initAssessment() {
             try {
-                // Load questions from API
-                const response = await fetch('http://localhost:8004/api/v1/questions');
+                // Load assessment blocks from V4 API
+                const response = await fetch('http://localhost:8004/api/v4/assessment/blocks?block_count=15');
                 if (response.ok) {
                     const data = await response.json();
-                    // Transform questions to quartet format if needed
-                    console.log('Loaded questions from API:', data);
+                    console.log('Loaded blocks from API:', data);
+
+                    // Store session ID
+                    sessionId = data.session_id;
+
+                    // Transform blocks to questions format
+                    questions = data.blocks.map(block => ({
+                        id: `q${block.block_id}`,
+                        block_id: block.block_id,
+                        statements: block.statements.map((stmt, idx) => ({
+                            id: stmt.id,
+                            text: stmt.text,
+                            dimension: stmt.dimension,
+                            index: idx
+                        }))
+                    }));
+
+                    totalQuestions = questions.length;
+                    console.log(`Loaded ${totalQuestions} blocks from API`);
+                } else {
+                    throw new Error('Failed to load blocks from API');
                 }
             } catch (error) {
-                console.log('Using sample questions');
+                console.error('Error loading blocks:', error);
+                console.log('Using sample questions as fallback');
                 questions = sampleQuestions;
+                totalQuestions = sampleQuestions.length;
             }
         }
 
         // Start Assessment
         async function startAssessment() {
             startTime = new Date();
-            sessionId = generateSessionId();
+            // sessionId is already set from initAssessment
+            if (!sessionId) {
+                sessionId = generateSessionId();
+            }
 
             // Hide welcome screen
             document.getElementById('welcomeScreen').style.display = 'none';
@@ -733,14 +757,27 @@
         // Navigate Questions
         function nextQuestion() {
             // Save current response
-            const mostLike = document.querySelector('.btn-most.selected')?.closest('.statement-card').dataset.statementId;
-            const leastLike = document.querySelector('.btn-least.selected')?.closest('.statement-card').dataset.statementId;
+            const mostLikeBtn = document.querySelector('.btn-most.selected');
+            const leastLikeBtn = document.querySelector('.btn-least.selected');
+
+            if (!mostLikeBtn || !leastLikeBtn) {
+                alert('請選擇最像和最不像的選項');
+                return;
+            }
+
+            const mostLikeCard = mostLikeBtn.closest('.statement-card');
+            const leastLikeCard = leastLikeBtn.closest('.statement-card');
+
+            // Find the index of selected statements
+            const cards = Array.from(document.querySelectorAll('.statement-card'));
+            const mostLikeIndex = cards.indexOf(mostLikeCard);
+            const leastLikeIndex = cards.indexOf(leastLikeCard);
 
             responses[currentQuestion] = {
-                questionId: currentQuestion,
-                mostLike: mostLike,
-                leastLike: leastLike,
-                timestamp: new Date().toISOString()
+                block_id: currentQuestion,
+                most_like_index: mostLikeIndex,
+                least_like_index: leastLikeIndex,
+                response_time_ms: Date.now() - (startTime?.getTime() || Date.now())
             };
 
             if (currentQuestion < totalQuestions - 1) {
@@ -794,8 +831,8 @@
                     },
                     body: JSON.stringify({
                         session_id: sessionId,
-                        responses: responses,
-                        completion_time: completionTime
+                        responses: responses.filter(r => r !== undefined),  // Remove any undefined responses
+                        completion_time_seconds: completionTime
                     })
                 });
 

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v4.0 小規模預測試 - Thurstonian IRT 系統</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .header p {
+            color: var(--text-muted);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        #testSection {
+            display: none;
+        }
+
+        .block-container {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .statements {
+            margin: 1rem 0;
+        }
+
+        .statement-item {
+            padding: 1rem;
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .statement-item:hover {
+            border-color: var(--border);
+        }
+
+        .statement-item.most-like {
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+
+        .statement-item.least-like {
+            border-color: var(--warning);
+            background: #fef3c7;
+        }
+
+        .statement-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .statement-index {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+
+        .dimension-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--bg);
+            color: var(--text-muted);
+            border-radius: 12px;
+            font-size: 0.875rem;
+            margin-left: auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.5s;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>v4.0 小規模預測試</h1>
+            <p>Thurstonian IRT 模型校準資料收集</p>
+        </div>
+
+        <!-- Registration Section -->
+        <div id="registrationSection" class="card">
+            <h2 class="section-title">參與者註冊</h2>
+
+            <div class="alert alert-info">
+                <strong>研究目的：</strong>收集優勢測驗v4.0版本的校準資料，以建立標準化常模。
+            </div>
+
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="age">年齡：</label>
+                    <input type="number" id="age" min="18" max="100" placeholder="請輸入年齡（18-100）">
+                </div>
+
+                <div class="form-group">
+                    <label>性別：</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="gender" value="male">
+                            <label for="male">男性</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="gender" value="female">
+                            <label for="female">女性</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="other" name="gender" value="other">
+                            <label for="other">其他</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="prefer_not" name="gender" value="prefer_not_to_say">
+                            <label for="prefer_not">不願透露</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="education">教育程度：</label>
+                    <select id="education">
+                        <option value="">請選擇</option>
+                        <option value="high_school">高中職</option>
+                        <option value="bachelor">學士</option>
+                        <option value="master">碩士</option>
+                        <option value="doctorate">博士</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="testGroup">測試組別：</label>
+                    <select id="testGroup">
+                        <option value="pilot">預測試組</option>
+                        <option value="calibration">校準組</option>
+                        <option value="validation">驗證組</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">開始測試</button>
+            </form>
+        </div>
+
+        <!-- Test Section -->
+        <div id="testSection" class="card">
+            <h2 class="section-title">優勢測驗 v4.0</h2>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <div class="timer" id="timer">00:00</div>
+
+            <div id="blockContainer">
+                <!-- Blocks will be inserted here -->
+            </div>
+
+            <div class="button-group">
+                <button id="prevBtn" class="btn btn-secondary" onclick="previousBlock()">上一題</button>
+                <button id="nextBtn" class="btn btn-primary" onclick="nextBlock()">下一題</button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="card" style="display: none;">
+            <h2 class="section-title">測試完成</h2>
+
+            <div class="alert alert-success">
+                感謝您的參與！您的資料已成功提交。
+            </div>
+
+            <div class="stats-grid" id="statsContainer">
+                <!-- Stats will be inserted here -->
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="location.reload()">再測一次</button>
+                <button class="btn btn-secondary" onclick="viewStats()">查看統計</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v4/data-collection';
+
+        let participantId = null;
+        let sessionId = null;
+        let testBlocks = [];
+        let currentBlockIndex = 0;
+        let responses = [];
+        let startTime = null;
+        let timerInterval = null;
+
+        // Registration
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const registration = {
+                age: parseInt(document.getElementById('age').value) || null,
+                gender: document.querySelector('input[name="gender"]:checked')?.value || null,
+                education: document.getElementById('education').value || null,
+                test_group: document.getElementById('testGroup').value
+            };
+
+            try {
+                showLoading(true);
+
+                // Register participant
+                const regResponse = await fetch(`${API_BASE}/participants/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registration)
+                });
+
+                if (!regResponse.ok) throw new Error('Registration failed');
+
+                const regData = await regResponse.json();
+                participantId = regData.participant_id;
+
+                // Start test session
+                const sessionResponse = await fetch(`${API_BASE}/sessions/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        participant_id: participantId,
+                        test_version: 'v4'
+                    })
+                });
+
+                if (!sessionResponse.ok) throw new Error('Failed to start session');
+
+                const sessionData = await sessionResponse.json();
+                sessionId = sessionData.session_id;
+                testBlocks = sessionData.blocks;
+
+                // Initialize responses array
+                responses = new Array(testBlocks.length).fill(null);
+
+                // Start test
+                startTest();
+
+            } catch (error) {
+                alert('註冊失敗: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        function startTest() {
+            document.getElementById('registrationSection').style.display = 'none';
+            document.getElementById('testSection').style.display = 'block';
+
+            startTime = Date.now();
+            startTimer();
+
+            displayBlock(0);
+        }
+
+        function displayBlock(index) {
+            currentBlockIndex = index;
+            const block = testBlocks[index];
+
+            // Update progress
+            const progress = ((index + 1) / testBlocks.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            // Build block HTML
+            let html = `
+                <div class="block-container">
+                    <h3>區組 ${index + 1} / ${testBlocks.length}</h3>
+                    <p class="alert alert-info">請選擇<strong>最符合</strong>和<strong>最不符合</strong>您的陳述（各選一項）</p>
+                    <div class="statements">
+            `;
+
+            block.statements.forEach((stmt, i) => {
+                html += `
+                    <div class="statement-item" id="stmt-${i}" onclick="selectStatement(${i})">
+                        <div class="statement-header">
+                            <div class="statement-index">${i + 1}</div>
+                            <span>${stmt.text}</span>
+                            <span class="dimension-tag">${stmt.dimension}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('blockContainer').innerHTML = html;
+
+            // Restore previous selection if exists
+            if (responses[index]) {
+                updateBlockDisplay(responses[index].most_like_index, responses[index].least_like_index);
+            }
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').textContent =
+                index === testBlocks.length - 1 ? '提交' : '下一題';
+        }
+
+        function selectStatement(index) {
+            const currentResponse = responses[currentBlockIndex] || {
+                block_id: currentBlockIndex,
+                most_like_index: null,
+                least_like_index: null,
+                response_time_ms: null
+            };
+
+            // Toggle selection logic
+            if (currentResponse.most_like_index === index) {
+                currentResponse.most_like_index = null;
+            } else if (currentResponse.least_like_index === index) {
+                currentResponse.least_like_index = null;
+            } else if (currentResponse.most_like_index === null) {
+                currentResponse.most_like_index = index;
+            } else if (currentResponse.least_like_index === null && index !== currentResponse.most_like_index) {
+                currentResponse.least_like_index = index;
+            } else {
+                // Replace most_like
+                currentResponse.most_like_index = index;
+            }
+
+            responses[currentBlockIndex] = currentResponse;
+            updateBlockDisplay(currentResponse.most_like_index, currentResponse.least_like_index);
+        }
+
+        function updateBlockDisplay(mostLikeIndex, leastLikeIndex) {
+            // Clear all selections
+            document.querySelectorAll('.statement-item').forEach(item => {
+                item.classList.remove('most-like', 'least-like');
+            });
+
+            // Apply selections
+            if (mostLikeIndex !== null) {
+                document.getElementById(`stmt-${mostLikeIndex}`).classList.add('most-like');
+            }
+            if (leastLikeIndex !== null) {
+                document.getElementById(`stmt-${leastLikeIndex}`).classList.add('least-like');
+            }
+        }
+
+        function previousBlock() {
+            if (currentBlockIndex > 0) {
+                displayBlock(currentBlockIndex - 1);
+            }
+        }
+
+        async function nextBlock() {
+            // Validate current block
+            const currentResponse = responses[currentBlockIndex];
+            if (!currentResponse ||
+                currentResponse.most_like_index === null ||
+                currentResponse.least_like_index === null) {
+                alert('請選擇最符合和最不符合您的陳述');
+                return;
+            }
+
+            // Record response time
+            currentResponse.response_time_ms = Date.now() - startTime;
+
+            if (currentBlockIndex < testBlocks.length - 1) {
+                displayBlock(currentBlockIndex + 1);
+            } else {
+                await submitResponses();
+            }
+        }
+
+        async function submitResponses() {
+            try {
+                showLoading(true);
+
+                const completionTime = (Date.now() - startTime) / 1000;
+
+                const submitData = {
+                    session_id: sessionId,
+                    responses: responses.filter(r => r !== null),
+                    completion_time_seconds: completionTime
+                };
+
+                const response = await fetch(`${API_BASE}/sessions/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(submitData)
+                });
+
+                if (!response.ok) throw new Error('Failed to submit responses');
+
+                stopTimer();
+                showResults(completionTime);
+
+            } catch (error) {
+                alert('提交失敗: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showResults(completionTime) {
+            document.getElementById('testSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+
+            const minutes = Math.floor(completionTime / 60);
+            const seconds = Math.floor(completionTime % 60);
+
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${testBlocks.length}</div>
+                    <div class="stat-label">完成區組數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                    <div class="stat-label">完成時間</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${participantId}</div>
+                    <div class="stat-label">參與者編號</div>
+                </div>
+            `;
+        }
+
+        async function viewStats() {
+            try {
+                showLoading(true);
+                const response = await fetch(`${API_BASE}/stats`);
+                const stats = await response.json();
+
+                alert(`
+資料收集統計：
+- 總參與者：${stats.total_participants}
+- 目標樣本：${stats.target_sample_size}
+- 完成率：${stats.completion_rate.toFixed(1)}%
+- 平均完成時間：${Math.round(stats.timing.avg_seconds / 60)}分鐘
+                `);
+            } catch (error) {
+                alert('無法載入統計資料');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent =
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+    </script>
+</body>
+</html>
