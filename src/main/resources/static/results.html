@@ -687,18 +687,70 @@
             </div>
         </div>
 
+        <!-- Next Actions Section -->
+        <div class="next-actions-section" style="background: linear-gradient(135deg, #EBF5FF 0%, #F0F9FF 100%); border-radius: 20px; padding: 48px; margin-bottom: 32px; text-align: center;">
+            <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary);">
+                下一步行動
+            </h2>
+            <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 40px;">
+                深入了解你的優勢，制定個人發展計劃
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: var(--shadow-lg); transition: all 0.3s; cursor: pointer;" onclick="viewDetailedReport()">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">查看深度分析報告</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px;">
+                        獲得30頁詳細分析，包含職涯建議、學習資源和發展路徑
+                    </p>
+                    <button class="btn btn-primary" style="margin-top: 16px; width: 100%;">
+                        立即查看
+                    </button>
+                </div>
+                <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: var(--shadow-lg); transition: all 0.3s; cursor: pointer;" onclick="createActionPlan()">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">生成行動方案</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px;">
+                        根據你的優勢制定30/60/90天個性化發展計劃
+                    </p>
+                    <button class="btn btn-primary" style="margin-top: 16px; width: 100%; background: var(--growth-green);">
+                        生成計劃
+                    </button>
+                </div>
+                <div style="background: white; border-radius: 16px; padding: 32px; box-shadow: var(--shadow-lg); transition: all 0.3s; cursor: pointer;" onclick="goToProfile()">
+                    <div style="font-size: 48px; margin-bottom: 16px;">👤</div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px;">個人檔案中心</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px;">
+                        追蹤你的成長進度，查看歷史記錄和成就徽章
+                    </p>
+                    <button class="btn btn-outline" style="margin-top: 16px; width: 100%;">
+                        前往檔案
+                    </button>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="retakeAssessment()">
+                    <span style="margin-right: 8px;">🔄</span>
+                    重新測評
+                </button>
+                <button class="btn btn-outline" onclick="goHome()">
+                    <span style="margin-right: 8px;">🏠</span>
+                    返回首頁
+                </button>
+            </div>
+        </div>
+
         <!-- Share Section -->
         <div class="share-section">
             <h3 style="margin-bottom: 8px;">分享你的優勢</h3>
             <p style="color: var(--text-secondary);">讓朋友也發現他們的天賦</p>
             <div class="share-buttons">
-                <button class="share-btn" style="background: #1877F2; color: white;">
+                <button class="share-btn" style="background: #1877F2; color: white;" onclick="shareToSocial('facebook')">
                     分享到 Facebook
                 </button>
-                <button class="share-btn" style="background: #1DA1F2; color: white;">
+                <button class="share-btn" style="background: #1DA1F2; color: white;" onclick="shareToSocial('twitter')">
                     分享到 Twitter
                 </button>
-                <button class="share-btn" style="background: #25D366; color: white;">
+                <button class="share-btn" style="background: #25D366; color: white;" onclick="shareToSocial('whatsapp')">
                     分享到 WhatsApp
                 </button>
             </div>
@@ -794,6 +846,33 @@
 
             // Redirect to payment page
             window.location.href = '/payment?product=premium_report';
+        }
+
+        // Navigation Functions
+        function viewDetailedReport() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session') || 'demo';
+            window.location.href = `report-detail.html?session=${sessionId}`;
+        }
+
+        function createActionPlan() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session') || 'demo';
+            window.location.href = `action-plan.html?session=${sessionId}`;
+        }
+
+        function goToProfile() {
+            window.location.href = 'profile.html';
+        }
+
+        function retakeAssessment() {
+            if (confirm('確定要重新進行評測嗎？這將開始一個新的測評流程。')) {
+                window.location.href = 'assessment-intro.html';
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'landing.html';
         }
 
         // Share Functions
