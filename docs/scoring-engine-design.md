@@ -1,200 +1,203 @@
 # Scoring Engine Technical Design Specification
 
-> **Document Version**: 3.0 (Forced-Choice Model Redesign)
+> **Document Version**: 4.0 (Thurstonian IRT Model Upgrade)
 > **Date**: 2025-09-30
 > **Author**: TaskMaster Design Agent
-> **Status**: Ready for Implementation
-> **Prerequisites**: `scoring-algorithm-research.md` (v3.0+)
+> **Status**: Ready for Implementation (Pending Calibration)
+> **Prerequisites**: `scoring-algorithm-research.md` (v4.0+)
 
 ## Executive Summary
 
-This document specifies the technical architecture for the scoring engine, redesigned around a **30-item forced-choice questionnaire**. The system's primary output is a structured **Tiered Talent Profile**, generated directly from user preferences. This design is simpler, more robust, and provides higher-fidelity insights than the previous proxy-based model.
+This document specifies the technical architecture for the scoring engine, redesigned around a **Thurstonian IRT model** and a **multi-statement forced-choice questionnaire**. This upgrade moves the system from a simple heuristic to a scientifically valid psychometric engine, producing normative, comparable scores. The output remains a structured **Tiered Talent Profile**, but its credibility and accuracy are significantly enhanced.
 
 ## 1. Architecture Overview
 
-### 1.1 System Context (Direct Assessment Pipeline)
+### 1.1 System Context (IRT-based Pipeline)
 
-The new pipeline is significantly streamlined. It directly translates user choices into a ranked talent profile, which is then classified into tiers.
+The new pipeline incorporates the offline calibration step and a more sophisticated online scoring engine.
 
 ```
+[Offline Phase: Pre-computation]
+┌──────────────────┐   ┌─────────────────┐   ┌─────────────────────────┐
+│ Item Pool        │──▶│ Calibration     │──▶│ Pre-calibrated          │
+│ (48+ Statements) │   │ Study (n≈500)   │   │ IRT Parameters (.json)  │
+└──────────────────┘   └─────────────────┘   └─────────────────────────┘
+                                                       │ (Loads)
+[Online Phase: Real-time Scoring]                      ▼
 ┌──────────────┐   ┌───────────────────┐   ┌───────────────────┐   ┌──────────────────┐
-│ 30 Forced-   │──▶│ ForcedChoice      │──▶│ TalentTier      │──▶│ Tiered Talent    │
-│ Choice       │   │ Scorer            │   │ Classifier      │   │ Profile          │
-│ Responses    │   │ (Tallying Engine) │   │                   │   │ (Final Output)   │
+│ User Responses │──▶│ IRT Scoring       │──▶│ TalentTier      │──▶│ Tiered Talent    │
+│ (Quartet Blocks) │   │ Engine (TIRT)     │   │ Classifier      │   │ Profile          │
 └──────────────┘   └───────────────────┘   └───────────────────┘   └──────────────────┘
-        (Input)            (Ranked Talents)      (Tiered Profile)         │
-                                                                         ▼
-                                                                 ┌──────────────────┐
-                                                                 │ Recommendation   │
-                                                                 │ Engine (Week 3)  │
-                                                                 └──────────────────┘
 ```
 
 ### 1.2 Design Principles
-(Unchanged from v2.0)
+(Unchanged)
 
 ### 1.3 Performance Requirements
-- **Scoring Latency**: < 5ms per assessment (The new algorithm is computationally simpler)
+- **Scoring Latency**: < 50ms per assessment (IRT estimation is more intensive than tallying)
 - **Database Write**: < 50ms per profile
-- **Memory Usage**: < 10MB per scoring instance
-- **Reliability**: 99.9% uptime for scoring operations
+- **Memory Usage**: < 50MB per scoring instance (to load IRT parameters)
 
 ## 2. Core Components Design (Redesigned)
 
 ### 2.1 Data Structures
 
-The final-output data structures (`Talent`, `TieredTalentProfile`, `ScoringResult`) from v2.0 remain perfectly suited for this new architecture. However, the input data structure changes.
+The input data structure is updated for block-based responses. The output structures remain relevant.
 
 ```python
-from typing import List, Dict, Tuple
+from typing import List, Dict, Optional
 from dataclasses import dataclass
 
 @dataclass
-class ForcedChoiceResponse:
-    """Represents a single response from the 30-item questionnaire."""
-    question_id: int  # 1-30
-    chosen_option: str  # "A" or "B"
+class ForcedChoiceBlockResponse:
+    """Represents a single response from a multi-statement block."""
+    block_id: int
+    most_like_me_statement_id: str
+    least_like_me_statement_id: str
 
-# ... TieredTalentProfile, Talent, and ScoringResult dataclasses remain as defined in v2.0 ...
+# --- TieredTalentProfile, Talent, and ScoringResult dataclasses remain as defined in v2.0 ---
+# Note: The `score` field in the `Talent` object will now represent a percentile (0-100).
 ```
 
-### 2.2 ForcedChoiceScorer (New Core Component)
+### 2.2 IRTScorer (New Core Component)
 **Location**: `src/main/python/core/scoring/scorer.py`
 
-This class replaces the previous `MiniIPIPScorer` and `StrengthsMapper`. It is the new heart of the scoring engine.
+This class is the new heart of the engine, replacing all previous scoring and mapping logic. It applies a pre-trained statistical model.
 
 ```python
-from collections import defaultdict
-
-class ForcedChoiceScorer:
+class IRTScorer:
     """
-    Calculates raw talent scores directly from 30 forced-choice responses.
+    Estimates latent talent traits using a pre-calibrated Thurstonian IRT model.
     """
-    TALENT_PAIRING_MATRIX = {
-        # The 30-item matrix from the research document
-        1: ("T1", "T3"), 2: ("T2", "T4"), 3: ("T5", "T7"),
-        4: ("T6", "T8"), 5: ("T9", "T11"), 6: ("T10", "T12"),
-        7: ("T1", "T4"), 8: ("T2", "T5"), 9: ("T3", "T6"),
-        10: ("T7", "T9"), 11: ("T8", "T10"), 12: ("T11", "T1"),
-        13: ("T12", "T2"), 14: ("T4", "T5"), 15: ("T3", "T8"),
-        16: ("T6", "T11"), 17: ("T7", "T12"), 18: ("T9", "T1"),
-        19: ("T10", "T2"), 20: ("T5", "T11"), 21: ("T3", "T12"),
-        22: ("T4", "T6"), 23: ("T8", "T9"), 24: ("T1", "T7"),
-        25: ("T2", "T6"), 26: ("T3", "T10"), 27: ("T4", "T11"),
-        28: ("T5", "T9"), 29: ("T7", "T8"), 30: ("T12", "T4")
-    }
-    
-    TALENT_IDS = [f"T{i}" for i in range(1, 13)]
-
-    def calculate_scores(self, responses: List[ForcedChoiceResponse]) -> List[Talent]:
+    def __init__(self, item_param_path: str, norm_param_path: str):
         """
-        Takes 30 forced-choice responses and returns a ranked list of Talents.
+        Initializes the scorer by loading pre-calibrated model parameters.
 
         Args:
-            responses: A list of 30 ForcedChoiceResponse objects.
+            item_param_path: Path to the JSON file with IRT item parameters.
+            norm_param_path: Path to the JSON file with population norm parameters (means/SDs for theta-to-percentile conversion).
+        """
+        self.item_params = self._load_json(item_param_path)
+        self.norm_params = self._load_json(norm_param_path)
+        # In a real implementation, this might initialize a more complex
+        # object for a library like `cats` or a custom estimation function.
+
+    def estimate_scores(self, responses: List[ForcedChoiceBlockResponse]) -> List[Talent]:
+        """
+        Takes block responses and returns a ranked list of Talents with percentile scores.
 
         Returns:
-            A list of 12 Talent objects, sorted by score in descending order.
+            A list of 12 Talent objects with percentile scores, sorted descending.
         """
-        if len(responses) != 30:
-            raise ValueError("Expected exactly 30 responses.")
+        # Step 1: Apply the TIRT model to estimate latent traits (thetas)
+        # This is a complex statistical operation. The actual implementation
+        # will depend on the chosen psychometric library or custom algorithm.
+        # For design purposes, we represent it as a call to a private method.
+        latent_thetas = self._estimate_latent_thetas(responses)
 
-        talent_scores = defaultdict(int)
+        # Step 2: Convert latent thetas to percentiles using population norms
+        percentiles = self._convert_thetas_to_percentiles(latent_thetas)
 
-        for response in responses:
-            q_id = response.question_id
-            choice = response.chosen_option
-            
-            if q_id not in self.TALENT_PAIRING_MATRIX:
-                continue # Or raise error for invalid question_id
+        # Step 3: Create and sort Talent objects
+        talents = [Talent(name=name, score=int(round(p))) for name, p in percentiles.items()]
+        talents.sort(key=lambda t: t.score, reverse=True)
+        
+        return talents
 
-            talent_pair = self.TALENT_PAIRING_MATRIX[q_id]
-            chosen_talent_id = talent_pair[0] if choice == "A" else talent_pair[1]
-            talent_scores[chosen_talent_id] += 1
+    def _estimate_latent_thetas(self, responses: List[ForcedChoiceBlockResponse]) -> Dict[str, float]:
+        """
+        (Placeholder for the core IRT estimation logic)
+        This function would use Maximum Likelihood Estimation (MLE) or
+        Bayesian methods (e.g., EAP) to find the most likely theta values
+        that would produce the given response pattern.
+        """
+        # --- This is a placeholder for a complex statistical calculation ---
+        # A real implementation would involve matrix operations based on
+        # self.item_params and the response vectors.
+        print("Applying Thurstonian IRT model...")
+        # For demonstration, return mock data.
+        mock_thetas = {f"T{i+1}": (i - 5.5) / 3.5 for i in range(12)}
+        return mock_thetas
 
-        # Create a sorted list of Talent objects
-        # Ensure all talents are present, even if their score is 0
-        final_scores = {talent_id: talent_scores.get(talent_id, 0) for talent_id in self.TALENT_IDS}
+    def _convert_thetas_to_percentiles(self, thetas: Dict[str, float]) -> Dict[str, float]:
+        """
+        Converts latent trait scores (thetas) to percentiles.
+        Requires scipy or a similar stats library.
+        """
+        from scipy.stats import norm
+        percentiles = {}
+        for talent_id, theta in thetas.items():
+            # Using standard normal distribution (Mean=0, SD=1) for thetas
+            percentiles[talent_id] = norm.cdf(theta) * 100
+        return percentiles
 
-        sorted_talents = sorted(
-            final_scores.items(),
-            key=lambda item: item[1],
-            reverse=True
-        )
+    def _load_json(self, path: str) -> dict:
+        import json
+        with open(path, 'r') as f:
+            return json.load(f)
 
-        return [Talent(name=name, score=score) for name, score in sorted_talents]
 ```
 
 ### 2.3 TalentTierClassifier
-**Location**: `src/main/python/core/scoring/tier.py`
-
-(This component's design from v2.0 is **perfectly reusable** as-is. Its function is to take a ranked list of `Talent` objects and classify them, which is exactly what the new `ForcedChoiceScorer` provides.)
+(This component's design from v2.0 is still valid. It now ingests `Talent` objects with percentile scores and classifies them based on pre-defined percentile thresholds, e.g., >75th, 25-75th, <25th.)
 
 ## 3. Database Schema
-(The schema defined in v2.0 is **perfectly reusable**. The decision to store the final `TieredTalentProfile` as a JSON object in the `scores` table means no changes are needed here.)
+(The v2.0 schema is still valid. The `strengths_profile` JSON column will now store the `TieredTalentProfile` containing talents with percentile scores.)
 
-## 4. API Integration Points (Simplified)
+## 4. API Integration Points
 
 ### 4.1 Scoring Service (Conceptual)
 
-The orchestration service is now much simpler.
+The service now depends on the pre-calibrated parameter files.
 
 ```python
 class ScoringService:
     def __init__(self):
-        self.scorer = ForcedChoiceScorer()
-        self.quality_checker = ResponseQualityChecker() # Still useful for timing, patterns
+        # These paths would come from a configuration file
+        ITEM_PARAM_PATH = "resources/irt_item_params_v1.json"
+        NORM_PARAM_PATH = "resources/population_norms_v1.json"
+        
+        self.scorer = IRTScorer(ITEM_PARAM_PATH, NORM_PARAM_PATH)
+        self.quality_checker = ResponseQualityChecker()
         self.classifier = TalentTierClassifier()
 
     def process_assessment(
         self,
         session_id: str,
-        responses: List[ForcedChoiceResponse],
+        responses: List[ForcedChoiceBlockResponse],
         completion_time: int
     ) -> ScoringResult:
-        """Orchestrates the new, direct scoring pipeline."""
-        quality_flags = self.quality_checker.assess_quality(responses, completion_time)
-        ranked_talents = self.scorer.calculate_scores(responses)
-        tiered_profile = self.classifier.classify(ranked_talents)
-
-        result = ScoringResult(
-            session_id=session_id,
-            tiered_profile=tiered_profile,
-            # ... other metadata fields like confidence, quality_flags, etc.
-        )
-        
-        self._save_profile_to_db(session_id, result)
-        return result
+        """Orchestrates the IRT-based scoring pipeline."""
+        # ... quality checks ...
+        ranked_talents_with_percentiles = self.scorer.estimate_scores(responses)
+        tiered_profile = self.classifier.classify(ranked_talents_with_percentiles)
+        # ... create and save ScoringResult ...
+            return result
 ```
 
 ### 4.2 API Endpoints
-(The `/profile/{session_id}` endpoint defined in v2.0 remains the **ideal interface**. No changes are needed, as it is already designed to serve the final `TieredTalentProfile` object, regardless of how it was calculated.)
+(The `/profile/{session_id}` endpoint from v2.0 remains the ideal interface.)
 
 ## 5. Testing Strategy (Updated)
 
-Testing is now more focused.
+Testing for the `IRTScorer` is different; it's about validating the *implementation* of the model, not the model's parameters themselves (which are validated offline).
 
-### 5.1 Unit Testing
-- **`TestForcedChoiceScorer` (New & Critical)**:
-    - Create a mock response list where one talent is chosen 5 times and others less. Assert it is ranked first.
-    - Create a response list where scores are tied. Assert a consistent secondary sort order.
-    - Test with invalid input (e.g., 29 responses, invalid `chosen_option`).
-- **`TestTalentTierClassifier`**: Tests from v2.0 are still valid.
-
-### 5.2 Integration Testing
-- The end-to-end test must be rewritten to provide a list of 30 `ForcedChoiceResponse` objects and assert that the final `TieredTalentProfile` is correctly structured and reflects the input choices.
+- **`TestIRTScorer` (New & Critical)**:
+    - Test that it correctly loads parameter files.
+    - Create a known set of responses and a pre-computed, expected set of theta scores (calculated externally in R or a trusted tool). Assert that the Python implementation yields the same thetas within a small tolerance.
+    - Test the theta-to-percentile conversion against known statistical values.
+- **Integration & E2E Tests**: Update to send `ForcedChoiceBlockResponse` objects as input.
 
 ## 6. Implementation Checklist (Updated)
 
-- [ ] **Task 1**: Implement the `ForcedChoiceResponse` input data structure.
-- [ ] **Task 2**: Implement the new `ForcedChoiceScorer` with the full 30-item pairing matrix.
-- [ ] **Task 3**: Implement the `TalentTierClassifier` (reusing v2.0 design).
-- [ ] **Task 4**: Update the main `ScoringService` to orchestrate the new, simpler pipeline.
-- [ ] **Task 5**: Update the database logic to save the profile (reusing v2.0 design).
-- [ ] **Task 6**: Implement the `/profile/{session_id}` API endpoint (reusing v2.0 design).
-- [ ] **Task 7**: Write comprehensive unit and integration tests for the `ForcedChoiceScorer`.
+- [ ] **Task 0 (Critical Pre-requisite)**: Conduct the offline item calibration study and produce the `irt_item_params.json` and `population_norms.json` files.
+- [ ] **Task 1**: Implement the `ForcedChoiceBlockResponse` input data structure.
+- [ ] **Task 2**: Implement the new `IRTScorer`, including the logic for loading parameters and a placeholder or actual implementation of the IRT estimation algorithm.
+- [ ] **Task 3**: Implement the `TalentTierClassifier` with percentile-based thresholds.
+- [ ] **Task 4**: Update the `ScoringService` to orchestrate the new pipeline.
+- [ ] **Task 5-7**: Update database logic, API endpoints, and tests as per the new design.
 
 ---
 **Document Status**: Design Complete ✅
 
-This technical design provides a complete blueprint for a more direct, robust, and elegant talent assessment engine. By moving to the 30-item forced-choice model, the system's accuracy and alignment with proven psychometric principles are significantly enhanced.
+This v4.0 design provides a blueprint for a truly professional-grade psychometric engine. It is scientifically defensible, produces comparable normative scores, and aligns with the highest standards in modern talent assessment.
