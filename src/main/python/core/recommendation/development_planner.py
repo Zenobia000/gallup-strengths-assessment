@@ -23,8 +23,9 @@ from enum import Enum
 from datetime import datetime, timedelta
 import json
 
-from .strength_mapper import StrengthProfile, StrengthScore, StrengthDomain
-from .career_matcher import CareerMatch, JobRole
+from .strength_mapper import StrengthProfile, StrengthScore
+from .career_matcher import CareerMatch
+from ..knowledge.career_knowledge_base import CareerRole, StrengthCategory
 
 
 class DevelopmentArea(Enum):
@@ -232,10 +233,10 @@ class DevelopmentPlanner:
         domain_gaps = []
 
         domain_names = {
-            StrengthDomain.EXECUTING: "執行力",
-            StrengthDomain.INFLUENCING: "影響力",
-            StrengthDomain.RELATIONSHIP_BUILDING: "關係建立",
-            StrengthDomain.STRATEGIC_THINKING: "戰略思維"
+            StrengthCategory.EXECUTING: "執行力",
+            StrengthCategory.INFLUENCING: "影響力",
+            StrengthCategory.RELATIONSHIP_BUILDING: "關係建立",
+            StrengthCategory.STRATEGIC_THINKING: "戰略思維"
         }
 
         # Find domains with low representation

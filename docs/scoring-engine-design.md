@@ -1,32 +1,32 @@
 # Scoring Engine Technical Design Specification
 
-> **Document Version**: 1.0
+> **Document Version**: 2.0 (Tier-Focused Redesign)
 > **Date**: 2025-09-30
 > **Author**: TaskMaster Week 2 Design Agent
 > **Status**: Ready for Implementation
-> **Prerequisites**: `scoring-algorithm-research.md`
+> **Prerequisites**: `scoring-algorithm-research.md` (v2.0+)
 
 ## Executive Summary
 
-This document specifies the technical architecture for implementing the Mini-IPIP Big Five scoring engine in the Gallup Strengths Assessment system. The design follows Linus Torvalds principles of simplicity, reliability, and performance while maintaining scientific rigor.
+This document specifies the technical architecture for the scoring engine, redesigned to be centered around the **Talent Tier Framework**. The system's primary output is no longer a simple set of scores, but a structured **Tiered Talent Profile**. This design follows Linus Torvalds' principles of simplicity and reliability while delivering actionable, hierarchical insights to the user.
 
 ## 1. Architecture Overview
 
-### 1.1 System Context
+### 1.1 System Context (Tier-Focused)
+
+The scoring pipeline is redesigned to explicitly produce a tiered profile, which then feeds into the recommendation engine.
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Assessment     │───▶│   Scoring        │───▶│  Strengths      │
-│  Service        │    │   Engine         │    │  Mapping        │
-│  (Week 1)       │    │  (Week 2)        │    │  (Week 2)       │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-        │                        │                        │
-        ▼                        ▼                        ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  User           │    │  Score           │    │  Recommendation │
-│  Responses      │    │  Storage         │    │  Engine         │
-│  (SQLite)       │    │  (Enhanced)      │    │  (Week 3)       │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌──────────────┐   ┌───────────┐   ┌───────────┐   ┌───────────────────┐   ┌──────────────────┐
+│ User         │──▶│ MiniIPIP  │──▶│ Strengths │──▶│ TalentTier      │──▶│ Tiered Talent    │
+│ Responses    │   │ Scorer    │   │ Mapper    │   │ Classifier      │   │ Profile          │
+└──────────────┘   └───────────┘   └───────────┘   └───────────────────┘   └──────────────────┘
+        (Input)         (Raw Scores)   (Ranked Scores)      (Tiered Output)          │
+                                                                                    ▼
+                                                                            ┌──────────────────┐
+                                                                            │ Recommendation   │
+                                                                            │ Engine (Week 3)  │
+                                                                            └──────────────────┘
 ```
 
 ### 1.2 Design Principles
@@ -42,14 +42,55 @@ This document specifies the technical architecture for implementing the Mini-IPI
 - **Scoring Latency**: < 10ms per assessment (20 items)
 - **Database Write**: < 50ms per score set
 - **Batch Processing**: 100+ assessments per minute
-- **Memory Usage**: < 10MB per scoring instance
+- **Memory Usage**: < 15MB per scoring instance (to accommodate new objects)
 - **Reliability**: 99.9% uptime for scoring operations
 
-## 2. Core Components Design
+## 2. Core Components Design (Redesigned)
 
-### 2.1 MiniIPIPScorer Class
+### 2.1 Data Structures (New)
 
-**Location**: `src/main/python/core/scoring.py`
+To support the tier-focused architecture, we introduce new, more descriptive data structures.
+
+```python
+from typing import List, Dict, Tuple, Optional
+from datetime import datetime
+from dataclasses import dataclass
+from models.schemas import ItemResponse, BigFiveScores, HEXACOScores
+
+@dataclass
+class Talent:
+    """Represents a single talent with its score."""
+    name: str
+    score: int
+    description: Optional[str] = None
+    strategy: Optional[str] = None # For lesser talents
+
+@dataclass
+class TieredTalentProfile:
+    """The primary, structured output of the scoring engine."""
+    dominant_talents: List[Talent]
+    supporting_talents: List[Talent]
+    lesser_talents: List[Talent]
+    full_ranking: List[Talent]
+
+@dataclass
+class ScoringResult:
+    """Complete scoring result with metadata and the final tiered profile."""
+    session_id: str
+    tiered_profile: TieredTalentProfile
+    raw_scores: BigFiveScores
+    percentiles: Dict[str, float]
+    confidence: float
+    quality_flags: List[str]
+    processing_time_ms: float
+    algorithm_version: str
+    calculated_at: datetime
+```
+
+### 2.2 MiniIPIPScorer Class
+**Location**: `src/main/python/core/scoring/scorer.py`
+
+(The internal logic of `MiniIPIPScorer` remains largely the same as in v1.0, calculating raw and standardized Big Five scores. Its role is now to provide the foundational data for the `StrengthsMapper`.)
 
 ```python
 from typing import List, Dict, Optional, Tuple
@@ -243,7 +284,7 @@ class MiniIPIPScorer:
         return sum(confidence_factors) / len(confidence_factors)
 ```
 
-### 2.2 Response Quality Checker
+### 2.3 Response Quality Checker
 
 ```python
 class ResponseQualityChecker:
@@ -308,7 +349,7 @@ class ResponseQualityChecker:
         return max_consecutive >= 5
 ```
 
-### 2.3 Strengths Mapper
+### 2.4 Strengths Mapper
 
 ```python
 class StrengthsMapper:
@@ -333,40 +374,90 @@ class StrengthsMapper:
         "責任與當責": lambda scores: 0.7 * scores.conscientiousness + 0.3 * scores.agreeableness,
     }
 
-    def map_to_strengths(self, big_five_scores: BigFiveScores) -> StrengthScores:
-        """Convert Big Five scores to 12 strength dimensions."""
+    def map_to_strengths(self, big_five_scores: BigFiveScores) -> List[Talent]:
+        """Convert Big Five scores to a ranked list of 12 strength Talents."""
         strength_values = {}
 
         for strength_name, formula in self.STRENGTH_FORMULAS.items():
             raw_score = formula(big_five_scores)
-            # Clamp to 0-100 range
             strength_values[strength_name] = int(max(0, min(100, raw_score)))
 
-        return StrengthScores(**strength_values)
+        # Sort by score to create a ranked list
+        sorted_strengths = sorted(
+            strength_values.items(),
+            key=lambda item: item[1],
+            reverse=True
+        )
+
+        return [Talent(name=name, score=score) for name, score in sorted_strengths]
 ```
 
-## 3. Database Schema Extensions
+### 2.5 TalentTierClassifier (New Core Component)
+
+```python
+class TalentTierClassifier:
+    """
+    Classifies a ranked list of talents into a structured, tiered profile.
+    """
+    DOMINANT_COUNT = 4
+    SUPPORTING_COUNT = 4
+
+    def classify(self, ranked_talents: List[Talent]) -> TieredTalentProfile:
+        """
+        Creates a TieredTalentProfile from a ranked list of talents.
+
+        Args:
+            ranked_talents: A list of Talent objects, sorted by score descending.
+
+        Returns:
+            A TieredTalentProfile object with talents categorized into tiers.
+        """
+        if len(ranked_talents) != 12:
+            raise ValueError("Expected 12 ranked talents for classification.")
+
+        dominant = ranked_talents[:self.DOMINANT_COUNT]
+        supporting = ranked_talents[self.DOMINANT_COUNT : self.DOMINANT_COUNT + self.SUPPORTING_COUNT]
+        lesser = ranked_talents[self.DOMINANT_COUNT + self.SUPPORTING_COUNT:]
+
+        # Optionally, add descriptions and strategies here
+        self._add_context(dominant, supporting, lesser)
+
+        return TieredTalentProfile(
+            dominant_talents=dominant,
+            supporting_talents=supporting,
+            lesser_talents=lesser,
+            full_ranking=ranked_talents
+        )
+
+    def _add_context(self, dominant: List[Talent], supporting: List[Talent], lesser: List[Talent]):
+        """Placeholder for adding descriptions and management strategies."""
+        for talent in dominant:
+            talent.description = f"This is a key driver for you..."
+        for talent in lesser:
+            talent.strategy = f"Partner with others who excel in {talent.name}..."
+```
+
+## 3. Database Schema Extensions (Redesigned)
 
 ### 3.1 Enhanced Scores Table
 
+The `scores` table will be adapted to store the full, structured `TieredTalentProfile` as JSON, which is more aligned with the system's purpose.
+
 ```sql
--- Extend existing scores table with new columns
-ALTER TABLE scores ADD COLUMN scoring_confidence REAL DEFAULT 0.0;
-ALTER TABLE scores ADD COLUMN response_quality_flags JSON DEFAULT '[]';
-ALTER TABLE scores ADD COLUMN raw_scores JSON NOT NULL DEFAULT '{}';
-ALTER TABLE scores ADD COLUMN percentiles JSON NOT NULL DEFAULT '{}';
-ALTER TABLE scores ADD COLUMN processing_time_ms REAL DEFAULT 0.0;
-ALTER TABLE scores ADD COLUMN local_norms_version TEXT DEFAULT 'v1.0';
+-- Existing scores table structure is assumed.
+-- Key change is to the `strengths_profile` column.
+ALTER TABLE scores ADD COLUMN strengths_profile JSON; -- Was TEXT or other
 
--- Add constraints
-ALTER TABLE scores ADD CONSTRAINT valid_confidence
-    CHECK (scoring_confidence >= 0.0 AND scoring_confidence <= 1.0);
-ALTER TABLE scores ADD CONSTRAINT valid_processing_time
-    CHECK (processing_time_ms >= 0.0);
+-- We will store the full TieredTalentProfile object in `strengths_profile`.
+-- Other columns like `raw_scores`, `percentiles`, `scoring_confidence` remain.
 
--- Add indexes for performance
-CREATE INDEX idx_scores_confidence ON scores(scoring_confidence);
-CREATE INDEX idx_scores_algorithm_version ON scores(algorithm_version);
+-- Example JSON structure for `strengths_profile`:
+-- {
+--   "dominant_talents": [{"name": "...", "score": 92}, ...],
+--   "supporting_talents": [...],
+--   "lesser_talents": [...],
+--   "full_ranking": [...]
+-- }
 ```
 
 ### 3.2 New Normative Data Table
@@ -401,280 +492,116 @@ INSERT INTO normative_data (version, factor, sample_size, mean_score, std_deviat
 ('literature_v1.0', 'openness', 1000, 16.8, 4.0);
 ```
 
-## 4. API Integration Points
+## 4. API Integration Points (Redesigned)
 
-### 4.1 Enhanced Assessment Service
+### 4.1 Scoring Service (Conceptual)
+
+The overall service orchestrates the new pipeline.
 
 ```python
-# Extend existing AssessmentService
-class AssessmentService:
+class ScoringService:
     def __init__(self):
-        self.db_manager = get_database_manager()
-        self.scorer = MiniIPIPScorer()  # Add scoring capability
-        self.strengths_mapper = StrengthsMapper()  # Add strengths mapping
+        self.scorer = MiniIPIPScorer()
+        self.quality_checker = ResponseQualityChecker()
+        self.mapper = StrengthsMapper()
+        self.classifier = TalentTierClassifier()
 
-    def submit_responses(
+    def process_assessment(
         self,
         session_id: str,
         responses: List[ItemResponse],
-        completion_time: int,
-        metadata: Optional[Dict[str, Any]] = None
+        completion_time: int
     ) -> ScoringResult:
-        """Enhanced submission with full scoring pipeline."""
+        """Orchestrates the new, tier-focused scoring pipeline."""
+        start_time = time.perf_counter()
 
-        # Validate session and responses (existing logic)
-        session = self.get_session(session_id)
-        if not session:
-            raise AssessmentError("Session not found")
+        quality_flags = self.quality_checker.assess_quality(responses, completion_time)
+        raw_scores, standardized_scores, percentiles = self.scorer.score(responses)
+        ranked_talents = self.mapper.map_to_strengths(standardized_scores)
+        tiered_profile = self.classifier.classify(ranked_talents)
 
-        # Save responses to database
-        response_data = [
-            {"item_id": resp.item_id, "response": resp.response}
-            for resp in responses
-        ]
-        self.db_manager.save_responses(session_id, response_data)
+        # ... calculate confidence, etc. ...
 
-        # NEW: Full scoring pipeline
-        scoring_result = self.scorer.score_assessment(responses, completion_time)
-
-        # Map to strengths
-        strength_scores = self.strengths_mapper.map_to_strengths(
-            scoring_result.standardized_scores
+        result = ScoringResult(
+            session_id=session_id,
+            tiered_profile=tiered_profile,
+            # ... other metadata fields
         )
 
-        # Save complete scores
-        self._save_enhanced_scores(session_id, scoring_result, strength_scores)
-
-        return scoring_result
-
-    def _save_enhanced_scores(
-        self,
-        session_id: str,
-        scoring_result: ScoringResult,
-        strength_scores: StrengthScores
-    ):
-        """Save complete scoring results to database."""
-        scores_data = {
-            "session_id": session_id,
-            "extraversion": scoring_result.standardized_scores.extraversion,
-            "agreeableness": scoring_result.standardized_scores.agreeableness,
-            "conscientiousness": scoring_result.standardized_scores.conscientiousness,
-            "neuroticism": scoring_result.standardized_scores.neuroticism,
-            "openness": scoring_result.standardized_scores.openness,
-            "honesty_humility": getattr(scoring_result.standardized_scores, 'honesty_humility', 50),
-            "strength_scores": strength_scores.dict(),
-            "scoring_confidence": scoring_result.confidence,
-            "response_quality_flags": scoring_result.quality_flags,
-            "raw_scores": scoring_result.raw_scores.dict(),
-            "percentiles": scoring_result.percentiles,
-            "processing_time_ms": scoring_result.processing_time_ms,
-            "algorithm_version": scoring_result.algorithm_version,
-            "weights_version": "v1.0.0",
-            "provenance": {
-                "scoring_method": "mini_ipip_validated",
-                "normative_data_version": "literature_v1.0",
-                "strength_mapping_version": "v1.0.0",
-                "calculated_at": scoring_result.calculated_at.isoformat()
-            }
-        }
-
-        self.db_manager.save_enhanced_scores(scores_data)
+        self._save_profile_to_db(session_id, result)
+        return result
 ```
 
-### 4.2 New API Endpoints
+### 4.2 API Endpoints (Crucial Change)
+
+The primary API endpoint is redesigned to deliver the `TieredTalentProfile`.
 
 ```python
-# Add to api/routes/scores.py
-@router.get("/scores/{session_id}")
-async def get_detailed_scores(session_id: str):
-    """Get complete scoring results including quality metrics."""
+# In api/routes/scoring.py (or a new file)
+from models.schemas import TieredTalentProfileResponse # New Pydantic model for response
 
-    scores = db.get_enhanced_scores(session_id)
-    if not scores:
-        raise HTTPException(404, "Scores not found")
+@router.get("/profile/{session_id}", response_model=APIResponse)
+async def get_talent_profile(session_id: str):
+    """
+    Get the complete, structured Tiered Talent Profile for a session.
+    This is the primary endpoint for retrieving assessment results.
+    """
+    profile_data = db.get_profile(session_id) # Fetches the stored JSON
+    if not profile_data:
+        raise HTTPException(404, "Talent profile not found")
 
+    # Assuming profile_data is the JSON of TieredTalentProfile
     return APIResponse(
         success=True,
-        data={
-            "big_five_scores": {
-                "extraversion": scores["extraversion"],
-                "agreeableness": scores["agreeableness"],
-                "conscientiousness": scores["conscientiousness"],
-                "neuroticism": scores["neuroticism"],
-                "openness": scores["openness"]
-            },
-            "strength_scores": scores["strength_scores"],
-            "percentiles": scores["percentiles"],
-            "quality_assessment": {
-                "confidence": scores["scoring_confidence"],
-                "quality_flags": scores["response_quality_flags"],
-                "processing_time_ms": scores["processing_time_ms"]
-            },
-            "provenance": scores["provenance"]
-        }
+        data=profile_data
     )
 
-@router.post("/scores/{session_id}/recalculate")
-async def recalculate_scores(session_id: str, version: str = "latest"):
-    """Recalculate scores with updated algorithm/norms."""
-    # Implementation for score updates when algorithms improve
-    pass
+# Example Response JSON:
+# {
+#   "success": true,
+#   "data": {
+#     "dominant_talents": [
+#       { "name": "結構化執行", "score": 92, "description": "...", "strategy": null },
+#       { "name": "分析與洞察", "score": 88, "description": "...", "strategy": null }
+#     ],
+#     "supporting_talents": [
+#       { "name": "學習與成長", "score": 79, "description": "...", "strategy": null }
+#     ],
+#     "lesser_talents": [
+#       { "name": "影響與倡議", "score": 45, "description": null, "strategy": "Partner with others..." }
+#     ],
+#     "full_ranking": [
+#       { "name": "結構化執行", "score": 92, ... },
+#       ...
+#     ]
+#   }
+# }
 ```
 
-## 5. Testing Strategy
+## 5. Testing Strategy (Updated)
+
+Testing must now validate the tiering logic and the new data structures.
 
 ### 5.1 Unit Testing
-
-```python
-class TestMiniIPIPScorer:
-    """Comprehensive test suite for scoring engine."""
-
-    def test_raw_score_calculation(self):
-        """Test basic raw score calculation with known inputs."""
-        responses = self._create_test_responses()
-        scorer = MiniIPIPScorer()
-
-        result = scorer.score_assessment(responses, 300)
-
-        # Assert expected raw scores
-        assert result.raw_scores.extraversion == 20  # High extraversion
-        assert result.raw_scores.neuroticism == 8    # Low neuroticism (stable)
-
-    def test_reverse_scoring(self):
-        """Test reverse scoring logic."""
-        scorer = MiniIPIPScorer()
-
-        # Test normal item
-        assert scorer._apply_reverse_scoring("ipip_001", 7, False) == 7
-
-        # Test reverse item (7-point scale)
-        assert scorer._apply_reverse_scoring("ipip_002", 7, True) == 1
-        assert scorer._apply_reverse_scoring("ipip_002", 1, True) == 7
-
-    def test_quality_assessment(self):
-        """Test response quality detection."""
-        checker = ResponseQualityChecker()
-
-        # Test all-same responses
-        bad_responses = [ItemResponse(item_id=f"ipip_{i:03d}", response=4)
-                        for i in range(1, 21)]
-        flags = checker.assess_quality(bad_responses, 300)
-        assert "ALL_SAME_RESPONSE" in flags
-```
+- `TestMiniIPIPScorer`: Unchanged.
+- `TestStrengthsMapper`: Update tests to assert that the output is a sorted list of `Talent` objects.
+- `TestTalentTierClassifier` (New):
+    - Test with a standard list of 12 talents, ensure correct classification.
+    - Test with edge cases (e.g., ties in scores).
+    - Test with invalid input (e.g., not 12 talents).
 
 ### 5.2 Integration Testing
-
-```python
-class TestScoringIntegration:
-    """Test complete scoring pipeline integration."""
-
-    def test_end_to_end_scoring(self):
-        """Test complete flow from responses to strength scores."""
-        # Create realistic test responses
-        responses = self._create_realistic_responses()
-
-        service = AssessmentService()
-        result = service.submit_responses("test_session", responses, 300)
-
-        # Verify all components working
-        assert result.confidence > 0.5
-        assert len(result.quality_flags) == 0
-        assert all(0 <= score <= 100 for score in result.standardized_scores.__dict__.values())
-```
+- `TestScoringIntegration`: The end-to-end test must now verify the final `TieredTalentProfile` structure. Assert that `dominant_talents` contains the highest-scoring items.
 
 ### 5.3 Performance Testing
+- The pipeline now has an extra step. Benchmark the `TalentTierClassifier`, which should be very fast (< 1ms). Ensure the total scoring latency remains under the 15ms target.
 
-```python
-class TestScoringPerformance:
-    """Performance benchmarking for scoring operations."""
+## 6. Monitoring and Analytics (Updated)
 
-    def test_scoring_latency(self):
-        """Ensure scoring meets performance targets."""
-        scorer = MiniIPIPScorer()
-        responses = self._create_test_responses()
+Metrics should be adapted to the tiered model.
 
-        start_time = time.perf_counter()
-        result = scorer.score_assessment(responses, 300)
-        end_time = time.perf_counter()
-
-        assert (end_time - start_time) * 1000 < 10  # < 10ms
-        assert result.processing_time_ms < 5  # Internal timing
-
-    def test_batch_processing(self):
-        """Test batch processing capability."""
-        # Test processing 100 assessments
-        batch_size = 100
-        start_time = time.time()
-
-        for _ in range(batch_size):
-            self._process_single_assessment()
-
-        elapsed = time.time() - start_time
-        rate = batch_size / elapsed
-
-        assert rate > 100  # > 100 assessments per minute
-```
-
-## 6. Monitoring and Analytics
-
-### 6.1 Performance Metrics
-
-```python
-class ScoringMetrics:
-    """Production monitoring for scoring engine."""
-
-    def __init__(self):
-        self.latency_histogram = []
-        self.error_count = 0
-        self.quality_flag_stats = defaultdict(int)
-
-    def record_scoring_event(self, result: ScoringResult):
-        """Record metrics from scoring operation."""
-        self.latency_histogram.append(result.processing_time_ms)
-
-        for flag in result.quality_flags:
-            self.quality_flag_stats[flag] += 1
-
-    def get_health_report(self) -> Dict:
-        """Generate health metrics for monitoring."""
-        return {
-            "avg_latency_ms": statistics.mean(self.latency_histogram[-1000:]),
-            "p95_latency_ms": statistics.quantiles(self.latency_histogram[-1000:], n=20)[18],
-            "error_rate": self.error_count / len(self.latency_histogram),
-            "quality_flags": dict(self.quality_flag_stats),
-            "throughput_per_minute": len(self.latency_histogram) / 60
-        }
-```
-
-### 6.2 Data Quality Monitoring
-
-```python
-class DataQualityMonitor:
-    """Monitor assessment data quality over time."""
-
-    def analyze_response_patterns(self, time_window: timedelta = timedelta(hours=24)):
-        """Analyze recent response patterns for anomalies."""
-        with get_db_connection() as conn:
-            # Query recent assessments
-            cursor = conn.execute("""
-                SELECT response_quality_flags, scoring_confidence
-                FROM scores
-                WHERE calculated_at > datetime('now', '-1 day')
-            """)
-
-            recent_scores = cursor.fetchall()
-
-            # Analyze patterns
-            low_confidence_rate = sum(1 for s in recent_scores if s['scoring_confidence'] < 0.5)
-            quality_issues = sum(1 for s in recent_scores if s['response_quality_flags'])
-
-            return {
-                "total_assessments": len(recent_scores),
-                "low_confidence_rate": low_confidence_rate / len(recent_scores),
-                "quality_issue_rate": quality_issues / len(recent_scores),
-                "alert_level": self._calculate_alert_level(low_confidence_rate, quality_issues)
-            }
-```
+- **Monitor Tier Distribution**: Track the population-level frequency of each talent appearing in the `Dominant` tier. This can reveal interesting insights about your user base.
+- **Track Lesser Talent Patterns**: Analyze which talents most commonly appear in the `Lesser` tier, which can inform training or team-building recommendations.
 
 ## 7. Error Handling and Recovery
 
@@ -722,18 +649,18 @@ class RobustScorer:
             return result
 ```
 
-## 8. Implementation Checklist
+## 8. Implementation Checklist (Updated)
 
 ### 8.1 Week 2 Development Tasks
 
-- [ ] **Task 3.2.2**: Implement `MiniIPIPScorer` class
-- [ ] **Task 3.2.3**: Create `ResponseQualityChecker`
-- [ ] **Task 3.2.4**: Build `StrengthsMapper` component
-- [ ] **Task 3.2.5**: Extend database schema
-- [ ] **Task 3.2.6**: Integrate with existing `AssessmentService`
-- [ ] **Task 3.2.7**: Add new API endpoints
-- [ ] **Task 3.2.8**: Implement comprehensive testing
-- [ ] **Task 3.2.9**: Add monitoring and metrics
+- [ ] **Task 3.2.2**: Refactor `MiniIPIPScorer` and define new data structures (`Talent`, `TieredTalentProfile`).
+- [ ] **Task 3.2.3**: Implement `ResponseQualityChecker` (as before).
+- [ ] **Task 3.2.4**: Update `StrengthsMapper` to return a ranked list of `Talent` objects.
+- [ ] **Task 3.2.5 (New)**: Implement the new `TalentTierClassifier` component.
+- [ ] **Task 3.2.6**: Update database logic to store and retrieve the `TieredTalentProfile` JSON.
+- [ ] **Task 3.2.7**: Implement the new `/profile/{session_id}` API endpoint and response model.
+- [ ] **Task 3.2.8**: Update all tests to reflect the new architecture and data structures.
+- [ ] **Task 3.2.9**: Add monitoring for tier distribution.
 
 ### 8.2 Quality Gates
 
@@ -757,8 +684,7 @@ After completion, system will support:
 ---
 
 **Document Status**: Design Complete ✅
-**Implementation Ready**: All classes and interfaces specified
-**Performance Validated**: Algorithms meet production requirements
-**Quality Assured**: Comprehensive testing strategy defined
+**Implementation Ready**: All components and interfaces are specified for the tier-focused architecture.
+**Quality Assured**: Comprehensive testing strategy is adapted for the new design.
 
-This technical design provides the complete blueprint for implementing the Mini-IPIP scoring engine with production-grade quality, performance, and reliability standards.
+This technical design provides the complete blueprint for implementing a scoring engine that is fundamentally oriented around producing an actionable, hierarchical **Tiered Talent Profile**.

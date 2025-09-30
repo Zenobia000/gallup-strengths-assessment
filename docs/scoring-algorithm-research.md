@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This document presents comprehensive research findings on the Mini-IPIP Big Five personality scoring methodology, establishing the scientific foundation for the Gallup Strengths Assessment project's scoring engine. The research validates the psychometric approach and provides detailed implementation specifications for Week 2 development tasks.
+This document presents comprehensive research findings on the Mini-IPIP Big Five personality scoring methodology, establishing the scientific foundation for the Gallup Strengths Assessment project's scoring engine. The research validates the psychometric approach and provides detailed implementation specifications for Week 2 development tasks. The ultimate goal is not merely to calculate scores, but to generate a structured **Talent Tier Profile** that guides users in leveraging their dominant strengths.
 
 ## 1. Mini-IPIP Background & Validation
 
@@ -32,7 +32,7 @@ The Mini-IPIP is a 20-item short form of the 50-item International Personality I
 | Neuroticism | 0.68 | 4 | 2 positive, 2 negative |
 | Openness/Intellect | 0.65 | 4 | 1 positive, 3 negative |
 
-**Critical Finding**: All factors meet or exceed the 0.60 reliability threshold for research use, with Extraversion showing the highest reliability (0.77).
+**Critical Finding**: All factors meet or exceed the 0.60 reliability threshold for research use, with Extraversion showing the highest reliability (0.77). This provides a solid foundation for the subsequent mapping to strength facets and their classification into talent tiers.
 
 ## 2. Detailed Scoring Methodology
 
@@ -150,6 +150,8 @@ MINI_IPIP_MAPPING = {
 - Important for management and strategic positions
 - Less relevant for routine operational tasks
 
+**Conclusion**: While Big Five scores provide the raw psychometric data, their true value is unlocked when mapped to actionable workplace strengths, which are then categorized into a hierarchical structure for clear interpretation and application.
+
 ### 3.2 Mapping to 12 Gallup-Style Strength Facets
 
 Based on research findings, here's the proposed mapping framework:
@@ -260,9 +262,44 @@ Research indicates Mini-IPIP validates across cultures, but response patterns ma
 - **Translation Effects**: Chinese versions may shift factor loadings slightly
 - **Professional Context**: Taiwanese workplace culture may influence results
 
-## 5. Quality Assurance Framework
+## 5. Talent Tier Interpretation Framework (New Section)
 
-### 5.1 Statistical Quality Checks
+This section establishes the core framework for interpreting the 12 mapped strength scores, moving from a flat list of numbers to a structured, actionable hierarchy. This approach is inspired by the Gallup (CliftonStrengths) methodology, which emphasizes focusing on dominant talents.
+
+### 5.1 The Rationale for a Tiered Model
+
+The primary goal of this assessment is not to label individuals, but to provide a roadmap for personal and professional development. Research in positive psychology consistently shows that focusing on developing one's strengths is significantly more effective than trying to fix weaknesses. A tiered model directly supports this by:
+
+1.  **Directing Focus**: Clearly highlighting the areas of greatest natural talent.
+2.  **Simplifying Complexity**: Translating 12 scores into a simple, three-level structure.
+3.  **Providing Actionable Strategy**: Offering distinct strategies for leveraging dominant talents, utilizing supporting ones, and managing weaker ones.
+
+### 5.2 Defining the Talent Tiers
+
+Based on our 12-facet strength model, we define the following three tiers:
+
+| Tier | Rank | Definition | User Focus |
+| :--- | :--- | :--- | :--- |
+| **Dominant Talents** | **Top 4** | The most natural and powerful ways of thinking, feeling, and behaving. These are the user's core drivers and sources of excellence. | **Maximize & Invest**: Actively seek roles and tasks that leverage these. Consciously develop and apply them. |
+| **Supporting Talents**| **Middle 4**| Context-dependent strengths that can be called upon when needed. They support the dominant talents. | **Utilize & Develop**: Recognize situations where these can be helpful. Develop them as needed to complement primary strengths. |
+| **Lesser Talents** | **Bottom 4**| The least natural ways of operating. Attempting to rely on these can be draining and lead to mediocre performance. | **Manage & Partner**: Do not try to "fix" these. Develop strategies to mitigate their impact, such as partnering with others or using tools. |
+
+### 5.3 Tier Classification Logic
+
+The classification will be based on the rank-ordering of the 12 calculated strength scores:
+
+1.  **Input**: A dictionary of 12 strength facets and their scores (0-100).
+2.  **Process**: Sort the strengths in descending order based on their scores.
+3.  **Output**:
+    *   The top 4 are classified as `Dominant`.
+    *   The middle 4 are classified as `Supporting`.
+    *   The bottom 4 are classified as `Lesser`.
+
+This rank-based approach is robust and ensures a consistent structure for every user, aligning with the goal of understanding relative strength rather than absolute scores.
+
+## 6. Quality Assurance Framework
+
+### 6.1 Statistical Quality Checks
 
 **Response Pattern Analysis:**
 ```python
@@ -286,7 +323,7 @@ def calculate_cronbach_alpha(responses_by_factor):
             flag_low_reliability(factor, alpha)
 ```
 
-### 5.2 Validity Checks
+### 6.2 Validity Checks
 
 **Content Validity:**
 - All 20 items answered
@@ -298,7 +335,7 @@ def calculate_cronbach_alpha(responses_by_factor):
 - No impossible score combinations
 - Response patterns consistent with personality theory
 
-### 5.3 Error Handling
+### 6.3 Error Handling
 
 **Invalid Response Patterns:**
 - Completion time < 60 seconds: Flag as "rushed"
@@ -306,9 +343,9 @@ def calculate_cronbach_alpha(responses_by_factor):
 - Extreme response bias (>80% at endpoints): Flag as "response style bias"
 - Missing responses: Cannot calculate valid scores
 
-## 6. Implementation Recommendations
+## 7. Implementation Recommendations
 
-### 6.1 Technical Architecture
+### 7.1 Technical Architecture
 
 **Core Classes:**
 ```python
@@ -327,65 +364,68 @@ ALTER TABLE scores ADD COLUMN response_quality_flags JSON;
 ALTER TABLE scores ADD COLUMN local_percentiles JSON;
 ```
 
-### 6.2 Processing Pipeline
+### 7.2 Processing Pipeline
 
 1. **Input Validation**: Verify 20 complete responses
 2. **Quality Assessment**: Flag potential issues
 3. **Raw Score Calculation**: Apply reverse scoring and sum
 4. **Standardization**: Convert to percentiles/T-scores
 5. **Strength Mapping**: Apply Big Five → 12 strengths formula
-6. **Confidence Assessment**: Calculate reliability metrics
-7. **Storage**: Save with provenance metadata
+6. **Talent Tiering (New)**: Classify the 12 strengths into Dominant, Supporting, and Lesser tiers.
+7. **Confidence Assessment**: Calculate reliability metrics
+8. **Storage**: Save the complete tiered profile with provenance metadata
 
-### 6.3 Performance Considerations
+### 7.3 Performance Considerations
 
 **Optimization Targets:**
 - Raw score calculation: < 10ms per assessment
 - Database write operations: < 50ms per score set
 - Batch processing capability: 100+ assessments per minute
 
-## 7. References and Further Reading
+## 8. References and Further Reading
 
-### 7.1 Primary Sources
+### 8.1 Primary Sources
 1. Donnellan, M. B., Oswald, F. L., Baird, B. M., & Lucas, R. E. (2006). The Mini-IPIP scales: Tiny-yet-effective measures of the Big Five factors of personality. *Psychological Assessment*, 18(2), 192-203.
 
 2. Goldberg, L. R. (1999). A broad-bandwidth, public domain, personality inventory measuring the lower-level facets of several five-factor models. *Personality Psychology in Europe*, 7, 7-28.
 
-### 7.2 Validation Studies
+### 8.2 Validation Studies
 1. Mini-IPIP confirmatory factor analysis studies (2010-2020)
 2. Cross-cultural validation research
 3. Workplace performance correlation studies
 
-### 7.3 Technical References
+### 8.3 Technical References
 1. IPIP Consortium Website: https://ipip.ori.org/
 2. Mini-IPIP Scoring Key: https://ipip.ori.org/MiniIPIPKey.htm
 3. Score Interpretation Guidelines: https://ipip.ori.org/InterpretingIndividualIPIPScaleScores.htm
 
-## 8. Next Steps for Week 2 Implementation
+## 9. Next Steps for Week 2 Implementation
 
-### 8.1 Immediate Technical Tasks
+### 9.1 Immediate Technical Tasks
 1. Implement `MiniIPIPScorer` class with validated algorithms
 2. Create database schema extensions for score storage
 3. Develop quality assessment pipeline
 4. Build normative data collection system
+5. **(New)** Implement `TalentTierClassifier` to generate the final report structure.
 
-### 8.2 Testing and Validation
+### 9.2 Testing and Validation
 1. Create test cases with known personality profiles
 2. Validate scoring accuracy against published examples
 3. Test cross-cultural response patterns
 4. Performance benchmarking
+5. **(New)** Validate that the tiered output is correctly generated from various score distributions.
 
-### 8.3 Integration Points
+### 9.3 Integration Points
 1. Connect to existing assessment service
 2. Integrate with user response collection
-3. Prepare for Week 3 recommendation engine
+3. Prepare for Week 3 recommendation engine (which will now consume the tiered profile)
 4. Establish monitoring and analytics
 
 ---
 
 **Document Status**: Research Complete ✅
-**Implementation Ready**: Week 2 tasks 3.2.2-3.2.9 can proceed
+**Implementation Ready**: Week 2 tasks 3.2.2-3.2.9 can proceed, with a new focus on producing a tiered output.
 **Quality Assurance**: Scientific methodology validated
 **Performance**: Algorithms optimized for production use
 
-This research provides the definitive foundation for implementing the Mini-IPIP scoring engine with scientific rigor and production quality standards.
+This research provides the definitive foundation for implementing the Mini-IPIP scoring engine, with a strategic focus on generating a **hierarchical Talent Tier Profile** that is both scientifically rigorous and practically actionable for the end-user.
