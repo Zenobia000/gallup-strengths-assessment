@@ -194,25 +194,70 @@ class API {
    * @returns {Promise<Object>} Results data with strengths
    */
   async getResults(sessionId) {
-    // For MVP, results are included in the submission response
-    // We'll just return a dummy result for now since scoring endpoint is not fully implemented
+    // For MVP, return properly formatted mock data that matches what results.html expects
+    // This will be replaced with actual API endpoint later
     return {
       success: true,
       data: {
         session_id: sessionId,
         scores: {
-          openness: Math.random() * 10,
-          conscientiousness: Math.random() * 10,
-          extraversion: Math.random() * 10,
-          agreeableness: Math.random() * 10,
-          neuroticism: Math.random() * 10
+          openness: 85,
+          conscientiousness: 78,
+          extraversion: 72,
+          agreeableness: 80,
+          neuroticism: 45
         },
         strengths: [
-          "Strategic Thinking",
-          "Analytical",
-          "Innovation",
-          "Leadership",
-          "Communication"
+          {
+            name: "Strategic",
+            score: 92.5,
+            description: "您擅長制定長遠計劃，能夠看到大局並預見潛在的挑戰和機會。"
+          },
+          {
+            name: "Learner",
+            score: 88.3,
+            description: "您熱愛學習新知識，不斷追求自我提升和成長。"
+          },
+          {
+            name: "Analytical",
+            score: 85.7,
+            description: "您善於分析複雜問題，用邏輯和數據支持決策。"
+          },
+          {
+            name: "Achiever",
+            score: 82.1,
+            description: "您有強烈的成就動機，每天都需要完成一些事情來感到滿足。"
+          },
+          {
+            name: "Responsibility",
+            score: 79.4,
+            description: "您對承諾非常認真，值得信賴，總是信守諾言。"
+          },
+          {
+            name: "Input",
+            score: 76.8,
+            description: "您喜歡收集和歸檔各種資訊，是一個知識的收藏家。"
+          },
+          {
+            name: "Intellection",
+            score: 74.2,
+            description: "您喜歡思考，享受獨處和深度思考的時光。"
+          },
+          {
+            name: "Focus",
+            score: 71.5,
+            description: "您能夠確定優先順序，保持專注，朝著目標前進。"
+          },
+          {
+            name: "Deliberative",
+            score: 68.9,
+            description: "您做決定時謹慎小心，仔細考慮所有選項。"
+          },
+          {
+            name: "Relator",
+            score: 65.3,
+            description: "您享受與親近的人建立深厚的關係。"
+          }
         ],
         message: "您的優勢分析已完成"
       }
