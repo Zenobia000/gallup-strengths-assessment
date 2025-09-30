@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度優勢分析報告 - 優勢天賦評測系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f7fafc;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        /* 導航欄 */
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .nav-btn:hover {
+            background: #f7fafc;
+            border-color: #cbd5e0;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* 報告頭部 */
+        .report-header {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-details h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-details p {
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .report-meta {
+            display: flex;
+            gap: 2rem;
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* 優勢總覽卡片 */
+        .strength-overview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .strength-overview::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .overview-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .overview-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .top-strengths {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .strength-badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .strength-badge.primary {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .overview-summary {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        /* 內容區塊 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* 詳細分析區 */
+        .analysis-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* 優勢詳解 */
+        .strength-detail {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .strength-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .strength-score {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
+
+        .strength-description {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .strength-applications {
+            margin-top: 1rem;
+        }
+
+        .application-list {
+            list-style: none;
+            margin-top: 0.5rem;
+        }
+
+        .application-list li {
+            padding: 0.5rem 0;
+            color: #4a5568;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .application-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* 職業建議 */
+        .career-recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .career-card {
+            background: #f7fafc;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .career-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .career-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .career-match {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .match-bar {
+            flex: 1;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .match-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .match-percentage {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .career-description {
+            font-size: 0.875rem;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        /* 發展建議 */
+        .development-timeline {
+            margin-top: 1.5rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            left: 19px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% + 1rem);
+            background: #e2e8f0;
+        }
+
+        .timeline-marker {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: #f7fafc;
+            padding: 1.25rem;
+            border-radius: 12px;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: #4a5568;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .action-items {
+            margin-top: 1rem;
+            padding-left: 1rem;
+        }
+
+        .action-item {
+            padding: 0.25rem 0;
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        .action-item::before {
+            content: "✓";
+            color: #48bb78;
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* 側邊欄 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        /* 學習資源 */
+        .resource-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .resource-item:hover {
+            background: #edf2f7;
+            transform: translateX(4px);
+        }
+
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .resource-info {
+            flex: 1;
+        }
+
+        .resource-name {
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 0.875rem;
+        }
+
+        .resource-type {
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
+
+        /* 行動按鈕區 */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: white;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 968px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .career-recommendations {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .user-info {
+                flex-direction: column;
+                align-items: start;
+                gap: 1rem;
+            }
+
+            .report-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .top-strengths {
+                flex-direction: column;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* 載入動畫 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease;
+        }
+
+        /* 打印樣式 */
+        @media print {
+            .navbar, .sidebar, .action-buttons {
+                display: none;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='landing.html'">
+                優勢天賦評測系統
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" onclick="window.print()">
+                    📄 下載PDF
+                </button>
+                <button class="nav-btn" onclick="shareReport()">
+                    📤 分享報告
+                </button>
+                <button class="nav-btn primary" onclick="window.location.href='action-plan.html'">
+                    開始行動計劃
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 報告頭部 -->
+        <div class="report-header fade-in">
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="avatar">U</div>
+                    <div class="user-details">
+                        <h2>您的深度優勢分析報告</h2>
+                        <p>基於 Thurstonian IRT 模型的科學評測結果</p>
+                    </div>
+                </div>
+                <div class="report-meta">
+                    <div class="meta-item">
+                        📅 生成時間：<span id="report-date">2025-09-30</span>
+                    </div>
+                    <div class="meta-item">
+                        ⏱️ 完成時長：<span id="completion-time">4分32秒</span>
+                    </div>
+                    <div class="meta-item">
+                        📊 準確度：<span id="accuracy">94%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 優勢總覽 -->
+        <div class="strength-overview fade-in">
+            <div class="overview-content">
+                <h3 class="overview-title">您的優勢DNA</h3>
+                <div class="top-strengths">
+                    <span class="strength-badge primary">🎯 戰略思維</span>
+                    <span class="strength-badge">💡 創新能力</span>
+                    <span class="strength-badge">🤝 溝通協調</span>
+                    <span class="strength-badge">📊 分析思考</span>
+                    <span class="strength-badge">🎨 創意表達</span>
+                </div>
+                <p class="overview-summary">
+                    您是一位具有卓越戰略視野的思考者，能夠看到大局並理解複雜系統之間的關聯。
+                    您的創新能力與溝通技巧的結合，使您特別適合需要同時運用分析和創意的角色。
+                    這種獨特的優勢組合在人群中僅占 3.2%，是極為稀有且有價值的天賦組合。
+                </p>
+            </div>
+        </div>
+
+        <!-- 內容網格 -->
+        <div class="content-grid">
+            <!-- 左側：詳細分析 -->
+            <div class="main-content">
+                <!-- 優勢深度解析 -->
+                <div class="analysis-section fade-in">
+                    <div class="section-header">
+                        <div class="section-icon">🌟</div>
+                        <h3 class="section-title">優勢深度解析</h3>
+                    </div>
+
+                    <div class="strength-detail">
+                        <div class="strength-name">
+                            戰略思維
+                            <span class="strength-score">95分</span>
+                        </div>
+                        <p class="strength-description">
+                            您擁有出色的全局觀和長遠規劃能力。能夠快速識別模式、預見潛在機會和風險，
+                            並制定有效的策略來達成目標。在複雜環境中，您能保持清晰的方向感。
+                        </p>
+                        <div class="strength-applications">
+                            <strong>實際應用場景：</strong>
+                            <ul class="application-list">
+                                <li>制定企業長期發展戰略</li>
+                                <li>分析市場趨勢和競爭格局</li>
+                                <li>設計產品路線圖和商業模式</li>
+                                <li>領導跨部門重大項目</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="strength-detail">
+                        <div class="strength-name">
+                            創新能力
+                            <span class="strength-score">88分</span>
+                        </div>
+                        <p class="strength-description">
+                            您善於跳出傳統思維框架，產生獨特的想法和解決方案。
+                            對新事物充滿好奇心，樂於嘗試不同的方法和途徑。
+                        </p>
+                        <div class="strength-applications">
+                            <strong>實際應用場景：</strong>
+                            <ul class="application-list">
+                                <li>產品創新和功能設計</li>
+                                <li>流程優化和效率提升</li>
+                                <li>創意營銷策略制定</li>
+                                <li>解決複雜技術挑戰</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 職業發展建議 -->
+                <div class="analysis-section fade-in">
+                    <div class="section-header">
+                        <div class="section-icon">💼</div>
+                        <h3 class="section-title">職業發展建議</h3>
+                    </div>
+
+                    <div class="career-recommendations">
+                        <div class="career-card">
+                            <div class="career-title">產品經理</div>
+                            <div class="career-match">
+                                <div class="match-bar">
+                                    <div class="match-fill" style="width: 92%"></div>
+                                </div>
+                                <span class="match-percentage">92%</span>
+                            </div>
+                            <p class="career-description">
+                                完美結合您的戰略思維和創新能力，在產品規劃和用戶體驗設計中發揮優勢。
+                            </p>
+                        </div>
+
+                        <div class="career-card">
+                            <div class="career-title">管理顧問</div>
+                            <div class="career-match">
+                                <div class="match-bar">
+                                    <div class="match-fill" style="width: 88%"></div>
+                                </div>
+                                <span class="match-percentage">88%</span>
+                            </div>
+                            <p class="career-description">
+                                運用分析能力和溝通技巧，為企業提供戰略建議和解決方案。
+                            </p>
+                        </div>
+
+                        <div class="career-card">
+                            <div class="career-title">創業家</div>
+                            <div class="career-match">
+                                <div class="match-bar">
+                                    <div class="match-fill" style="width: 85%"></div>
+                                </div>
+                                <span class="match-percentage">85%</span>
+                            </div>
+                            <p class="career-description">
+                                發揮您的創新精神和戰略視野，創建並領導自己的事業。
+                            </p>
+                        </div>
+
+                        <div class="career-card">
+                            <div class="career-title">戰略分析師</div>
+                            <div class="career-match">
+                                <div class="match-bar">
+                                    <div class="match-fill" style="width: 83%"></div>
+                                </div>
+                                <span class="match-percentage">83%</span>
+                            </div>
+                            <p class="career-description">
+                                專注於數據分析和市場研究，為決策提供深度洞察。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 個人發展路徑 -->
+                <div class="analysis-section fade-in">
+                    <div class="section-header">
+                        <div class="section-icon">🚀</div>
+                        <h3 class="section-title">個人發展路徑</h3>
+                    </div>
+
+                    <div class="development-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker">30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">30天 - 基礎強化</div>
+                                <p class="timeline-description">
+                                    建立日常習慣，強化核心優勢的應用
+                                </p>
+                                <div class="action-items">
+                                    <div class="action-item">每日寫戰略思考日記（10分鐘）</div>
+                                    <div class="action-item">閱讀《好策略壞策略》並做筆記</div>
+                                    <div class="action-item">參加一個線上戰略分析課程</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker">60</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">60天 - 技能提升</div>
+                                <p class="timeline-description">
+                                    深化專業技能，建立系統化知識體系
+                                </p>
+                                <div class="action-items">
+                                    <div class="action-item">完成一個實際的策略分析項目</div>
+                                    <div class="action-item">建立個人知識管理系統</div>
+                                    <div class="action-item">與3位行業專家進行深度交流</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-marker">90</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">90天 - 實踐應用</div>
+                                <p class="timeline-description">
+                                    將優勢轉化為實際成果，建立個人品牌
+                                </p>
+                                <div class="action-items">
+                                    <div class="action-item">發表一篇戰略分析文章</div>
+                                    <div class="action-item">主導一個創新項目</div>
+                                    <div class="action-item">建立專業人脈網絡</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：側邊欄 -->
+            <div class="sidebar">
+                <!-- 學習資源推薦 -->
+                <div class="sidebar-card fade-in">
+                    <h4 class="sidebar-title">📚 推薦學習資源</h4>
+                    <div class="resource-list">
+                        <div class="resource-item" onclick="openResource('book1')">
+                            <div class="resource-icon">📖</div>
+                            <div class="resource-info">
+                                <div class="resource-name">《好策略壞策略》</div>
+                                <div class="resource-type">必讀書籍</div>
+                            </div>
+                        </div>
+                        <div class="resource-item" onclick="openResource('course1')">
+                            <div class="resource-icon">🎓</div>
+                            <div class="resource-info">
+                                <div class="resource-name">戰略思維訓練營</div>
+                                <div class="resource-type">線上課程</div>
+                            </div>
+                        </div>
+                        <div class="resource-item" onclick="openResource('tool1')">
+                            <div class="resource-icon">🛠️</div>
+                            <div class="resource-info">
+                                <div class="resource-name">SWOT分析模板</div>
+                                <div class="resource-type">實用工具</div>
+                            </div>
+                        </div>
+                        <div class="resource-item" onclick="openResource('community1')">
+                            <div class="resource-icon">👥</div>
+                            <div class="resource-info">
+                                <div class="resource-name">策略思考者社群</div>
+                                <div class="resource-type">學習社群</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 相似優勢名人 -->
+                <div class="sidebar-card fade-in">
+                    <h4 class="sidebar-title">✨ 相似優勢名人</h4>
+                    <div style="padding: 1rem 0;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 50px; height: 50px; background: #f7fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                👤
+                            </div>
+                            <div>
+                                <strong>史蒂夫·賈伯斯</strong>
+                                <div style="font-size: 0.875rem; color: #718096;">
+                                    戰略遠見 + 創新思維
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 50px; height: 50px; background: #f7fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                👤
+                            </div>
+                            <div>
+                                <strong>埃隆·馬斯克</strong>
+                                <div style="font-size: 0.875rem; color: #718096;">
+                                    系統思考 + 突破創新
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: #f7fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                👤
+                            </div>
+                            <div>
+                                <strong>雷·達利歐</strong>
+                                <div style="font-size: 0.875rem; color: #718096;">
+                                    原則思維 + 系統分析
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 升級提示 -->
+                <div class="sidebar-card fade-in" style="background: linear-gradient(135deg, #fef5e7 0%, #fff4e6 100%); border: 2px solid #f9c851;">
+                    <h4 class="sidebar-title">🎁 解鎖更多功能</h4>
+                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1rem;">
+                        升級至專業版，獲得：
+                    </p>
+                    <ul style="font-size: 0.875rem; color: #4a5568; list-style: none; padding-left: 0;">
+                        <li style="padding: 0.25rem 0;">✓ 1對1職業諮詢</li>
+                        <li style="padding: 0.25rem 0;">✓ 季度優勢追蹤</li>
+                        <li style="padding: 0.25rem 0;">✓ 專屬成長社群</li>
+                        <li style="padding: 0.25rem 0;">✓ AI智能導師</li>
+                    </ul>
+                    <button class="action-btn primary" style="width: 100%; margin-top: 1rem;">
+                        立即升級
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 行動按鈕區 -->
+        <div class="action-buttons fade-in">
+            <button class="action-btn secondary" onclick="window.location.href='results.html'">
+                ← 返回基礎報告
+            </button>
+            <button class="action-btn primary" onclick="window.location.href='action-plan.html'">
+                生成行動方案 →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 頁面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 設置當前日期
+            const today = new Date();
+            document.getElementById('report-date').textContent =
+                `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            // 從 localStorage 獲取評測數據
+            const sessionId = new URLSearchParams(window.location.search).get('session') ||
+                            localStorage.getItem('currentSessionId');
+
+            if (sessionId) {
+                loadDetailedReport(sessionId);
+            }
+
+            // 添加滾動動畫
+            observeElements();
+
+            // 載入動畫延遲
+            animateStrengthBars();
+        });
+
+        // 載入詳細報告
+        async function loadDetailedReport(sessionId) {
+            try {
+                // 這裡應該調用 API 獲取詳細報告
+                // const response = await fetch(`http://localhost:8004/api/v4/assessment/detailed-report/${sessionId}`);
+                // const data = await response.json();
+                // updateReportContent(data);
+
+                // 模擬數據載入
+                console.log('Loading detailed report for session:', sessionId);
+            } catch (error) {
+                console.error('Failed to load detailed report:', error);
+            }
+        }
+
+        // 分享報告
+        function shareReport() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '我的優勢分析報告',
+                    text: '我剛完成了優勢天賦評測，發現了我的獨特優勢組合！',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                // 複製連結
+                navigator.clipboard.writeText(window.location.href);
+                alert('報告連結已複製到剪貼板！');
+            }
+        }
+
+        // 打開資源
+        function openResource(resourceId) {
+            // 根據資源ID打開相應的連結
+            const resources = {
+                book1: 'https://example.com/good-strategy-bad-strategy',
+                course1: 'https://example.com/strategic-thinking-course',
+                tool1: 'https://example.com/swot-template',
+                community1: 'https://example.com/strategic-thinkers-community'
+            };
+
+            if (resources[resourceId]) {
+                window.open(resources[resourceId], '_blank');
+            }
+        }
+
+        // 觀察元素進入視窗
+        function observeElements() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '0';
+                        entry.target.style.transform = 'translateY(20px)';
+
+                        setTimeout(() => {
+                            entry.target.style.transition = 'all 0.8s ease';
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.analysis-section, .sidebar-card').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // 動畫化匹配度條
+        function animateStrengthBars() {
+            setTimeout(() => {
+                document.querySelectorAll('.match-fill').forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 500);
+                });
+            }, 1000);
+        }
+
+        // 追蹤頁面查看
+        localStorage.setItem('lastCheckpoint', 'report_detail_viewed');
+    </script>
+</body>
+</html>

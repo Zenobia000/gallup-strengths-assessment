@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>準備開始評測 - 優勢天賦評測系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 導航欄 */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 800px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+        }
+
+        /* 卡片容器 */
+        .intro-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 標題區 */
+        .header-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: #718096;
+        }
+
+        /* 流程預覽 */
+        .process-preview {
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .process-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .process-title::before {
+            content: "📋";
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .process-item {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .process-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .process-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .process-content h3 {
+            font-size: 0.875rem;
+            color: #718096;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .process-content p {
+            font-size: 1.125rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        /* 流程步驟 */
+        .steps-section {
+            margin-bottom: 2rem;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .step-connector {
+            position: absolute;
+            top: 45px;
+            left: 15%;
+            right: 15%;
+            height: 2px;
+            background: linear-gradient(90deg, #cbd5e0 0%, #667eea 50%, #cbd5e0 100%);
+            z-index: 1;
+        }
+
+        /* 注意事項 */
+        .guidelines {
+            background: #fef5e7;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid #f9c851;
+        }
+
+        .guidelines-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #d68910;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .guidelines-title::before {
+            content: "💡";
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .guidelines-list {
+            list-style: none;
+        }
+
+        .guidelines-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #5a6c7d;
+        }
+
+        .guidelines-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        /* 開始按鈕 */
+        .action-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 3rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .start-btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .start-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 底部提示 */
+        .bottom-hint {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #718096;
+            font-size: 0.875rem;
+        }
+
+        /* 進度指示器 */
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .intro-card {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .process-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-container {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .step-connector {
+                display: none;
+            }
+        }
+
+        /* 動畫效果 */
+        .fade-in {
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='landing.html'">
+                優勢天賦評測系統
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <div class="intro-card">
+            <!-- 標題區 -->
+            <div class="header-section">
+                <h1>準備好發現你的優勢了嗎？</h1>
+                <p class="subtitle">只需3-5分鐘，科學評測助你認識真實的自己</p>
+            </div>
+
+            <!-- 流程預覽 -->
+            <div class="process-preview">
+                <h2 class="process-title">評測概覽</h2>
+                <div class="process-grid">
+                    <div class="process-item">
+                        <span class="process-icon">⏱️</span>
+                        <div class="process-content">
+                            <h3>評測時長</h3>
+                            <p>3-5分鐘</p>
+                        </div>
+                    </div>
+                    <div class="process-item">
+                        <span class="process-icon">📊</span>
+                        <div class="process-content">
+                            <h3>題目數量</h3>
+                            <p>15個選擇題</p>
+                        </div>
+                    </div>
+                    <div class="process-item">
+                        <span class="process-icon">🎯</span>
+                        <div class="process-content">
+                            <h3>評測方式</h3>
+                            <p>四選二模式</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 流程步驟 -->
+            <div class="steps-section">
+                <div class="steps-container">
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">閱讀陳述</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">選擇最像你的</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">選擇最不像你的</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-circle">✓</div>
+                        <div class="step-label">獲得報告</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 注意事項 -->
+            <div class="guidelines">
+                <h3 class="guidelines-title">測評小貼士</h3>
+                <ul class="guidelines-list">
+                    <li>沒有對錯答案，請根據真實感受選擇</li>
+                    <li>憑第一直覺選擇，不要過度思考</li>
+                    <li>選擇一個安靜的環境，避免干擾</li>
+                    <li>您的進度會自動保存，可隨時繼續</li>
+                </ul>
+            </div>
+
+            <!-- 開始按鈕 -->
+            <div class="action-section">
+                <button class="start-btn pulse" onclick="startAssessment()">
+                    <span>我準備好了，開始評測</span>
+                </button>
+                <p class="bottom-hint">
+                    💾 進度自動保存 | 🔒 資料絕對保密
+                </p>
+            </div>
+
+            <!-- 進度指示器 -->
+            <div class="progress-indicator">
+                <span class="progress-dot active"></span>
+                <span class="progress-dot"></span>
+                <span class="progress-dot"></span>
+                <span class="progress-dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 開始評測
+        function startAssessment() {
+            // 添加載入動畫
+            const btn = document.querySelector('.start-btn');
+            btn.innerHTML = '<span>正在準備評測...</span>';
+            btn.disabled = true;
+
+            // 儲存開始時間
+            localStorage.setItem('assessmentStartTime', Date.now());
+            localStorage.setItem('lastCheckpoint', 'assessment_intro_viewed');
+
+            // 延遲跳轉以顯示動畫
+            setTimeout(() => {
+                window.location.href = 'assessment.html';
+            }, 800);
+        }
+
+        // 頁面載入時檢查是否有未完成的評測
+        document.addEventListener('DOMContentLoaded', function() {
+            const lastCheckpoint = localStorage.getItem('lastCheckpoint');
+            const sessionId = localStorage.getItem('currentSessionId');
+
+            if (lastCheckpoint === 'assessment_started' && sessionId) {
+                // 顯示繼續提示
+                const actionSection = document.querySelector('.action-section');
+                const resumeHint = document.createElement('p');
+                resumeHint.style.marginTop = '1rem';
+                resumeHint.style.color = '#48bb78';
+                resumeHint.innerHTML = '✨ 檢測到未完成的評測，點擊按鈕繼續';
+                actionSection.appendChild(resumeHint);
+
+                // 修改按鈕文字
+                document.querySelector('.start-btn span').textContent = '繼續上次的評測';
+            }
+        });
+
+        // 添加頁面動畫
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // 觀察所有需要動畫的元素
+        document.querySelectorAll('.process-item, .step, .guidelines').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

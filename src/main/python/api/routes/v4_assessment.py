@@ -261,9 +261,9 @@ async def submit_assessment(request: SubmitRequest):
                 def __init__(self, theta):
                     self.theta = theta
                     self.log_likelihood = -100.0  # Placeholder
-                    self.converged = True
-                    self.iterations = 0  # From cache
-                    self.standard_errors = np.ones_like(theta) * 0.1
+                    self.convergence = True
+                    self.n_iterations = 0  # From cache
+                    self.se = np.ones(len(theta)) * 0.1
             theta_estimate = MockEstimate(theta_scores)
         else:
             # Convert responses to the format expected by the scorer
@@ -275,9 +275,9 @@ async def submit_assessment(request: SubmitRequest):
                     'least_like': resp['least_like_index']
                 })
 
-            # Get theta estimates
+            # Get theta estimates using simple method
             start_time = time.time()
-            theta_estimate = scorer.estimate_theta(response_list, blocks_data)
+            theta_estimate = scorer.estimate_theta_simple(response_list, blocks_data)
             theta_scores = theta_estimate.theta
             duration = time.time() - start_time
 
@@ -298,9 +298,9 @@ async def submit_assessment(request: SubmitRequest):
         # Calculate fit statistics from theta estimation
         fit_stats = {
             'log_likelihood': theta_estimate.log_likelihood,
-            'converged': theta_estimate.converged,
-            'iterations': theta_estimate.iterations,
-            'mean_se': float(np.mean(theta_estimate.standard_errors))
+            'converged': theta_estimate.convergence,
+            'iterations': theta_estimate.n_iterations,
+            'mean_se': float(np.mean(theta_estimate.se))
         }
 
         # Format dimension scores

@@ -9,7 +9,7 @@ docs/v4_research/irt-theory-foundation.md
 
 import numpy as np
 from scipy import optimize, stats
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Any
 import json
 import logging
 from pathlib import Path
@@ -146,6 +146,148 @@ class ThurstonianIRTScorer:
             convergence=convergence,
             n_iterations=n_iter
         )
+
+    def estimate_theta_simple(self,
+                            responses: List[Dict],
+                            blocks_data: List[Dict],
+                            method: str = 'MLE',
+                            use_prior: bool = True) -> ThetaEstimate:
+        """
+        Estimate theta from simple dictionary format (API usage)
+
+        Args:
+            responses: List of response dicts with 'block_id', 'most_like', 'least_like'
+            blocks_data: List of block dicts with 'block_id', 'statement_ids'
+            method: Estimation method
+            use_prior: Whether to use Bayesian prior
+
+        Returns:
+            ThetaEstimate with theta scores
+        """
+        # Get initial estimates from simple responses
+        initial_theta = self._get_initial_estimate_simple(responses, blocks_data)
+
+        # Create simple blocks for likelihood calculation
+        simple_blocks = self._create_simple_blocks(blocks_data)
+
+        # Perform estimation
+        if method == 'MLE':
+            theta, se, convergence, n_iter = self._mle_estimate(
+                responses,
+                simple_blocks,
+                initial_theta,
+                use_prior
+            )
+        else:
+            raise ValueError(f"Unknown estimation method: {method}")
+
+        # Calculate final log-likelihood
+        ll = self._log_likelihood(theta, responses, simple_blocks)
+
+        # Create dimension-keyed theta dict
+        theta_dict = {}
+        dimensions = ['Achiever', 'Belief', 'Command', 'Communication', 'Competition',
+                     'Connectedness', 'Consistency', 'Context', 'Deliberative']
+
+        for i, dim in enumerate(dimensions[:self.n_dimensions]):
+            theta_dict[dim] = float(theta[i]) if i < len(theta) else 0.0
+
+        # Also create standard errors dict to match theta format
+        se_dict = {}
+        for i, dim in enumerate(dimensions[:self.n_dimensions]):
+            se_dict[dim] = float(se[i]) if i < len(se) else 0.1
+
+        return ThetaEstimate(
+            theta=theta_dict,
+            se=se_dict,
+            log_likelihood=ll,
+            convergence=convergence,
+            n_iterations=n_iter
+        )
+
+    def _get_initial_estimate_simple(self,
+                                    responses: List[Dict],
+                                    blocks_data: List[Dict]) -> np.ndarray:
+        """
+        Get initial theta estimates from simple response format
+        """
+        dimension_scores = np.zeros(self.n_dimensions)
+        dimension_counts = np.zeros(self.n_dimensions)
+
+        # Map dimensions to indices
+        dimensions = ['Achiever', 'Belief', 'Command', 'Communication', 'Competition',
+                     'Connectedness', 'Consistency', 'Context', 'Deliberative']
+        dim_to_idx = {dim: i for i, dim in enumerate(dimensions[:self.n_dimensions])}
+
+        # Get dimension mappings from statement IDs
+        from data.v4_statements import DIMENSION_MAPPING
+
+        for response in responses:
+            block_id = response['block_id']
+            # Find the matching block
+            block = next((b for b in blocks_data if b.get('block_id') == block_id), None)
+            if not block:
+                continue
+
+            # Get statement IDs
+            stmt_ids = block.get('statement_ids', [])
+
+            # Add point for "most like" dimension
+            if response.get('most_like') is not None and response['most_like'] < len(stmt_ids):
+                most_stmt_id = stmt_ids[response['most_like']]
+                dim = DIMENSION_MAPPING.get(most_stmt_id)
+                if dim and dim in dim_to_idx:
+                    dimension_scores[dim_to_idx[dim]] += 1
+                    dimension_counts[dim_to_idx[dim]] += 1
+
+            # Subtract point for "least like" dimension
+            if response.get('least_like') is not None and response['least_like'] < len(stmt_ids):
+                least_stmt_id = stmt_ids[response['least_like']]
+                dim = DIMENSION_MAPPING.get(least_stmt_id)
+                if dim and dim in dim_to_idx:
+                    dimension_scores[dim_to_idx[dim]] -= 1
+                    dimension_counts[dim_to_idx[dim]] += 1
+
+        # Normalize by counts
+        initial_theta = np.zeros(self.n_dimensions)
+        for i in range(self.n_dimensions):
+            if dimension_counts[i] > 0:
+                initial_theta[i] = dimension_scores[i] / dimension_counts[i] * 0.5
+
+        return initial_theta
+
+    def _create_simple_blocks(self, blocks_data: List[Dict]) -> List[Any]:
+        """
+        Create simplified block structures for likelihood calculation
+        """
+        from data.v4_statements import DIMENSION_MAPPING, STATEMENT_POOL
+        from models.v4.forced_choice import Statement, QuartetBlock
+
+        blocks = []
+        for block in blocks_data:
+            stmt_ids = block.get('statement_ids', [])
+            statements = []
+
+            for stmt_id in stmt_ids:
+                # Get statement info
+                stmt_info = STATEMENT_POOL.get(stmt_id)
+                if stmt_info:
+                    statements.append(Statement(
+                        statement_id=stmt_id,
+                        text=stmt_info['text'],
+                        dimension=stmt_info['dimension'],
+                        factor_loading=stmt_info.get('factor_loading', 0.7),
+                        social_desirability=stmt_info.get('social_desirability', 0.0)
+                    ))
+
+            if len(statements) == 4:
+                blocks.append(QuartetBlock(
+                    block_id=block.get('block_id', 0),
+                    statements=statements,
+                    dimensions=list(set(s.dimension for s in statements))
+                ))
+
+        return blocks
 
     def _get_initial_estimate(self,
                             response_data: ForcedChoiceBlockResponse) -> np.ndarray:
@@ -297,20 +439,21 @@ class ThurstonianIRTScorer:
         """
         utilities = np.zeros(4)
 
-        # Map dimension names to theta indices
-        dim_to_idx = {
-            'Achiever': 0, 'Activator': 1, 'Adaptability': 2,
-            'Analytical': 3, 'Arranger': 4, 'Belief': 5,
-            'Command': 6, 'Communication': 7, 'Competition': 8,
-            'Connectedness': 9, 'Consistency': 10, 'Context': 11
-        }
+        # Use consistent dimension mapping
+        dimensions = ['Achiever', 'Belief', 'Command', 'Communication', 'Competition',
+                     'Connectedness', 'Consistency', 'Context', 'Deliberative']
+        dim_to_idx = {dim: i for i, dim in enumerate(dimensions[:self.n_dimensions])}
 
         for i, stmt in enumerate(block.statements):
             if stmt.dimension in dim_to_idx:
                 dim_idx = dim_to_idx[stmt.dimension]
-                # Utility = factor_loading * theta + error
-                # For deterministic utility, ignore error term
-                utilities[i] = stmt.factor_loading * theta[dim_idx]
+                if dim_idx < len(theta):
+                    # Utility = factor_loading * theta + error
+                    # For deterministic utility, ignore error term
+                    utilities[i] = stmt.factor_loading * theta[dim_idx]
+                else:
+                    # Default utility if dimension index out of range
+                    utilities[i] = 0.0
 
         return utilities
 

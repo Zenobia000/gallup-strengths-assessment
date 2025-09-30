@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人化行動方案 - 優勢天賦評測系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        /* 導航欄 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .nav-progress {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .progress-step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #a0aec0;
+            position: relative;
+        }
+
+        .progress-step.completed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .progress-step.active {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+            }
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* 頂部卡片 */
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .header-text h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .header-text p {
+            color: #718096;
+            font-size: 1.125rem;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        /* 時間線容器 */
+        .timeline-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 時間選擇器 */
+        .time-selector {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 100px;
+        }
+
+        .time-selector h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .time-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .time-option {
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .time-option:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .time-option.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .time-option-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .time-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .time-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .time-subtitle {
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
+
+        /* 行動計劃區 */
+        .action-plans {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .plan-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            animation: slideIn 0.6s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f7fafc;
+        }
+
+        .plan-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .plan-title {
+            flex: 1;
+        }
+
+        .plan-title h3 {
+            font-size: 1.25rem;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .plan-title p {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .priority-medium {
+            background: #fef5e7;
+            color: #d68910;
+        }
+
+        .priority-low {
+            background: #c6f6d5;
+            color: #276749;
+        }
+
+        /* 任務列表 */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            background: #edf2f7;
+            transform: translateX(4px);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task-checkbox:hover {
+            border-color: #667eea;
+        }
+
+        .task-checkbox.checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .task-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .task-description {
+            font-size: 0.875rem;
+            color: #718096;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .task-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: white;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #4a5568;
+        }
+
+        .task-time {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
+
+        /* 資源卡片 */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .resource-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .resource-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .resource-type {
+            font-size: 0.75rem;
+            color: #667eea;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .resource-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-description {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .resource-action {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid #f7fafc;
+        }
+
+        .resource-duration {
+            font-size: 0.875rem;
+            color: #a0aec0;
+        }
+
+        .resource-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* 進度追蹤 */
+        .progress-tracker {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .progress-percentage {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-bar-container {
+            background: #f7fafc;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .milestone-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .milestone-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .milestone-check.completed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+
+        .milestone-check.completed::after {
+            content: "✓";
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .milestone-text {
+            font-size: 0.875rem;
+            color: #4a5568;
+        }
+
+        .milestone-item.completed .milestone-text {
+            color: #a0aec0;
+            text-decoration: line-through;
+        }
+
+        /* 浮動操作按鈕 */
+        .fab-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .fab-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .fab-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .fab-menu {
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .fab-menu.active {
+            display: flex;
+        }
+
+        .fab-menu-item {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .fab-menu-item:hover {
+            transform: translateX(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1024px) {
+            .timeline-container {
+                grid-template-columns: 1fr;
+            }
+
+            .time-selector {
+                position: static;
+            }
+
+            .time-options {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .milestone-list {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-progress {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導航欄 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='landing.html'">
+                優勢天賦評測系統
+            </div>
+            <div class="nav-progress">
+                <div class="progress-steps">
+                    <div class="progress-step completed">✓</div>
+                    <div class="progress-step completed">✓</div>
+                    <div class="progress-step completed">✓</div>
+                    <div class="progress-step active">4</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 頂部卡片 -->
+        <div class="header-card">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>您的專屬行動方案</h1>
+                    <p>基於您的優勢組合，我們為您制定了個性化的發展路徑</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">21</div>
+                        <div class="stat-label">總任務數</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">90</div>
+                        <div class="stat-label">預計天數</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">5</div>
+                        <div class="stat-label">核心優勢</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 時間線容器 -->
+        <div class="timeline-container">
+            <!-- 時間選擇器 -->
+            <div class="time-selector">
+                <h3>選擇時間階段</h3>
+                <div class="time-options">
+                    <div class="time-option active" onclick="selectTimeframe('30')">
+                        <div class="time-option-info">
+                            <div class="time-icon">30</div>
+                            <div class="time-text">
+                                <span class="time-title">立即行動</span>
+                                <span class="time-subtitle">基礎建立期</span>
+                            </div>
+                        </div>
+                        <span>→</span>
+                    </div>
+                    <div class="time-option" onclick="selectTimeframe('60')">
+                        <div class="time-option-info">
+                            <div class="time-icon">60</div>
+                            <div class="time-text">
+                                <span class="time-title">深度提升</span>
+                                <span class="time-subtitle">技能強化期</span>
+                            </div>
+                        </div>
+                        <span>→</span>
+                    </div>
+                    <div class="time-option" onclick="selectTimeframe('90')">
+                        <div class="time-option-info">
+                            <div class="time-icon">90</div>
+                            <div class="time-text">
+                                <span class="time-title">成果展現</span>
+                                <span class="time-subtitle">實踐應用期</span>
+                            </div>
+                        </div>
+                        <span>→</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 行動計劃區 -->
+            <div class="action-plans" id="actionPlans">
+                <!-- 30天計劃 -->
+                <div class="plan-section" data-timeframe="30">
+                    <div class="plan-header">
+                        <div class="plan-icon">🎯</div>
+                        <div class="plan-title">
+                            <h3>每日習慣養成</h3>
+                            <p>建立強化優勢的日常實踐</p>
+                        </div>
+                        <span class="priority-badge priority-high">高優先級</span>
+                    </div>
+                    <div class="task-list">
+                        <div class="task-item" onclick="toggleTask(this)">
+                            <div class="task-checkbox"></div>
+                            <div class="task-content">
+                                <div class="task-title">戰略思考日記</div>
+                                <div class="task-description">
+                                    每天花10分鐘記錄一個商業案例分析，培養系統性思考習慣
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag">📝 日常練習</span>
+                                    <span class="task-time">⏱️ 10分鐘/天</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item" onclick="toggleTask(this)">
+                            <div class="task-checkbox"></div>
+                            <div class="task-content">
+                                <div class="task-title">閱讀計劃：《好策略壞策略》</div>
+                                <div class="task-description">
+                                    每天閱讀30頁，做重點筆記，深化戰略思維能力
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag">📚 知識輸入</span>
+                                    <span class="task-time">⏱️ 30分鐘/天</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item" onclick="toggleTask(this)">
+                            <div class="task-checkbox"></div>
+                            <div class="task-content">
+                                <div class="task-title">創新思維訓練</div>
+                                <div class="task-description">
+                                    使用SCAMPER技法，每週選一個產品進行創新改進練習
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag">💡 創意練習</span>
+                                    <span class="task-time">⏱️ 1小時/週</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plan-section" data-timeframe="30">
+                    <div class="plan-header">
+                        <div class="plan-icon">📚</div>
+                        <div class="plan-title">
+                            <h3>知識體系構建</h3>
+                            <p>系統化學習核心技能</p>
+                        </div>
+                        <span class="priority-badge priority-medium">中優先級</span>
+                    </div>
+                    <div class="task-list">
+                        <div class="task-item" onclick="toggleTask(this)">
+                            <div class="task-checkbox"></div>
+                            <div class="task-content">
+                                <div class="task-title">完成線上課程：戰略思維訓練營</div>
+                                <div class="task-description">
+                                    系統學習戰略分析框架，包括SWOT、波特五力、BCG矩陣等
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag">🎓 系統學習</span>
+                                    <span class="task-time">⏱️ 2小時/週</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item" onclick="toggleTask(this)">
+                            <div class="task-checkbox"></div>
+                            <div class="task-content">
+                                <div class="task-title">建立個人知識庫</div>
+                                <div class="task-description">
+                                    使用Notion或Obsidian建立知識管理系統，整理學習筆記
+                                </div>
+                                <div class="task-meta">
+                                    <span class="task-tag">🗂️ 知識管理</span>
+                                    <span class="task-time">⏱️ 初始設置3小時</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 學習資源推薦 -->
+        <div class="resources-grid">
+            <div class="resource-card" onclick="openResource('book')">
+                <div class="resource-header">
+                    <div class="resource-icon">📖</div>
+                    <div>
+                        <div class="resource-type">必讀書籍</div>
+                        <div class="resource-title">《好策略壞策略》</div>
+                    </div>
+                </div>
+                <div class="resource-description">
+                    理查德·魯梅爾特的經典之作，深入剖析什麼是真正的好策略
+                </div>
+                <div class="resource-action">
+                    <span class="resource-duration">預計：2週完成</span>
+                    <a href="#" class="resource-link">立即開始 →</a>
+                </div>
+            </div>
+
+            <div class="resource-card" onclick="openResource('course')">
+                <div class="resource-header">
+                    <div class="resource-icon">🎓</div>
+                    <div>
+                        <div class="resource-type">線上課程</div>
+                        <div class="resource-title">產品戰略實戰</div>
+                    </div>
+                </div>
+                <div class="resource-description">
+                    從0到1掌握產品戰略制定，包含實戰案例分析
+                </div>
+                <div class="resource-action">
+                    <span class="resource-duration">總時長：12小時</span>
+                    <a href="#" class="resource-link">查看詳情 →</a>
+                </div>
+            </div>
+
+            <div class="resource-card" onclick="openResource('tool')">
+                <div class="resource-header">
+                    <div class="resource-icon">🛠️</div>
+                    <div>
+                        <div class="resource-type">實用工具</div>
+                        <div class="resource-title">戰略畫布模板</div>
+                    </div>
+                </div>
+                <div class="resource-description">
+                    可視化戰略規劃工具，幫助系統化思考和表達
+                </div>
+                <div class="resource-action">
+                    <span class="resource-duration">立即可用</span>
+                    <a href="#" class="resource-link">免費下載 →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 進度追蹤 -->
+        <div class="progress-tracker">
+            <div class="progress-header">
+                <h3 class="progress-title">整體進度</h3>
+                <span class="progress-percentage">15%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: 15%"></div>
+            </div>
+            <div class="milestone-list">
+                <div class="milestone-item completed">
+                    <div class="milestone-check completed"></div>
+                    <span class="milestone-text">完成優勢評測</span>
+                </div>
+                <div class="milestone-item completed">
+                    <div class="milestone-check completed"></div>
+                    <span class="milestone-text">生成行動方案</span>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-check"></div>
+                    <span class="milestone-text">建立日常習慣</span>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-check"></div>
+                    <span class="milestone-text">完成基礎學習</span>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-check"></div>
+                    <span class="milestone-text">實踐第一個項目</span>
+                </div>
+                <div class="milestone-item">
+                    <div class="milestone-check"></div>
+                    <span class="milestone-text">建立專業網絡</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 浮動操作按鈕 -->
+    <div class="fab-container">
+        <div class="fab-menu" id="fabMenu">
+            <div class="fab-menu-item" onclick="exportPlan()">📥 導出計劃</div>
+            <div class="fab-menu-item" onclick="setReminder()">⏰ 設置提醒</div>
+            <div class="fab-menu-item" onclick="shareProgress()">📤 分享進度</div>
+        </div>
+        <button class="fab-btn" onclick="toggleFabMenu()">+</button>
+    </div>
+
+    <script>
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 載入用戶數據
+            loadUserData();
+
+            // 初始化進度
+            updateProgress();
+
+            // 添加動畫
+            animateElements();
+        });
+
+        // 選擇時間框架
+        function selectTimeframe(days) {
+            // 更新選中狀態
+            document.querySelectorAll('.time-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // 更新顯示的內容
+            updateActionPlans(days);
+        }
+
+        // 更新行動計劃
+        function updateActionPlans(timeframe) {
+            const plansContainer = document.getElementById('actionPlans');
+
+            // 這裡應該根據時間框架動態載入不同的計劃
+            // 暫時使用簡單的顯示/隱藏邏輯
+            console.log(`Loading plans for ${timeframe} days`);
+
+            // 添加載入動畫
+            plansContainer.style.opacity = '0';
+            setTimeout(() => {
+                // 更新內容
+                plansContainer.style.opacity = '1';
+            }, 300);
+        }
+
+        // 切換任務狀態
+        function toggleTask(taskElement) {
+            const checkbox = taskElement.querySelector('.task-checkbox');
+            checkbox.classList.toggle('checked');
+
+            // 更新進度
+            updateProgress();
+
+            // 保存到本地存儲
+            saveTaskState();
+        }
+
+        // 更新進度
+        function updateProgress() {
+            const totalTasks = document.querySelectorAll('.task-checkbox').length;
+            const completedTasks = document.querySelectorAll('.task-checkbox.checked').length;
+
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+
+            // 更新進度條
+            const progressBar = document.querySelector('.progress-bar-fill');
+            const progressText = document.querySelector('.progress-percentage');
+
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+            }
+
+            if (progressText) {
+                progressText.textContent = percentage + '%';
+            }
+
+            // 更新里程碑
+            updateMilestones(percentage);
+        }
+
+        // 更新里程碑
+        function updateMilestones(percentage) {
+            const milestones = document.querySelectorAll('.milestone-item');
+            const thresholds = [0, 0, 20, 40, 60, 80];
+
+            milestones.forEach((milestone, index) => {
+                if (percentage >= thresholds[index]) {
+                    milestone.classList.add('completed');
+                    milestone.querySelector('.milestone-check').classList.add('completed');
+                } else {
+                    milestone.classList.remove('completed');
+                    milestone.querySelector('.milestone-check').classList.remove('completed');
+                }
+            });
+        }
+
+        // 切換FAB菜單
+        function toggleFabMenu() {
+            const menu = document.getElementById('fabMenu');
+            menu.classList.toggle('active');
+        }
+
+        // 導出計劃
+        function exportPlan() {
+            // 生成PDF或其他格式
+            alert('正在生成您的行動計劃PDF...');
+            toggleFabMenu();
+        }
+
+        // 設置提醒
+        function setReminder() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        alert('提醒設置成功！我們會在每天早上9點提醒您完成任務');
+                    }
+                });
+            }
+            toggleFabMenu();
+        }
+
+        // 分享進度
+        function shareProgress() {
+            const percentage = document.querySelector('.progress-percentage').textContent;
+            const text = `我正在執行優勢發展計劃，目前已完成 ${percentage} 的任務！`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: '我的優勢發展進度',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(text);
+                alert('進度信息已複製到剪貼板！');
+            }
+            toggleFabMenu();
+        }
+
+        // 打開資源
+        function openResource(type) {
+            // 根據資源類型打開相應連結
+            console.log(`Opening resource: ${type}`);
+            // 這裡應該導航到實際的資源頁面
+        }
+
+        // 載入用戶數據
+        function loadUserData() {
+            const sessionId = new URLSearchParams(window.location.search).get('session') ||
+                            localStorage.getItem('currentSessionId');
+
+            if (sessionId) {
+                // 從API載入用戶的優勢數據和個性化計劃
+                console.log('Loading action plan for session:', sessionId);
+            }
+        }
+
+        // 保存任務狀態
+        function saveTaskState() {
+            const tasks = [];
+            document.querySelectorAll('.task-item').forEach((task, index) => {
+                tasks.push({
+                    id: index,
+                    completed: task.querySelector('.task-checkbox').classList.contains('checked')
+                });
+            });
+
+            localStorage.setItem('actionPlanTasks', JSON.stringify(tasks));
+        }
+
+        // 添加動畫效果
+        function animateElements() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '0';
+                        entry.target.style.transform = 'translateY(20px)';
+
+                        setTimeout(() => {
+                            entry.target.style.transition = 'all 0.6s ease';
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.plan-section, .resource-card').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // 記錄頁面訪問
+        localStorage.setItem('lastCheckpoint', 'action_plan_viewed');
+    </script>
+</body>
+</html>
