@@ -17,7 +17,7 @@ while providing scientifically-backed, actionable recommendations.
 """
 
 from .strength_mapper import StrengthMapper, StrengthProfile
-from .recommendation_engine import RecommendationEngine, JobRecommendation
+from .recommendation_engine import RecommendationEngine, JobRecommendation, RecommendationResult, get_recommendation_engine
 from .rule_engine import RuleEngine, RecommendationRule
 from .career_matcher import CareerMatcher, CareerMatch
 from .development_planner import DevelopmentPlanner, DevelopmentPlan
@@ -27,6 +27,8 @@ __all__ = [
     'StrengthProfile',
     'RecommendationEngine',
     'JobRecommendation',
+    'RecommendationResult',
+    'get_recommendation_engine',
     'RuleEngine',
     'RecommendationRule',
     'CareerMatcher',

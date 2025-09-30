@@ -32,7 +32,7 @@ from models.schemas import (
 # TODO: Refactor AssessmentService to use ScoringEngine (Task: future)
 # from services.assessment import AssessmentService
 from utils.database import get_db_connection
-from api.routes import consent, sessions, scoring
+from api.routes import consent, sessions, scoring, recommendations
 from api.middleware.error_handler import register_error_handlers
 
 
@@ -123,6 +123,7 @@ async def health_check() -> HealthResponse:
 app.include_router(consent.router, prefix="/api/v1", tags=["Consent"])
 app.include_router(sessions.router, prefix="/api/v1", tags=["Sessions"])
 app.include_router(scoring.router, tags=["Scoring"])
+app.include_router(recommendations.router, tags=["Recommendations"])
 
 
 # Application startup event
