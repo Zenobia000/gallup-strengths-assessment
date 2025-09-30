@@ -114,7 +114,7 @@ redis-server
 7. **Run Development Server**
 ```bash
 cd src/main/python
-uvicorn api.main:app --reload --host 0.0.0.0 --port 8002
+uvicorn api.main:app --reload --host 0.0.0.0 --port 8004
 ```
 
 ### Production Deployment
@@ -140,7 +140,7 @@ python -c "from src.main.python.core.database import init_db; init_db()"
 3. **Start Production Server**
 ```bash
 cd src/main/python
-uvicorn api.main:app --host 0.0.0.0 --port 8002 --workers 4
+uvicorn api.main:app --host 0.0.0.0 --port 8004 --workers 4
 ```
 
 ### Docker Deployment
@@ -154,9 +154,9 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY src/ ./src/
-EXPOSE 8002
+EXPOSE 8004
 
-CMD ["uvicorn", "src.main.python.api.main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "src.main.python.api.main:app", "--host", "0.0.0.0", "--port", "8004"]
 ```
 
 2. **Docker Compose Setup**
@@ -166,7 +166,7 @@ services:
   app:
     build: .
     ports:
-      - "8002:8002"
+      - "8004:8004"
     depends_on:
       - redis
       - postgres
@@ -611,7 +611,7 @@ grep -i "database" /var/log/strengths-app.log | grep -i error
 echo "=== Daily Health Check - $(date) ==="
 
 # Check application status
-curl -s http://localhost:8002/api/v1/health | jq .
+curl -s http://localhost:8004/api/v1/health | jq .
 
 # Check database status
 psql strengths_db -c "SELECT COUNT(*) FROM users;"

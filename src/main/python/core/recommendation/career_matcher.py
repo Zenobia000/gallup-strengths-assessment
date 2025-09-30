@@ -1,20 +1,20 @@
 """
 Career Matcher - Job Role Matching Based on Strengths
 
-This module provides intelligent career matching by analyzing strength profiles
-and matching them with suitable job roles and career paths. The matching
-algorithm considers both strength alignment and industry context.
+基於統一職涯知識庫的智能職涯匹配系統
+分析優勢檔案並與適合的職位角色和發展路徑進行匹配
 
-Design Philosophy:
-Following Linus Torvalds' principle of "good taste" - clear matching logic
-without overengineering, transparent scoring, and practical job recommendations.
+設計原則：
+- 使用統一知識庫確保數據一致性
+- 透明的評分算法
+- 實用的職涯建議
+- 支援本地化和文化背景
 
-Key Features:
-- Comprehensive job role database
-- Strength-based matching algorithm
-- Industry sector categorization
-- Experience level consideration
-- Cultural and market context awareness
+主要功能：
+- 統一的職位角色資料庫
+- 優勢導向的匹配算法
+- 產業分類和經驗等級考量
+- 文化和市場背景支援
 """
 
 from typing import Dict, List, Optional, Any, Tuple
@@ -24,59 +24,25 @@ import json
 from pathlib import Path
 
 from .strength_mapper import StrengthProfile, StrengthScore, StrengthDomain
+from ..knowledge.career_knowledge_base import (
+    get_career_knowledge_base,
+    CareerRole,
+    StrengthCategory,
+    IndustrySector,
+    ExperienceLevel
+)
 
 
-class ExperienceLevel(Enum):
-    """Experience levels for job matching."""
-    ENTRY = "entry"
-    JUNIOR = "junior"
-    MID = "mid"
-    SENIOR = "senior"
-    EXECUTIVE = "executive"
+# 移除重複的枚舉定義，使用統一知識庫中的定義
 
 
-class IndustrySector(Enum):
-    """Industry sectors for job categorization."""
-    TECHNOLOGY = "technology"
-    FINANCE = "finance"
-    HEALTHCARE = "healthcare"
-    EDUCATION = "education"
-    MANUFACTURING = "manufacturing"
-    RETAIL = "retail"
-    CONSULTING = "consulting"
-    MEDIA = "media"
-    GOVERNMENT = "government"
-    NON_PROFIT = "non_profit"
-    STARTUP = "startup"
-    CORPORATE = "corporate"
-
-
-@dataclass
-class JobRole:
-    """Definition of a job role with strength requirements."""
-    role_id: str
-    role_name: str
-    chinese_name: str
-    industry_sector: IndustrySector
-    experience_levels: List[ExperienceLevel]
-    description: str
-    required_strengths: List[str]  # Primary strength themes needed
-    beneficial_strengths: List[str]  # Secondary strengths that help
-    domain_weights: Dict[StrengthDomain, float]  # Weight for each domain
-    min_education: str
-    typical_salary_range: str
-    growth_potential: str
-    work_environment: str
-    key_responsibilities: List[str]
-
-    def __str__(self) -> str:
-        return f"{self.chinese_name} ({self.role_name}) - {self.industry_sector.value}"
+# 移除重複的 JobRole 定義，使用統一知識庫中的 CareerRole
 
 
 @dataclass
 class CareerMatch:
     """A career match result with scoring details."""
-    job_role: JobRole
+    job_role: CareerRole
     role_name: str
     chinese_name: str
     industry_sector: str
@@ -96,17 +62,20 @@ class CareerMatch:
 
 class CareerMatcher:
     """
-    Intelligent career matching based on strength profiles.
+    基於優勢檔案的智能職涯匹配系統
 
-    This class analyzes strength profiles and matches them against a database
-    of job roles, providing scored recommendations with explanations.
+    使用統一職涯知識庫分析優勢檔案，並與職位角色進行匹配，
+    提供評分建議和詳細說明。
     """
 
     def __init__(self):
-        """Initialize the career matcher with job role database."""
-        self.job_roles = self._load_job_roles()
+        """Initialize the career matcher with unified knowledge base."""
+        self.knowledge_base = get_career_knowledge_base()
 
-    def _load_job_roles(self) -> List[JobRole]:
+        # 保留舊的載入邏輯作為備用
+        # self.job_roles = self._load_job_roles()  # 已廢棄，改用統一知識庫
+
+    def _load_job_roles(self) -> List[CareerRole]:
         """Load comprehensive job role database."""
         roles = []
 
@@ -343,30 +312,93 @@ class CareerMatcher:
         user_context: Optional[Dict[str, Any]] = None
     ) -> List[CareerMatch]:
         """
-        Find career matches based on strength profile and user context.
+        根據優勢檔案和用戶背景尋找職涯匹配
 
         Args:
-            strength_profile: Complete strength profile from StrengthMapper
-            user_context: User preferences and context (experience, industry, etc.)
+            strength_profile: StrengthMapper 產生的完整優勢檔案
+            user_context: 用戶偏好和背景（經驗、產業等）
 
         Returns:
-            List of CareerMatch objects sorted by match score (highest first)
+            依匹配分數排序的 CareerMatch 列表（最高分在前）
         """
         if user_context is None:
             user_context = {}
 
         matches = []
 
-        for job_role in self.job_roles:
-            match = self._calculate_job_match(job_role, strength_profile, user_context)
+        # 從統一知識庫獲取所有職涯角色
+        career_roles = self.knowledge_base.get_all_career_roles()
+
+        for role_id, career_role in career_roles.items():
+            match = self._calculate_job_match_from_knowledge_base(
+                career_role, strength_profile, user_context
+            )
             matches.append(match)
 
-        # Sort by match score (highest first)
+        # 依匹配分數排序（最高在前）
         return sorted(matches, key=lambda x: x.match_score, reverse=True)
+
+    def _calculate_job_match_from_knowledge_base(
+        self,
+        career_role: CareerRole,
+        strength_profile: StrengthProfile,
+        user_context: Dict[str, Any]
+    ) -> CareerMatch:
+        """根據統一知識庫計算職位匹配分數"""
+
+        # 1. 計算優勢對齊度
+        strength_alignment = self._calculate_strength_alignment_from_kb(career_role, strength_profile)
+
+        # 2. 計算領域適配度
+        domain_fit = self._calculate_domain_fit_from_kb(career_role, strength_profile)
+
+        # 3. 應用情境獎勵（經驗、產業偏好等）
+        context_bonus = self._calculate_context_bonus_from_kb(career_role, user_context)
+
+        # 4. 計算整體匹配分數
+        base_score = (
+            sum(strength_alignment.values()) * 0.6 +  # 優勢對齊最重要
+            sum(domain_fit.values()) * 0.3 +          # 領域適配次要
+            context_bonus * 0.1                       # 情境獎勵最少
+        )
+
+        # 正規化至 0-100 範圍
+        match_score = min(100, max(0, base_score))
+
+        # 5. 基於優勢檔案信心計算匹配信心
+        confidence = self._calculate_match_confidence_from_kb(
+            strength_profile, strength_alignment, domain_fit
+        )
+
+        # 6. 識別匹配優勢和發展需求
+        matching_strengths, development_needs = self._analyze_strength_gaps_from_kb(
+            career_role, strength_profile
+        )
+
+        # 7. 生成匹配原因
+        reasons = self._generate_match_reasons_from_kb(
+            career_role, strength_alignment, domain_fit, matching_strengths
+        )
+
+        return CareerMatch(
+            job_role=career_role,
+            role_name=career_role.role_name,
+            chinese_name=career_role.chinese_name,
+            industry_sector=career_role.industry_sector.value,
+            match_score=match_score,
+            strength_alignment=strength_alignment,
+            domain_fit=domain_fit,
+            confidence=confidence,
+            matching_strengths=matching_strengths,
+            development_needs=development_needs,
+            description=career_role.description,
+            required_strengths=career_role.primary_strengths,
+            reasons=reasons
+        )
 
     def _calculate_job_match(
         self,
-        job_role: JobRole,
+        job_role: CareerRole,  # 修正型別
         strength_profile: StrengthProfile,
         user_context: Dict[str, Any]
     ) -> CareerMatch:
@@ -602,6 +634,195 @@ class CareerMatcher:
         reasons.append(f"{job_role.industry_sector.value}產業提供良好的發展機會")
 
         return reasons[:3]  # Limit to top 3 reasons
+
+
+    # 新增基於統一知識庫的匹配方法
+    def _calculate_strength_alignment_from_kb(self, career_role: CareerRole, strength_profile: StrengthProfile) -> Dict[str, float]:
+        """計算優勢對齊度 - 基於統一知識庫"""
+        alignment = {}
+
+        # 獲取用戶優勢分數
+        user_strengths = {s.name: s.score for s in strength_profile.all_strengths}
+
+        # 計算主要優勢對齊（較高權重）
+        primary_alignment = 0
+        for required_strength in career_role.primary_strengths:
+            strength_score = user_strengths.get(required_strength, 0)
+            weight = career_role.get_strength_weight(required_strength)
+            alignment_score = (strength_score / 100) * weight
+            alignment[f"primary_{required_strength}"] = alignment_score
+            primary_alignment += alignment_score
+
+        # 計算次要優勢對齊（較低權重）
+        secondary_alignment = 0
+        for beneficial_strength in career_role.secondary_strengths:
+            strength_score = user_strengths.get(beneficial_strength, 0)
+            weight = career_role.get_strength_weight(beneficial_strength) * 0.5  # 次要優勢權重減半
+            alignment_score = (strength_score / 100) * weight
+            alignment[f"secondary_{beneficial_strength}"] = alignment_score
+            secondary_alignment += alignment_score
+
+        # 計算平均對齊度
+        total_primary = len(career_role.primary_strengths)
+        total_secondary = len(career_role.secondary_strengths)
+
+        if total_primary > 0:
+            alignment["primary_average"] = primary_alignment / total_primary
+        if total_secondary > 0:
+            alignment["secondary_average"] = secondary_alignment / total_secondary
+
+        return alignment
+
+    def _calculate_domain_fit_from_kb(self, career_role: CareerRole, strength_profile: StrengthProfile) -> Dict[StrengthCategory, float]:
+        """計算領域適配度 - 基於統一知識庫"""
+        domain_fit = {}
+
+        # 計算每個優勢類別的用戶分布
+        user_category_scores = {}
+        category_counts = {}
+
+        for strength in strength_profile.all_strengths:
+            # 從知識庫獲取優勢主題以確定類別
+            strength_theme = self.knowledge_base.get_strength_theme(strength.name)
+            if strength_theme:
+                category = strength_theme.category
+                if category not in user_category_scores:
+                    user_category_scores[category] = 0
+                    category_counts[category] = 0
+                user_category_scores[category] += strength.score
+                category_counts[category] += 1
+
+        # 計算平均分數
+        user_category_averages = {}
+        for category, total_score in user_category_scores.items():
+            user_category_averages[category] = total_score / category_counts[category]
+
+        # 計算與職位需求的適配度
+        for category in StrengthCategory:
+            user_strength = user_category_averages.get(category, 0)
+            # 簡化的適配度計算：用戶該類別的強度
+            domain_fit[category] = user_strength / 100
+
+        return domain_fit
+
+    def _calculate_context_bonus_from_kb(self, career_role: CareerRole, user_context: Dict[str, Any]) -> float:
+        """計算情境獎勵 - 基於統一知識庫"""
+        bonus = 0
+
+        # 產業偏好獎勵
+        preferred_industry = user_context.get("industry_preference", "").lower()
+        if preferred_industry and preferred_industry in career_role.industry_sector.value.lower():
+            bonus += 10
+
+        # 經驗等級匹配
+        user_experience = user_context.get("experience_level", "").lower()
+        if user_experience:
+            try:
+                user_exp_level = ExperienceLevel(user_experience)
+                if user_exp_level in career_role.experience_levels:
+                    bonus += 15
+            except ValueError:
+                pass
+
+        # 薪資期望匹配
+        salary_expectation = user_context.get("salary_expectation", 0)
+        if salary_expectation > 0:
+            try:
+                # 從薪資範圍提取數字，如 "60-150萬"
+                numbers = [int(s) for s in career_role.salary_range.replace("萬", "").split("-") if s.isdigit()]
+                if len(numbers) == 2:
+                    min_salary, max_salary = numbers
+                    if min_salary <= salary_expectation <= max_salary:
+                        bonus += 10
+                    elif salary_expectation < min_salary:
+                        bonus -= 5
+            except:
+                pass
+
+        return bonus
+
+    def _calculate_match_confidence_from_kb(self, strength_profile: StrengthProfile,
+                                          strength_alignment: Dict[str, float],
+                                          domain_fit: Dict[StrengthCategory, float]) -> float:
+        """計算匹配信心 - 基於統一知識庫"""
+        # 基礎信心來自優勢檔案
+        base_confidence = strength_profile.profile_confidence
+
+        # 對齊信心 - 主要優勢對齊度越高信心越高
+        alignment_confidence = 0
+        if "primary_average" in strength_alignment:
+            alignment_confidence = strength_alignment["primary_average"]
+
+        # 領域信心 - 領域適配度平均值
+        domain_confidence = sum(domain_fit.values()) / len(domain_fit) if domain_fit else 0
+
+        # 綜合信心
+        overall_confidence = (
+            base_confidence * 0.4 +
+            alignment_confidence * 0.4 +
+            domain_confidence * 0.2
+        )
+
+        return min(1.0, max(0.0, overall_confidence))
+
+    def _analyze_strength_gaps_from_kb(self, career_role: CareerRole,
+                                     strength_profile: StrengthProfile) -> Tuple[List[str], List[str]]:
+        """分析優勢差距 - 基於統一知識庫"""
+        user_strength_names = [s.name for s in strength_profile.top_5_strengths]
+
+        matching_strengths = []
+        development_needs = []
+
+        # 檢查主要優勢
+        for required in career_role.primary_strengths:
+            if required in user_strength_names:
+                matching_strengths.append(required)
+            else:
+                development_needs.append(required)
+
+        # 檢查次要優勢
+        for beneficial in career_role.secondary_strengths:
+            if beneficial in user_strength_names and beneficial not in matching_strengths:
+                matching_strengths.append(beneficial)
+
+        return matching_strengths, development_needs
+
+    def _generate_match_reasons_from_kb(self, career_role: CareerRole,
+                                      strength_alignment: Dict[str, float],
+                                      domain_fit: Dict[StrengthCategory, float],
+                                      matching_strengths: List[str]) -> List[str]:
+        """生成匹配原因 - 基於統一知識庫"""
+        reasons = []
+
+        # 優勢匹配原因
+        if matching_strengths:
+            # 從知識庫獲取優勢的中文名稱
+            chinese_names = []
+            for strength_id in matching_strengths[:2]:
+                strength_theme = self.knowledge_base.get_strength_theme(strength_id)
+                if strength_theme:
+                    chinese_names.append(strength_theme.chinese_name)
+
+            if chinese_names:
+                reasons.append(f"您的{', '.join(chinese_names)}優勢與此職位高度匹配")
+
+        # 領域對齊原因
+        top_domain = max(domain_fit.items(), key=lambda x: x[1]) if domain_fit else None
+        if top_domain and top_domain[1] > 0.3:
+            domain_names = {
+                StrengthCategory.EXECUTION: "執行力",
+                StrengthCategory.INFLUENCING: "影響力",
+                StrengthCategory.RELATIONSHIP: "關係建立",
+                StrengthCategory.THINKING: "策略思維"
+            }
+            domain_name = domain_names.get(top_domain[0], "")
+            if domain_name:
+                reasons.append(f"您在{domain_name}領域的優勢適合此職位需求")
+
+        # 產業機會原因
+        reasons.append(f"{career_role.industry_sector.value}產業提供良好的發展機會")
+
+        return reasons[:3]  # 限制為前3個原因
 
 
 def get_career_matcher() -> CareerMatcher:

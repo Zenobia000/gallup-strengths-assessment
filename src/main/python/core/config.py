@@ -129,6 +129,7 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_prefix = "GALLUP_"
         case_sensitive = False
+        extra = "ignore"
 
 
 class PsychometricSettings:

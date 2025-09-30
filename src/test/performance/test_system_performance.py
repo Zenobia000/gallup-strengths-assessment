@@ -16,7 +16,7 @@ import json
 
 
 class PerformanceTestSuite:
-    def __init__(self, base_url: str = "http://localhost:8002/api/v1"):
+    def __init__(self, base_url: str = "http://localhost:8004/api/v1"):
         self.base_url = base_url
         self.performance_results = []
 

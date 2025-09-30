@@ -119,7 +119,7 @@ python3 -m http.server 3000
 ```bash
 # 啟動後端 API 服務
 cd src/main/python
-python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8002 --reload
+python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8004 --reload
 
 # 啟動前端服務器
 cd src/main/resources/static
@@ -134,9 +134,9 @@ python3 -m http.server 3000
 - **結果展示**: http://localhost:3000/pages/results.html
 
 #### 後端 API (開發/測試)
-- **健康檢查**: http://localhost:8002/api/v1/health
-- **API 文檔**: http://localhost:8002/api/v1/docs
-- **測驗問題**: http://localhost:8002/api/v1/questions
+- **健康檢查**: http://localhost:8004/api/v1/health
+- **API 文檔**: http://localhost:8004/api/v1/docs
+- **測驗問題**: http://localhost:8004/api/v1/questions
 
 #### 🛠️ 除錯工具 (Debug Tools)
 - **清除會話工具**: http://localhost:3000/clear_session.html
@@ -194,13 +194,13 @@ python scripts/run_tests.py coverage
 #### API 測試
 ```bash
 # 健康檢查
-curl http://localhost:8002/api/v1/health
+curl http://localhost:8004/api/v1/health
 
 # 獲取問題
-curl http://localhost:8002/api/v1/questions
+curl http://localhost:8004/api/v1/questions
 
 # 檢視 API 文檔
-# 瀏覽器訪問: http://localhost:8002/api/v1/docs
+# 瀏覽器訪問: http://localhost:8004/api/v1/docs
 ```
 
 ### 🛠️ 故障排除
@@ -217,7 +217,7 @@ curl http://localhost:8002/api/v1/questions
 2. **端口被占用**
    ```bash
    # 檢查端口使用情況
-   netstat -tulpn | grep :8002
+   netstat -tulpn | grep :8004
    netstat -tulpn | grep :3000
 
    # 終止占用的進程
@@ -244,13 +244,13 @@ curl http://localhost:8002/api/v1/questions
 #### 檢查服務狀態
 ```bash
 # 檢查所有服務
-curl -s http://localhost:8002/api/v1/health | python3 -m json.tool
+curl -s http://localhost:8004/api/v1/health | python3 -m json.tool
 
 # 檢查快取狀態
-curl -s http://localhost:8002/api/v1/cache/health | python3 -m json.tool
+curl -s http://localhost:8004/api/v1/cache/health | python3 -m json.tool
 
 # 檢查快取統計
-curl -s http://localhost:8002/api/v1/cache/stats | python3 -m json.tool
+curl -s http://localhost:8004/api/v1/cache/stats | python3 -m json.tool
 ```
 
 ## 📊 API 端點設計

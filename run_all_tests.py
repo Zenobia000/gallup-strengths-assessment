@@ -16,7 +16,7 @@ import subprocess
 import time
 import requests
 
-def check_server_health(base_url: str = "http://localhost:8004/api/v1", timeout: int = 30):
+def check_server_health(base_url: str = "http://localhost:8005/api/v1", timeout: int = 30):
     """Check if the backend server is running"""
     print(f"🔍 Checking server health at {base_url}...")
 
@@ -179,7 +179,7 @@ async def main():
     if not args.skip_health_check:
         if not check_server_health():
             print("\n💡 To start the server, run:")
-            print("   cd src/main/python && python -m uvicorn api.main:app --host 0.0.0.0 --port 8002")
+            print("   cd src/main/python && python -m uvicorn api.main:app --host 0.0.0.0 --port 8004")
             print("\nOr skip health check with: --skip-health-check")
             return 1
 

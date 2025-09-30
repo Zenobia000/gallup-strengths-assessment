@@ -9,212 +9,98 @@
 - POST /api/scoring/quality-check - 品質檢查
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any, Optional
-from datetime import datetime
+import logging
 import json
 
 from utils.sqlalchemy_db import get_db
-from models.database import AssessmentSession, AssessmentResponse, Score
+from models.database import Score
 from models.schemas import (
-    ScoringRequest, ScoringResponse, StrengthsRequest, StrengthsResponse,
-    QualityCheckRequest, QualityCheckResponse, ScoreResultResponse
+    ScoringRequest, 
+    ScoringResponse, 
+    APIResponse, 
+    ScoreResultResponse, 
+    QuestionResponse,
+    QualityCheckRequest,
+    QualityCheckResponse
 )
-from core.scoring import ScoringEngine
+from core.scoring import ScoringEngine, DimensionScores
 
-router = APIRouter(prefix="/api/scoring", tags=["scoring"])
+router = APIRouter()
+logger = logging.getLogger(__name__)
 
-# 依賴注入
+
 def get_scorer():
-    """取得計分器實例"""
+    """Dependency injector for ScoringEngine."""
     return ScoringEngine()
 
 
-@router.post("/calculate", response_model=ScoringResponse)
+@router.post("/api/v1/scoring/calculate", response_model=APIResponse)
 async def calculate_big_five_scores(
     request: ScoringRequest,
     db: Session = Depends(get_db),
     scorer: ScoringEngine = Depends(get_scorer)
 ):
     """
-    計算 Big Five 人格分數
-
-    Args:
-        request: 包含 session_id 和 responses 的請求
-        db: 資料庫會話
-        scorer: ScoringEngine 計分器
-
-    Returns:
-        ScoringResponse: Big Five 分數結果
+    Calculate and save comprehensive psychometric scores.
     """
+    logger.info(f"Received scoring request for session_id: {request.session_id}")
     try:
-        # 驗證會話存在
-        session = db.query(AssessmentSession).filter(
-            AssessmentSession.session_id == request.session_id
-        ).first()
+        # 1. Convert request for ScoringEngine
+        question_responses = [
+            QuestionResponse(question_id=r.question_id, score=r.response_value)
+            for r in request.responses
+        ]
 
-        if not session:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Assessment session not found"
-            )
+        # 2. Calculate scores using ScoringEngine
+        logger.info("Calculating dimension scores...")
+        dimension_scores = scorer.create_dimension_scores(question_responses)
+        logger.info(f"Successfully calculated dimension scores: {dimension_scores}")
 
-        # 驗證回答完整性
-        if len(request.responses) != 20:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Expected 20 responses, got {len(request.responses)}"
-            )
-
-        # 提取回答值 (7-point scale)
-        response_values = [r.response_value for r in request.responses]
-
-        # 計算 Big Five 分數 (使用 7-point 轉 5-point 適配器)
-        dimension_scores = scorer.calculate_scores_from_api(
-            response_values,
-            scale_type="7-point"
-        )
-
-        # 儲存分數到資料庫 (simplified format)
-        score_record = Score(
-            session_id=request.session_id,
-            raw_scores=json.dumps(dimension_scores),
-            standardized_scores=json.dumps(dimension_scores),  # For now, raw = standardized
-            percentiles=json.dumps({}),  # TODO: Add percentile calculation
-            confidence_level="high",  # TODO: Add confidence assessment
-            quality_flags=json.dumps([]),  # TODO: Add quality checks
-            scoring_version="1.0.0-basic",
-            computation_time_ms=0,  # TODO: Add timing
-            created_at=datetime.utcnow()
-        )
-
+        # 3. Create or update Score record in database
+        logger.info("Saving scores to the database...")
+        score_record = db.query(Score).filter_by(session_id=request.session_id).first()
+        if not score_record:
+            score_record = Score(session_id=request.session_id)
+        
+        # NOTE: This is a temporary adaptation. The Score model expects more detailed
+        # scores (raw, percentiles, etc.) which the basic ScoringEngine does not
+        # currently provide. We are populating it with the available data.
+        scores_dict = dimension_scores.to_dict()
+        score_record.raw_scores = scores_dict
+        score_record.standardized_scores = scores_dict # Placeholder
+        score_record.percentiles = scores_dict # Placeholder
+        score_record.confidence_level = "medium" # Placeholder
+        score_record.quality_flags = [] # Placeholder
+        score_record.scoring_confidence = 0.85 # Placeholder
+        score_record.scoring_version = "1.0.0-basic"
+        score_record.computation_time_ms = 50.0 # Placeholder
+        score_record.norms_version = "dev-norms-v1" # Placeholder
+        
         db.add(score_record)
         db.commit()
         db.refresh(score_record)
+        logger.info(f"Successfully saved scores for session_id: {request.session_id}")
 
-        return ScoringResponse(
+        # 4. Prepare and return response
+        response_data = ScoringResponse(
             session_id=request.session_id,
-            big_five_scores={
-                "raw_scores": dimension_scores,
-                "scoring_version": "1.0.0-basic",
-                "timestamp": datetime.utcnow().isoformat()
-            },
+            big_five_scores=scores_dict,
             score_id=score_record.id
         )
 
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid input: {str(e)}"
+        return APIResponse(
+            success=True,
+            data=response_data.dict()
         )
+
     except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to calculate scores for session {request.session_id}: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Scoring calculation failed: {str(e)}"
-        )
-
-
-# TODO: Re-implement strengths mapping after core functionality is stable
-# @router.post("/strengths", response_model=StrengthsResponse)
-async def calculate_strengths_profile_DISABLED(
-    request: StrengthsRequest,
-    db: Session = Depends(get_db)
-):
-    """
-    計算優勢檔案
-
-    Args:
-        request: 包含 session_id 的請求 (或直接提供 Big Five 分數)
-        db: 資料庫會話
-        scorer: Mini-IPIP 計分器
-        mapper: 優勢映射器
-
-    Returns:
-        StrengthsResponse: 完整優勢檔案
-    """
-    try:
-        big_five_scores = None
-
-        if request.session_id:
-            # 從資料庫取得現有分數
-            score_record = db.query(Score).filter(
-                Score.session_id == request.session_id
-            ).first()
-
-            if not score_record:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="No scores found for this session. Calculate Big Five scores first."
-                )
-
-            # 重建 BigFiveScores 物件
-            raw_scores = json.loads(score_record.raw_scores)
-            standardized_scores = json.loads(score_record.standardized_scores)
-            percentiles = json.loads(score_record.percentiles)
-
-            from core.scoring.mini_ipip_scorer import BigFiveScores, ScoreConfidence
-            big_five_scores = BigFiveScores(
-                raw_extraversion=raw_scores["extraversion"],
-                raw_agreeableness=raw_scores["agreeableness"],
-                raw_conscientiousness=raw_scores["conscientiousness"],
-                raw_neuroticism=raw_scores["neuroticism"],
-                raw_openness=raw_scores["openness"],
-                standardized_extraversion=standardized_scores["extraversion"],
-                standardized_agreeableness=standardized_scores["agreeableness"],
-                standardized_conscientiousness=standardized_scores["conscientiousness"],
-                standardized_neuroticism=standardized_scores["neuroticism"],
-                standardized_openness=standardized_scores["openness"],
-                percentile_extraversion=percentiles["extraversion"],
-                percentile_agreeableness=percentiles["agreeableness"],
-                percentile_conscientiousness=percentiles["conscientiousness"],
-                percentile_neuroticism=percentiles["neuroticism"],
-                percentile_openness=percentiles["openness"],
-                confidence_level=ScoreConfidence(score_record.confidence_level),
-                quality_flags=json.loads(score_record.quality_flags),
-                scoring_version=score_record.scoring_version,
-                computation_time_ms=score_record.computation_time_ms,
-                timestamp=score_record.created_at.strftime("%Y-%m-%d %H:%M:%S")
-            )
-
-        elif request.big_five_scores:
-            # 使用提供的 Big Five 分數
-            responses = [r.response_value for r in request.responses]
-            big_five_scores = scorer.calculate_scores(responses)
-
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Either session_id or big_five_scores with responses must be provided"
-            )
-
-        # 計算優勢檔案
-        strengths_profile = mapper.map_strengths(big_five_scores)
-
-        # 儲存優勢結果 (擴展 Score 表或建立新表)
-        if request.session_id:
-            score_record = db.query(Score).filter(
-                Score.session_id == request.session_id
-            ).first()
-            if score_record:
-                score_record.strengths_profile = json.dumps(strengths_profile.to_dict())
-                score_record.updated_at = datetime.utcnow()
-                db.commit()
-
-        return StrengthsResponse(
-            session_id=request.session_id,
-            strengths_profile=strengths_profile.to_dict()
-        )
-
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid input: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Strengths calculation failed: {str(e)}"
+            status_code=500,
+            detail=f"Failed to calculate scores: {str(e)}"
         )
 
 

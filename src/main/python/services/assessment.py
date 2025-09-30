@@ -24,11 +24,12 @@ from models.schemas import (
     SessionStatus,
     HEXACOScores,
     BigFiveScores,
-    StrengthScores
+    StrengthScores,
+    ResponseOption
 )
 from utils.database import get_database_manager
 from core.config import get_settings, get_psychometric_settings
-from core.scoring import MiniIPIPScorer, StrengthsMapper
+from core.scoring import MiniIPIPScorer, StrengthMapper
 
 
 class AssessmentError(Exception):
@@ -54,9 +55,9 @@ class AssessmentService:
         self.psych_settings = get_psychometric_settings()
 
         # Initialize scoring components
-        normative_data = self.db_manager.get_normative_data()
-        self.scorer = MiniIPIPScorer(normative_data)
-        self.strengths_mapper = StrengthsMapper()
+        self.normative_data = self.db_manager.get_normative_data()
+        self.scorer = MiniIPIPScorer()
+        self.strengths_mapper = StrengthMapper()
 
     def create_session(self, consent_id: str, instrument: str) -> SessionData:
         """
@@ -182,12 +183,40 @@ class AssessmentService:
             # Convert to domain objects
             items = []
             for item in raw_items:
+                # Parse JSON fields if they exist
+                response_options = None
+                dimension_weights = None
+
+                if item.get("response_options"):
+                    import json
+                    try:
+                        response_options_data = json.loads(item["response_options"])
+                        response_options = [
+                            ResponseOption(
+                                value=opt["value"],
+                                text=opt["text"],
+                                dimensions=opt.get("dimensions")
+                            ) for opt in response_options_data
+                        ]
+                    except (json.JSONDecodeError, KeyError):
+                        response_options = None
+
+                if item.get("dimension_weights"):
+                    try:
+                        dimension_weights = json.loads(item["dimension_weights"])
+                    except json.JSONDecodeError:
+                        dimension_weights = None
+
                 items.append(AssessmentItem(
                     item_id=item["item_id"],
                     text=item["text_chinese"],
                     scale_type="likert_7",
                     reverse_scored=bool(item["reverse_scored"]),
-                    dimension=item["dimension"]
+                    dimension=item["dimension"],
+                    question_type=item.get("question_type", "traditional"),
+                    scenario_context=item.get("scenario_context"),
+                    response_options=response_options,
+                    dimension_weights=dimension_weights
                 ))
 
             return items

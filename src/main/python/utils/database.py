@@ -208,31 +208,39 @@ class DatabaseManager:
 
     def apply_migrations(self):
         """Apply any pending database migrations."""
-        try:
-            from utils.migrations.migration_002_enhanced_scores import apply_migration
+        migrations = [
+            ('002', 'utils.migrations.migration_002_enhanced_scores'),
+            ('003', 'utils.migrations.migration_003_situational_questions')
+        ]
 
-            with self.get_connection() as conn:
-                # Check if migration 002 has been applied
-                cursor = conn.execute("""
-                    SELECT name FROM sqlite_master
-                    WHERE type='table' AND name='migrations'
-                """)
+        with self.get_connection() as conn:
+            # Ensure migrations table exists
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS migrations (
+                    version TEXT PRIMARY KEY,
+                    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    description TEXT
+                )
+            """)
 
-                if cursor.fetchone():
+            for version, module_name in migrations:
+                try:
+                    # Check if migration has been applied
                     cursor = conn.execute("""
-                        SELECT version FROM migrations
-                        WHERE version = '002'
-                    """)
-                    if not cursor.fetchone():
-                        apply_migration(conn)
-                else:
-                    apply_migration(conn)
+                        SELECT version FROM migrations WHERE version = ?
+                    """, (version,))
 
-        except ImportError:
-            # Migration file doesn't exist yet, skip
-            pass
-        except Exception as e:
-            print(f"Migration error: {e}")
+                    if not cursor.fetchone():
+                        # Import and apply migration
+                        module = __import__(module_name, fromlist=['apply_migration'])
+                        apply_migration = getattr(module, 'apply_migration')
+                        apply_migration(conn)
+                        print(f"✅ Applied migration {version}")
+
+                except ImportError:
+                    print(f"⚠️ Migration {version} file not found, skipping")
+                except Exception as e:
+                    print(f"❌ Migration {version} error: {e}")
 
     def seed_assessment_items(self, conn=None):
         """
@@ -450,16 +458,15 @@ class DatabaseManager:
         """Get normative data for score standardization."""
         with self.get_connection() as conn:
             cursor = conn.execute("""
-                SELECT factor, mean_score, std_deviation
+                SELECT dimension, mean, std_dev
                 FROM normative_data
-                WHERE version = ?
-            """, (version,))
+            """)
 
             norms = {}
             for row in cursor.fetchall():
-                norms[row["factor"]] = {
-                    "mean": row["mean_score"],
-                    "std": row["std_deviation"]
+                norms[row["dimension"]] = {
+                    "mean": row["mean"],
+                    "std": row["std_dev"]
                 }
 
             return norms

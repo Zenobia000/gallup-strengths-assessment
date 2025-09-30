@@ -20,7 +20,15 @@
       "Bash(pkill:*)",
       "Bash(PYTHONPATH=src/main/python python3 -c \"from core.scoring.quality_checker import ResponseQualityChecker; print(''QualityChecker imported successfully'')\")",
       "Bash(PYTHONPATH=src/main/python python3 -c \"import sys; sys.path.append(''src/test/unit''); from test_mini_ipip_scorer import *; print(''Mini IPIP scorer tests imported successfully'')\")",
-      "Bash(open http://localhost:3000/test_submit.html)"
+      "Bash(open http://localhost:3000/test_submit.html)",
+      "Bash(PYTHONPATH=/home/os-sunnie.gd.weng/python_workstation/side-project/strength-system/src/main/python python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8002 --reload)",
+      "Bash(find:*)",
+      "Bash(ss:*)",
+      "Bash(lsof:*)",
+      "Read(//proc/280121/**)",
+      "Bash(kill:*)",
+      "mcp__playwright__browser_navigate",
+      "Bash(sqlite3:*)"
     ],
     "deny": [],
     "ask": []

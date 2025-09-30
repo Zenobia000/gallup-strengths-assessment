@@ -12,7 +12,8 @@ Follows Linus Torvalds philosophy: focused functions, clear error handling.
 
 import uuid
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+import httpx
 
 from fastapi import APIRouter, HTTPException, Request, Path, Depends
 from fastapi.responses import JSONResponse
@@ -371,6 +372,37 @@ async def submit_assessment_responses(
 
         # save_responses already updates session status to COMPLETED
         db_manager.save_responses(session_id, responses_data)
+
+        # Asynchronously trigger scoring calculation
+        try:
+            async with httpx.AsyncClient() as client:
+                scoring_request_data = {
+                    "session_id": session_id,
+                    "responses": [
+                        {
+                            "question_id": int(resp["item_id"].split("_")[-1]),
+                            "response_value": resp["response"]
+                        }
+                        for resp in responses_data
+                    ]
+                }
+                # Assuming the scoring service is running at the same base URL
+                base_url = str(request.base_url)
+                scoring_url = f"{base_url}api/v1/scoring/calculate"
+                
+                response = await client.post(scoring_url, json=scoring_request_data, timeout=30.0)
+                response.raise_for_status()
+
+        except httpx.RequestError as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Failed to trigger scoring service: {e}"
+            )
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(
+                status_code=e.response.status_code,
+                detail=f"Scoring service returned an error: {e.response.text}"
+            )
 
         # Calculate basic Big Five scores (simplified for MVP)
         # This would be replaced with proper psychometric algorithms in Week 2

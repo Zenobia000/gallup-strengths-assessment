@@ -11,9 +11,11 @@ import os
 from pathlib import Path
 
 # Add src/main/python to Python path
-project_root = Path(__file__).parent
+# Correctly identify the project root, which is two levels above this script.
+project_root = Path(__file__).resolve().parent.parent.parent
 python_path = project_root / "src" / "main" / "python"
 sys.path.insert(0, str(python_path))
+
 
 if __name__ == "__main__":
     import uvicorn

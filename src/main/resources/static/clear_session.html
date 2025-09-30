@@ -34,7 +34,7 @@
 
             try {
                 // 1. Submit consent
-                const consentResp = await fetch('http://localhost:8002/api/v1/consent', {
+                const consentResp = await fetch('http://localhost:8004/api/v1/consent', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -47,7 +47,7 @@
                 output.textContent += '1. Consent ID: ' + consent.data.consent_id + '\n';
 
                 // 2. Start session
-                const sessionResp = await fetch('http://localhost:8002/api/v1/sessions/start', {
+                const sessionResp = await fetch('http://localhost:8004/api/v1/sessions/start', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({

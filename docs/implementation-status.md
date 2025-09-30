@@ -57,7 +57,7 @@
 
 ### API 端點配置
 ```
-開發環境: http://localhost:8002/api/v1
+開發環境: http://localhost:8004/api/v1
 測試環境: http://localhost:8003/api/v1
 前端服務: http://localhost:8080
 ```

@@ -2,7 +2,7 @@
 優勢映射引擎
 將 Big Five 人格分數映射到 12 個 Gallup 風格的優勢面向
 
-基於研究文檔的權重矩陣與科學映射方法
+基於統一職涯知識庫的映射方法，確保與職涯推薦系統的數據一致性
 支援可解釋性追蹤與信心評估
 """
 
@@ -12,14 +12,10 @@ from enum import Enum
 import json
 import math
 from .mini_ipip_scorer import BigFiveScores, ScoreConfidence
+from ..knowledge.career_knowledge_base import get_career_knowledge_base, StrengthCategory
 
 
-class StrengthCategory(Enum):
-    """優勢類別"""
-    EXECUTION = "execution"      # 執行力
-    INFLUENCING = "influencing"  # 影響力
-    RELATIONSHIP = "relationship" # 關係建立
-    THINKING = "thinking"        # 策略思維
+# 使用統一知識庫中的 StrengthCategory，移除重複定義
 
 
 @dataclass
@@ -38,10 +34,10 @@ class StrengthResult:
     secondary_factors: Dict[str, float]
     weight_formula: str
 
-    # 描述與建議
+    # 描述與建議（從統一知識庫獲取）
     description: str
-    job_matches: List[str] = field(default_factory=list)
-    development_suggestions: List[str] = field(default_factory=list)
+    job_matches: List[str] = field(default_factory=list)  # 從知識庫動態生成
+    development_suggestions: List[str] = field(default_factory=list)  # 從知識庫動態生成
 
     def to_dict(self) -> Dict[str, Any]:
         """轉換為字典格式"""
@@ -101,10 +97,14 @@ class StrengthsProfile:
 
 
 class StrengthMapper:
-    """優勢映射引擎"""
+    """優勢映射引擎 - 使用統一職涯知識庫"""
 
-    # 12 個優勢面向的映射配置
-    STRENGTH_MAPPINGS = {
+    def __init__(self):
+        """初始化優勢映射引擎"""
+        self.knowledge_base = get_career_knowledge_base()
+
+    # 保留原有映射配置作為備用（已廢棄，改用統一知識庫）
+    DEPRECATED_STRENGTH_MAPPINGS = {
         "structured_execution": {
             "display_name": "結構化執行",
             "category": StrengthCategory.EXECUTION,
@@ -274,9 +274,7 @@ class StrengthMapper:
         }
     }
 
-    def __init__(self):
-        """初始化優勢映射引擎"""
-        self.mappings = self.STRENGTH_MAPPINGS.copy()
+    # 移除舊的 __init__ 方法，已在上方重新定義
 
     def map_strengths(self, big_five_scores: BigFiveScores) -> StrengthsProfile:
         """
@@ -297,11 +295,13 @@ class StrengthMapper:
             "O": big_five_scores.standardized_openness
         }
 
-        # 計算每個優勢的分數
+        # 計算每個優勢的分數 - 使用統一知識庫
         all_strengths = []
-        for strength_key, config in self.mappings.items():
-            strength_result = self._calculate_strength_score(
-                strength_key, config, scores, big_five_scores.confidence_level
+        strength_themes = self.knowledge_base.get_all_strength_themes()
+
+        for strength_id, strength_theme in strength_themes.items():
+            strength_result = self._calculate_strength_score_from_knowledge_base(
+                strength_id, strength_theme, scores, big_five_scores.confidence_level
             )
             all_strengths.append(strength_result)
 
@@ -322,9 +322,9 @@ class StrengthMapper:
                 1 for s in all_strengths if s.confidence == conf
             )
 
-        # 生成職涯建議
-        recommended_roles = self._generate_role_recommendations(top_strengths)
-        development_priorities = self._generate_development_priorities(all_strengths)
+        # 生成職涯建議 - 使用統一知識庫
+        recommended_roles = self._generate_role_recommendations_from_knowledge_base(top_strengths)
+        development_priorities = self._generate_development_priorities_from_knowledge_base(all_strengths)
 
         return StrengthsProfile(
             top_strengths=top_strengths,
@@ -337,12 +337,12 @@ class StrengthMapper:
             development_priorities=development_priorities
         )
 
-    def _calculate_strength_score(self, strength_key: str, config: Dict[str, Any],
-                                 big_five_scores: Dict[str, float],
-                                 overall_confidence: ScoreConfidence) -> StrengthResult:
-        """計算單一優勢分數"""
+    def _calculate_strength_score_from_knowledge_base(self, strength_id: str, strength_theme,
+                                                     big_five_scores: Dict[str, float],
+                                                     overall_confidence: ScoreConfidence) -> StrengthResult:
+        """計算單一優勢分數 - 基於統一知識庫"""
         # 解析權重公式
-        formula = config["weight_formula"]
+        formula = strength_theme.weight_formula
 
         # 替換變數
         E, A, C, N, O = (big_five_scores[k] for k in ["E", "A", "C", "N", "O"])
@@ -355,7 +355,7 @@ class StrengthMapper:
             })
         except:
             # 萬一公式有問題，使用主要因子分數
-            primary_factor_key = config["primary_factor"].upper()
+            primary_factor_key = strength_theme.primary_factor.upper()
             if primary_factor_key == "NEUROTICISM_REVERSED":
                 score = 100 - N
             else:
@@ -368,7 +368,7 @@ class StrengthMapper:
         percentile = self._calculate_percentile(score)
 
         # 分解貢獻度
-        primary_factor = config["primary_factor"]
+        primary_factor = strength_theme.primary_factor
         primary_contribution, secondary_factors = self._decompose_contributions(
             formula, big_five_scores, score
         )
@@ -378,20 +378,28 @@ class StrengthMapper:
             score, primary_contribution, overall_confidence
         )
 
+        # 從知識庫獲取職涯匹配和發展建議
+        career_roles = self.knowledge_base.get_roles_for_strength(strength_id)
+        job_matches = [role.chinese_name for role in career_roles[:4]]  # 取前4個
+
+        development_suggestions = []
+        for suggestion in strength_theme.development_suggestions[:3]:  # 取前3個
+            development_suggestions.append(suggestion.title)
+
         return StrengthResult(
-            name=strength_key,
-            display_name=config["display_name"],
+            name=strength_id,
+            display_name=strength_theme.chinese_name,
             score=score,
             percentile=percentile,
             confidence=confidence,
-            category=config["category"],
+            category=strength_theme.category,
             primary_factor=primary_factor,
             primary_contribution=primary_contribution,
             secondary_factors=secondary_factors,
             weight_formula=formula,
-            description=config["description"],
-            job_matches=config["job_matches"].copy(),
-            development_suggestions=config["development_suggestions"].copy()
+            description=strength_theme.description,
+            job_matches=job_matches,
+            development_suggestions=development_suggestions
         )
 
     def _calculate_percentile(self, score: float) -> float:
@@ -458,8 +466,19 @@ class StrengthMapper:
 
         return max(category_counts.keys(), key=lambda x: category_counts[x])
 
+    def _generate_role_recommendations_from_knowledge_base(self, top_strengths: List[StrengthResult]) -> List[str]:
+        """從統一知識庫生成職涯角色建議"""
+        # 收集前5大優勢的優勢ID
+        strength_ids = [s.name for s in top_strengths]
+
+        # 使用知識庫的匹配演算法
+        career_matches = self.knowledge_base.find_career_matches_by_strengths(strength_ids, top_n=8)
+
+        # 返回角色名稱
+        return [role.chinese_name for role, score in career_matches]
+
     def _generate_role_recommendations(self, top_strengths: List[StrengthResult]) -> List[str]:
-        """生成職涯角色建議"""
+        """生成職涯角色建議 - 舊版方法，保留作為備用"""
         role_frequency = {}
 
         for strength in top_strengths:
@@ -470,8 +489,25 @@ class StrengthMapper:
         sorted_roles = sorted(role_frequency.items(), key=lambda x: x[1], reverse=True)
         return [role for role, _ in sorted_roles[:8]]  # 取前8個推薦角色
 
+    def _generate_development_priorities_from_knowledge_base(self, all_strengths: List[StrengthResult]) -> List[str]:
+        """從統一知識庫生成發展優先順序"""
+        # 基於低分優勢生成發展建議
+        weak_strengths = [s for s in all_strengths if s.score < 40]
+        weak_strengths.sort(key=lambda x: x.score)  # 從最低分開始
+
+        development_priorities = []
+
+        # 從知識庫獲取發展建議
+        for strength in weak_strengths[:3]:  # 取最需要發展的3個
+            strength_theme = self.knowledge_base.get_strength_theme(strength.name)
+            if strength_theme:
+                for suggestion in strength_theme.development_suggestions[:2]:
+                    development_priorities.append(suggestion.title)
+
+        return development_priorities[:6]  # 最多6個發展建議
+
     def _generate_development_priorities(self, all_strengths: List[StrengthResult]) -> List[str]:
-        """生成發展優先順序"""
+        """生成發展優先順序 - 舊版方法，保留作為備用"""
         # 基於低分優勢生成發展建議
         weak_strengths = [s for s in all_strengths if s.score < 40]
         weak_strengths.sort(key=lambda x: x.score)  # 從最低分開始
@@ -483,14 +519,25 @@ class StrengthMapper:
         return development_priorities[:6]  # 最多6個發展建議
 
     def get_strength_details(self, strength_name: str) -> Optional[Dict[str, Any]]:
-        """取得特定優勢的詳細資訊"""
-        return self.mappings.get(strength_name)
+        """取得特定優勢的詳細資訊 - 從統一知識庫獲取"""
+        strength_theme = self.knowledge_base.get_strength_theme(strength_name)
+        if strength_theme:
+            return {
+                "display_name": strength_theme.chinese_name,
+                "category": strength_theme.category.value,
+                "primary_factor": strength_theme.primary_factor,
+                "weight_formula": strength_theme.weight_formula,
+                "description": strength_theme.description,
+                "behavioral_indicators": strength_theme.behavioral_indicators,
+                "work_style_preferences": strength_theme.work_style_preferences
+            }
+        return None
 
     def customize_strength_mapping(self, strength_name: str,
                                  custom_config: Dict[str, Any]) -> None:
-        """自訂優勢映射配置"""
-        if strength_name in self.mappings:
-            self.mappings[strength_name].update(custom_config)
+        """自訂優勢映射配置 - 已廢棄，請直接修改統一知識庫"""
+        # 這個方法已不再使用，因為配置統一在知識庫中管理
+        print(f"Warning: customize_strength_mapping is deprecated. Please modify the unified knowledge base directly.")
 
 # Alias for backward compatibility with tests
 StrengthMappingResult = StrengthsProfile
