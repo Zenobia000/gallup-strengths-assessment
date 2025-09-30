@@ -4,16 +4,23 @@
  * Version: 1.0
  */
 
+import { config } from './config.js';
+
 class API {
   constructor() {
-    this.baseURL = 'http://localhost:8002/api/v1';
+    this.baseURL = config.getApiBaseURL();
+    this.timeout = config.getApiConfig().timeout;
+    this.retries = config.getApiConfig().retries;
     this.headers = {
       'Content-Type': 'application/json',
     };
+
+    // Log configuration in development
+    config.logInfo();
   }
 
   /**
-   * Generic HTTP request handler
+   * Generic HTTP request handler with retry logic
    * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
    * @param {string} endpoint - API endpoint path
    * @param {Object|null} data - Request body data
@@ -26,6 +33,7 @@ class API {
     const config = {
       method,
       headers: { ...this.headers, ...options.headers },
+      signal: AbortSignal.timeout(this.timeout),
       ...options,
     };
 
@@ -34,34 +42,72 @@ class API {
       config.body = JSON.stringify(data);
     }
 
-    try {
-      const response = await fetch(url, config);
+    let lastError;
 
-      // Handle non-OK responses
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new APIError(
-          errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-          response.status,
-          errorData
-        );
+    // Retry logic
+    for (let attempt = 1; attempt <= this.retries; attempt++) {
+      try {
+        if (config.isFeatureEnabled && config.isFeatureEnabled('debug')) {
+          console.log(`🌐 API Request (attempt ${attempt}/${this.retries}):`, method, endpoint);
+        }
+
+        const response = await fetch(url, config);
+
+        // Handle non-OK responses
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const apiError = new APIError(
+            errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+            response.status,
+            errorData
+          );
+
+          // Don't retry client errors (4xx)
+          if (response.status >= 400 && response.status < 500) {
+            throw apiError;
+          }
+
+          lastError = apiError;
+          continue; // Retry for 5xx errors
+        }
+
+        // Return parsed JSON
+        const result = await response.json();
+
+        if (config.isFeatureEnabled && config.isFeatureEnabled('debug')) {
+          console.log('✅ API Response:', result);
+        }
+
+        return result;
+      } catch (error) {
+        lastError = error;
+
+        // Don't retry API errors with client status codes
+        if (error instanceof APIError && error.statusCode >= 400 && error.statusCode < 500) {
+          throw error;
+        }
+
+        // Don't retry on the last attempt
+        if (attempt === this.retries) {
+          break;
+        }
+
+        // Wait before retry (exponential backoff)
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
-
-      // Return parsed JSON
-      return await response.json();
-    } catch (error) {
-      // Re-throw API errors
-      if (error instanceof APIError) {
-        throw error;
-      }
-
-      // Network or other errors
-      throw new APIError(
-        error.message || 'Network error occurred',
-        0,
-        { originalError: error }
-      );
     }
+
+    // All retries failed
+    if (lastError instanceof APIError) {
+      throw lastError;
+    }
+
+    throw new APIError(
+      lastError?.message || 'Network error occurred',
+      0,
+      { originalError: lastError }
+    );
   }
 
   /**
@@ -145,11 +191,13 @@ class API {
   // ============================================
 
   /**
-   * Get all assessment questions
+   * Get all assessment questions with situational support
+   * @param {boolean} includeSituational - Include situational questions
    * @returns {Promise<Object>} Questions data
    */
-  async getQuestions() {
-    return this.get('/questions');
+  async getQuestions(includeSituational = true) {
+    const params = includeSituational ? '?include_situational=true' : '';
+    return this.get(`/questions${params}`);
   }
 
   /**
@@ -182,6 +230,19 @@ class API {
       responses,
       completion_time
     });
+  }
+
+  // ============================================
+  // Scoring API
+  // ============================================
+
+  /**
+   * Submit responses for scoring
+   * @param {Object} scoringData - Scoring request data
+   * @returns {Promise<Object>} Scoring results
+   */
+  async submitForScoring(scoringData) {
+    return this.post('/scoring/calculate', scoringData);
   }
 
   // ============================================

@@ -7,8 +7,7 @@
   <meta name="keywords" content="Gallup, 優勢測驗, 人格測驗, 職涯規劃, Mini-IPIP">
   <title>Gallup 優勢測驗 - 探索您的獨特優勢</title>
 
-  <!-- Preconnect to API -->
-  <link rel="preconnect" href="http://localhost:8002">
+  <!-- Dynamic preconnect will be added by JavaScript -->
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="/css/variables.css">
@@ -387,6 +386,7 @@
   <script type="module">
     import { storage } from '/js/storage.js';
     import { api } from '/js/api.js';
+    import { config } from '/js/config.js';
 
     // Global function to start assessment
     window.startAssessment = async function() {
@@ -424,9 +424,17 @@
       }
     };
 
-    // Check API health on page load
+    // Initialize on page load
     window.addEventListener('DOMContentLoaded', async () => {
       try {
+        // Add dynamic preconnect for API
+        const apiUrl = new URL(config.getApiBaseURL());
+        const preconnectLink = document.createElement('link');
+        preconnectLink.rel = 'preconnect';
+        preconnectLink.href = apiUrl.origin;
+        document.head.appendChild(preconnectLink);
+
+        // Check API health
         await api.healthCheck();
         console.log('API health check: OK');
       } catch (error) {
