@@ -199,6 +199,8 @@ class ReportGenerationResponse(BaseModel):
     share_url: Optional[str] = Field(None, description="Shareable URL for the report")
     expires_at: Optional[datetime] = Field(None, description="Report expiration timestamp")
     warnings: List[str] = Field(default_factory=list, description="Generation warnings")
+    cached: bool = Field(default=False, description="Whether the report was served from cache")
+    cache_hit: bool = Field(default=False, description="Whether this was a cache hit")
 
 
 class ReportStatusResponse(BaseModel):

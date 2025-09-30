@@ -20,6 +20,7 @@ from .content_generator import ContentGenerator, PersonalizedContentGenerator, R
 from .report_template import ReportTemplate, ReportSection
 from .chart_renderer import ChartRenderer, ChartType
 from .share_link import ShareLinkManager, ShareLink
+from .cache_manager import ReportCacheManager, CacheConfiguration, get_report_cache_manager
 
 __all__ = [
     'PDFReportGenerator',
@@ -32,7 +33,10 @@ __all__ = [
     'ChartRenderer',
     'ChartType',
     'ShareLinkManager',
-    'ShareLink'
+    'ShareLink',
+    'ReportCacheManager',
+    'CacheConfiguration',
+    'get_report_cache_manager'
 ]
 
 __version__ = '1.0.0'

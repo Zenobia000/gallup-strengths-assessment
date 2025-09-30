@@ -360,14 +360,15 @@
 
         // Submit consent to API
         const response = await api.submitConsent({
-          consent_given: true,
-          consent_timestamp: new Date().toISOString(),
+          agreed: true,
+          user_agent: navigator.userAgent,
           ip_address: null, // Backend will capture this
+          consent_version: "v1.0"
         });
 
-        // Save session ID and consent status
-        const sessionId = response.data.session_id;
-        storage.saveSession(sessionId);
+        // Save consent ID as session ID (temporary until session API is implemented)
+        const consentId = response.data.consent_id;
+        storage.saveSession(consentId);
         storage.saveConsent(true);
 
         // Redirect to assessment page

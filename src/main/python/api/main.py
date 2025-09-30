@@ -129,6 +129,10 @@ app.include_router(recommendations.router, tags=["Recommendations"])
 from api.routes import reports
 app.include_router(reports.router, prefix="/api/v1", tags=["Reports"])
 
+# Cache administration routes
+from api.routes import cache_admin
+app.include_router(cache_admin.router, prefix="/api/v1", tags=["Cache"])
+
 
 # Application startup event
 @app.on_event("startup")

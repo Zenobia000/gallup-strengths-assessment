@@ -45,6 +45,8 @@ from models.report_models import (
     ReportShareRequest, ReportShareResponse, ReportListResponse, ReportListItem
 )
 from utils.database import get_db_connection
+from services.cache_service import get_cache_service, CacheConfiguration
+from core.report.cache_manager import get_report_cache_manager
 
 
 class ReportGenerationError(Exception):
@@ -80,12 +82,13 @@ class ReportService:
     and the core report generation components.
     """
 
-    def __init__(self, output_directory: str = "/tmp/reports"):
+    def __init__(self, output_directory: str = "/tmp/reports", enable_cache: bool = True):
         """
         Initialize the report service.
 
         Args:
             output_directory: Directory for storing generated reports
+            enable_cache: Whether to enable caching functionality
         """
         self.output_directory = Path(output_directory)
         self.output_directory.mkdir(parents=True, exist_ok=True)
@@ -94,6 +97,20 @@ class ReportService:
         self.pdf_generator = PDFReportGenerator()
         self.content_generator = ContentGenerator()
         self.scoring_engine = ScoringEngine()
+
+        # Initialize cache components
+        self.enable_cache = enable_cache
+        if self.enable_cache:
+            cache_config = CacheConfiguration(
+                report_ttl=24 * 3600,  # 24 hours
+                max_cached_reports=1000,
+                cache_if_generation_time_gt=5.0
+            )
+            self.cache_service = get_cache_service(cache_config)
+            self.report_cache_manager = get_report_cache_manager(cache_config)
+        else:
+            self.cache_service = None
+            self.report_cache_manager = None
 
         # Generation tracking
         self._active_generations: Dict[str, asyncio.Task] = {}
@@ -116,6 +133,44 @@ class ReportService:
         """
         # Generate unique report ID
         report_id = f"RPT-{datetime.now().strftime('%Y%m%d%H%M%S')}-{str(uuid.uuid4())[:8].upper()}"
+
+        # Check cache first if enabled
+        if self.enable_cache and self.cache_service:
+            try:
+                cached_report = await self.cache_service.get_report_from_cache(
+                    responses=request.responses,
+                    report_type=request.report_type,
+                    report_format=request.report_format,
+                    user_context=request.user_context
+                )
+
+                if cached_report and cached_report.get('cached'):
+                    # Return cached report immediately
+                    return ReportGenerationResponse(
+                        success=True,
+                        report_id=report_id,
+                        status=ReportStatus.COMPLETED,
+                        metadata=ReportMetadata(
+                            report_id=report_id,
+                            report_type=request.report_type,
+                            report_format=request.report_format,
+                            report_quality=request.report_quality,
+                            user_name=request.user_name,
+                            assessment_date=datetime.now(),
+                            generation_timestamp=cached_report['cache_created_at'],
+                            generation_time_seconds=cached_report['generation_time_seconds'],
+                            file_size_bytes=cached_report['file_size_bytes']
+                        ),
+                        download_url=f"/api/reports/{report_id}/download",
+                        expires_at=datetime.now() + timedelta(hours=72),
+                        cached=True,
+                        cache_hit=True
+                    )
+            except Exception as e:
+                # Log cache error but continue with generation
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Cache lookup failed, proceeding with generation: {e}")
 
         try:
             # Create database record
@@ -244,6 +299,57 @@ class ReportService:
                     report_id
                 ))
                 conn.commit()
+
+            # Cache the generated report if enabled and generation took significant time
+            if self.enable_cache and self.cache_service and generation_time >= 5.0:
+                try:
+                    # Calculate Big Five scores for caching
+                    response_values = [0] * 20
+                    for response in request.responses:
+                        if 1 <= response.question_id <= 20:
+                            response_values[response.question_id - 1] = response.score
+
+                    scores_dict = self.scoring_engine.calculate_scores_from_api(
+                        response_values, scale_type="5-point"
+                    )
+
+                    # Cache the report
+                    await self.cache_service.cache_generated_report(
+                        responses=request.responses,
+                        report_type=request.report_type,
+                        report_data={
+                            'generation_result': generation_result.to_dict() if hasattr(generation_result, 'to_dict') else {
+                                'success': generation_result.success,
+                                'file_path': str(final_path),
+                                'file_size_bytes': generation_result.file_size_bytes,
+                                'generation_time_seconds': generation_time
+                            }
+                        },
+                        file_path=str(final_path),
+                        file_size_bytes=generation_result.file_size_bytes,
+                        generation_time_seconds=generation_time,
+                        big_five_scores=scores_dict,
+                        report_metadata={
+                            'user_name': request.user_name,
+                            'report_type': request.report_type.value,
+                            'report_format': request.report_format.value,
+                            'report_quality': request.report_quality.value,
+                            'include_charts': request.include_charts,
+                            'include_recommendations': request.include_recommendations
+                        },
+                        report_format=request.report_format,
+                        user_context=request.user_context
+                    )
+
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"Successfully cached report {report_id} (generation time: {generation_time:.2f}s)")
+
+                except Exception as cache_error:
+                    # Log cache error but don't fail the generation
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"Failed to cache report {report_id}: {cache_error}")
 
         except Exception as e:
             # Update database with failure
@@ -731,16 +837,108 @@ class ReportService:
 
             return deleted_count
 
+    async def get_cache_performance_stats(self) -> Dict[str, Any]:
+        """
+        Get comprehensive cache performance statistics.
+
+        Returns:
+            Cache performance statistics
+        """
+        if not self.enable_cache or not self.cache_service:
+            return {'cache_enabled': False, 'message': 'Caching is disabled'}
+
+        try:
+            return self.cache_service.get_comprehensive_stats()
+        except Exception as e:
+            return {'error': f'Failed to get cache stats: {str(e)}'}
+
+    async def warm_report_cache(self) -> Dict[str, Any]:
+        """
+        Warm the report cache with common patterns.
+
+        Returns:
+            Cache warming results
+        """
+        if not self.enable_cache or not self.cache_service:
+            return {'cache_enabled': False, 'message': 'Caching is disabled'}
+
+        try:
+            return await self.cache_service.warm_cache_strategically()
+        except Exception as e:
+            return {'error': f'Failed to warm cache: {str(e)}'}
+
+    async def perform_cache_health_check(self) -> Dict[str, Any]:
+        """
+        Perform cache health check.
+
+        Returns:
+            Cache health status
+        """
+        if not self.enable_cache or not self.cache_service:
+            return {'cache_enabled': False, 'message': 'Caching is disabled'}
+
+        try:
+            health_status = await self.cache_service.perform_health_check()
+            return {
+                'is_healthy': health_status.is_healthy,
+                'hit_rate_percent': health_status.hit_rate_percent,
+                'response_time_ms': health_status.response_time_ms,
+                'memory_usage_percent': health_status.memory_usage_percent,
+                'error_rate_percent': health_status.error_rate_percent,
+                'last_check': health_status.last_check.isoformat()
+            }
+        except Exception as e:
+            return {'error': f'Failed to perform health check: {str(e)}'}
+
+    async def invalidate_cache_pattern(self, pattern: str) -> Dict[str, Any]:
+        """
+        Invalidate cache entries matching a pattern.
+
+        Args:
+            pattern: Pattern to match for invalidation
+
+        Returns:
+            Invalidation results
+        """
+        if not self.enable_cache or not self.cache_service:
+            return {'cache_enabled': False, 'message': 'Caching is disabled'}
+
+        try:
+            invalidated_count = await self.cache_service.invalidate_cache_by_pattern(pattern)
+            return {
+                'success': True,
+                'invalidated_count': invalidated_count,
+                'pattern': pattern
+            }
+        except Exception as e:
+            return {'error': f'Failed to invalidate cache: {str(e)}'}
+
+    async def optimize_cache_performance(self) -> Dict[str, Any]:
+        """
+        Optimize cache performance.
+
+        Returns:
+            Optimization results
+        """
+        if not self.enable_cache or not self.cache_service:
+            return {'cache_enabled': False, 'message': 'Caching is disabled'}
+
+        try:
+            return await self.cache_service.optimize_cache_performance()
+        except Exception as e:
+            return {'error': f'Failed to optimize cache: {str(e)}'}
+
 
 # Convenience factory function
-def create_report_service(output_directory: str = "/tmp/reports") -> ReportService:
+def create_report_service(output_directory: str = "/tmp/reports", enable_cache: bool = True) -> ReportService:
     """
     Factory function to create a configured report service.
 
     Args:
         output_directory: Directory for storing generated reports
+        enable_cache: Whether to enable caching functionality
 
     Returns:
         Configured ReportService instance
     """
-    return ReportService(output_directory)
+    return ReportService(output_directory, enable_cache)
