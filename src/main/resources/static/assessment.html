@@ -618,9 +618,16 @@
                 }
             } catch (error) {
                 console.error('Error loading blocks:', error);
-                console.log('Using sample questions as fallback');
-                questions = sampleQuestions;
-                totalQuestions = sampleQuestions.length;
+                // Check if it's an HTML response (404)
+                if (error.message && error.message.includes('Unexpected token')) {
+                    alert('無法載入測驗題目：API 端點不存在');
+                } else {
+                    console.log('Using sample questions as fallback');
+                    // Generate a session ID for fallback mode
+                    sessionId = generateSessionId();
+                    questions = sampleQuestions;
+                    totalQuestions = sampleQuestions.length;
+                }
             }
         }
 
@@ -851,7 +858,12 @@
                 }
             } catch (error) {
                 console.error('Submission error:', error);
-                alert(`網路錯誤: ${error.message}`);
+                // Check if the response is HTML (404 page)
+                if (error.message && error.message.includes('Unexpected token')) {
+                    alert('API 端點不存在或路徑錯誤，請檢查系統設定');
+                } else {
+                    alert(`網路錯誤: ${error.message}`);
+                }
                 // Hide loading state
                 document.getElementById('loadingState').classList.remove('active');
                 document.getElementById('questionCard').style.display = 'block';

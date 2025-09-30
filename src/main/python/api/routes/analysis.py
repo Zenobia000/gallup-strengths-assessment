@@ -15,12 +15,18 @@ from core.analysis.content_analyzer import (
     LearningResource,
     DevelopmentMilestone
 )
+from core.analysis.archetype_mapper import (
+    ArchetypeMapper,
+    TalentProfile,
+    TALENT_DIMENSIONS
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # 初始化分析器
 analyzer = ContentAnalyzer()
+archetype_mapper = ArchetypeMapper()
 
 # 資料模型
 class StrengthScores(BaseModel):
@@ -268,6 +274,82 @@ async def get_action_plan(
 
     except Exception as e:
         logger.error(f"Error getting action plan: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/career-archetype")
+async def analyze_career_archetype(strength_scores: StrengthScores):
+    """
+    分析職業原型（基於凱爾西氣質理論）
+    """
+    try:
+        # 將分數轉換為T1-T12格式
+        talent_scores = {}
+        for key, value in strength_scores.scores.items():
+            # 如果key已經是T1-T12格式，直接使用
+            if key.startswith('T'):
+                talent_scores[key] = value
+            else:
+                # 嘗試映射到T1-T12
+                # 這裡需要一個映射表，暫時使用簡單的對應
+                talent_map = {
+                    '戰略思維': 'T4',  # 分析與洞察
+                    '創新思維': 'T3',  # 探索與創新
+                    '影響力': 'T5',    # 影響與倡議
+                    '執行力': 'T1',    # 結構化執行
+                    '分析力': 'T4',    # 分析與洞察
+                    '溝通': 'T6',      # 協作與共好
+                    '學習力': 'T8',    # 學習與成長
+                    '適應力': 'T10',   # 壓力調節
+                    '責任感': 'T12',   # 責任與當責
+                    '積極性': 'T5',    # 影響與倡議
+                    '同理心': 'T6',    # 協作與共好
+                    '專注力': 'T2'     # 品質與完備
+                }
+                if key in talent_map:
+                    talent_scores[talent_map[key]] = value
+
+        # 分類天賦
+        talent_profile = archetype_mapper.classify_talents(talent_scores)
+
+        # 映射到職業原型
+        archetype = archetype_mapper.map_to_archetype(talent_profile)
+
+        # 分析協同效應
+        dominant_ids = [t[0] for t in talent_profile.dominant_talents]
+        synergy_analysis = archetype_mapper.get_synergy_analysis(dominant_ids)
+
+        # 獲取發展建議
+        development_suggestions = archetype_mapper.get_development_suggestions(talent_profile)
+
+        return {
+            'archetype': {
+                'id': archetype.archetype_id,
+                'name': archetype.archetype_name,
+                'temperament': archetype.keirsey_temperament,
+                'mbti_correlates': archetype.mbti_correlates,
+                'description': archetype.description,
+                'career_suggestions': archetype.career_suggestions
+            },
+            'talent_hierarchy': {
+                'dominant': [
+                    {'id': t[0], 'name': TALENT_DIMENSIONS.get(t[0], t[0]), 'score': t[1]}
+                    for t in talent_profile.dominant_talents
+                ],
+                'supporting': [
+                    {'id': t[0], 'name': TALENT_DIMENSIONS.get(t[0], t[0]), 'score': t[1]}
+                    for t in talent_profile.supporting_talents
+                ],
+                'lesser': [
+                    {'id': t[0], 'name': TALENT_DIMENSIONS.get(t[0], t[0]), 'score': t[1]}
+                    for t in talent_profile.lesser_talents
+                ]
+            },
+            'synergy_analysis': synergy_analysis,
+            'development_suggestions': development_suggestions
+        }
+
+    except Exception as e:
+        logger.error(f"Error analyzing career archetype: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/strength-synergies")
