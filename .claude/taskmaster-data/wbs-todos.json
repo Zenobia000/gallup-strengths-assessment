@@ -1,327 +1,202 @@
 {
   "wbsInfo": {
     "totalTasks": 28,
-    "completedTasks": 15,
+    "completedTasks": 23,
     "pendingTasks": 0,
-    "inProgressTasks": 0,
-    "readyTasks": 13,
-    "progressPercentage": 53.6,
-    "currentPhase": "Phase 3 - Week 1 開發階段",
-    "lastUpdated": "2025-09-26T17:52:00Z"
+    "inProgressTasks": 2,
+    "readyTasks": 3,
+    "progressPercentage": 60,
+    "currentPhase": "3.4 報告系統開發 [Week 3]",
+    "totalHours": 480,
+    "completedHours": 274,
+    "lastUpdated": "2025-09-30T10:30:00Z"
   },
   "currentTask": {
-    "id": "task-w1-005",
-    "title": "用戶同意與隱私合規",
-    "phase": "Week 1",
+    "id": "task-3.4.3",
+    "title": "報告內容生成邏輯",
+    "phase": "3.4 報告系統開發",
     "status": "READY",
-    "description": "實作 GDPR 合規的用戶同意管理系統",
-    "estimatedHours": 6,
-    "hubSuggestion": "security-infrastructure-auditor",
+    "description": "實作 PDF 報告內容生成的核心邏輯",
+    "estimatedHours": 8,
+    "hubSuggestion": "general-purpose",
     "priority": "HIGH",
     "deliverables": [
-      "Consent management API",
-      "GDPR compliance features",
-      "Privacy request handling"
+      "報告內容生成邏輯",
+      "個人化內容模組",
+      "報告結構定義"
     ]
   },
   "phaseBreakdown": {
-    "Phase 1": {
-      "name": "文檔生成階段",
-      "status": "COMPLETED",
-      "tasks": 3,
-      "completed": 3,
-      "progress": 100
+    "1.0": {
+      "name": "專案管理與規劃 (Project Management)",
+      "status": "MOSTLY_COMPLETED",
+      "totalHours": 38,
+      "completedHours": 30,
+      "progress": 79,
+      "tasks": [
+        {"id": "1.1", "name": "專案啟動與規劃", "status": "COMPLETED"},
+        {"id": "1.2", "name": "需求分析與文檔", "status": "MOSTLY_COMPLETED"},
+        {"id": "1.3", "name": "專案監控與報告", "status": "IN_PROGRESS"}
+      ]
     },
-    "Phase 2": {
-      "name": "文檔完善階段",
-      "status": "COMPLETED",
-      "tasks": 3,
-      "completed": 3,
-      "progress": 100
+    "2.0": {
+      "name": "系統架構與設計 (System Architecture)",
+      "status": "MOSTLY_COMPLETED",
+      "totalHours": 66,
+      "completedHours": 55,
+      "progress": 83,
+      "tasks": [
+        {"id": "2.1", "name": "技術架構設計", "status": "MOSTLY_COMPLETED"},
+        {"id": "2.2", "name": "資料庫設計", "status": "MOSTLY_COMPLETED"},
+        {"id": "2.3", "name": "API 設計規範", "status": "MOSTLY_COMPLETED"}
+      ]
     },
-    "Phase 2.5": {
-      "name": "駕駛員審查閘道",
-      "status": "COMPLETED",
-      "tasks": 1,
-      "completed": 1,
-      "progress": 100,
-      "criticalGate": true,
-      "completedAt": "2025-09-26T17:07:00Z"
+    "3.0": {
+      "name": "後端開發 (Backend Development)",
+      "status": "ALMOST_COMPLETED",
+      "totalHours": 155,
+      "completedHours": 145,
+      "progress": 94,
+      "tasks": [
+        {"id": "3.1", "name": "基礎架構建置 [Week 1]", "status": "COMPLETED"},
+        {"id": "3.2", "name": "計分引擎開發 [Week 2]", "status": "COMPLETED"},
+        {"id": "3.3", "name": "推薦系統開發 [Week 3]", "status": "COMPLETED"},
+        {"id": "3.4", "name": "報告系統開發 [Week 3]", "status": "IN_PROGRESS"}
+      ]
     },
-    "Phase 3": {
-      "name": "Week 1 - 基礎架構",
-      "status": "ACTIVE",
-      "tasks": 7,
-      "completed": 3,
-      "ready": 4,
-      "progress": 43,
-      "unlockedAt": "2025-09-26T17:07:00Z"
+    "4.0": {
+      "name": "前端開發 (Frontend Development)",
+      "status": "IN_PROGRESS",
+      "totalHours": 61,
+      "completedHours": 47,
+      "progress": 77,
+      "tasks": [
+        {"id": "4.1", "name": "使用者介面設計", "status": "COMPLETED"},
+        {"id": "4.2", "name": "測驗流程實作", "status": "COMPLETED"},
+        {"id": "4.3", "name": "結果展示介面", "status": "IN_PROGRESS"}
+      ]
     },
-    "Phase 4": {
-      "name": "Week 2 - 計分引擎",
+    "5.0": {
+      "name": "測試與品質保證 (Testing & QA)",
+      "status": "IN_PROGRESS",
+      "totalHours": 72,
+      "completedHours": 24,
+      "progress": 33,
+      "tasks": [
+        {"id": "5.1", "name": "單元測試", "status": "COMPLETED"},
+        {"id": "5.2", "name": "整合測試", "status": "IN_PROGRESS"},
+        {"id": "5.3", "name": "端到端測試", "status": "NOT_STARTED"},
+        {"id": "5.4", "name": "效能測試", "status": "NOT_STARTED"}
+      ]
+    },
+    "6.0": {
+      "name": "部署與上線 (Deployment)",
       "status": "NOT_STARTED",
-      "tasks": 8,
-      "completed": 0,
-      "progress": 0
+      "totalHours": 35,
+      "completedHours": 0,
+      "progress": 0,
+      "tasks": [
+        {"id": "6.1", "name": "部署環境準備", "status": "NOT_STARTED"},
+        {"id": "6.2", "name": "生產部署", "status": "NOT_STARTED"},
+        {"id": "6.3", "name": "監控與維護", "status": "NOT_STARTED"}
+      ]
     },
-    "Phase 5": {
-      "name": "Week 3 - 推薦系統",
-      "status": "NOT_STARTED",
-      "tasks": 7,
-      "completed": 0,
-      "progress": 0
+    "7.0": {
+      "name": "文檔與培訓 (Documentation)",
+      "status": "IN_PROGRESS",
+      "totalHours": 53,
+      "completedHours": 22,
+      "progress": 42,
+      "tasks": [
+        {"id": "7.1", "name": "技術文檔", "status": "MOSTLY_COMPLETED"},
+        {"id": "7.2", "name": "使用者手冊", "status": "NOT_STARTED"},
+        {"id": "7.3", "name": "維護手冊", "status": "NOT_STARTED"}
+      ]
+    }
+  },
+  "weeklyProgress": {
+    "Week 1": {
+      "phase": "3.1 基礎架構建置",
+      "status": "COMPLETED",
+      "tasks": 9,
+      "completedTasks": 9,
+      "hours": 34,
+      "efficiency": "162%",
+      "description": "FastAPI 後端基礎、SQLite 資料庫、Mini-IPIP 題庫載入完成"
     },
-    "Phase 6": {
-      "name": "Week 4 - 品質保證",
-      "status": "NOT_STARTED",
-      "tasks": 6,
-      "completed": 0,
-      "progress": 0
+    "Week 2": {
+      "phase": "3.2 計分引擎開發",
+      "status": "COMPLETED",
+      "tasks": 9,
+      "completedTasks": 9,
+      "hours": 49,
+      "efficiency": "100%",
+      "description": "Big Five 計分演算法、12 優勢面向映射、計分 API 完成"
+    },
+    "Week 3": {
+      "phase": "3.3 推薦系統開發 + 3.4 報告系統開發",
+      "status": "MOSTLY_COMPLETED",
+      "tasks": 14,
+      "completedTasks": 11,
+      "inProgressTasks": 3,
+      "hours": 71,
+      "efficiency": "77%",
+      "description": "推薦引擎完成，PDF 報告系統部分完成"
     }
   },
   "todos": [
     {
-      "id": "task-init-001",
-      "title": "收集專案基礎資訊",
-      "status": "completed",
-      "activeForm": "收集專案基礎資訊中",
-      "phase": "Initialization",
-      "completedAt": "2025-09-25T17:55:00Z",
-      "estimatedHours": 0.5,
-      "actualHours": 0.5
-    },
-    {
-      "id": "task-init-002",
-      "title": "進行 VibeCoding 7問澄清",
-      "status": "completed",
-      "activeForm": "進行 VibeCoding 7問澄清中",
-      "phase": "Initialization",
-      "completedAt": "2025-09-25T18:35:00Z",
-      "estimatedHours": 1,
-      "actualHours": 0.75
-    },
-    {
-      "id": "task-init-003",
-      "title": "TaskMaster 智能分析和規劃",
-      "status": "completed",
-      "activeForm": "進行 TaskMaster 智能分析和規劃中",
-      "phase": "Initialization",
-      "completedAt": "2025-09-25T18:40:00Z",
-      "estimatedHours": 1,
-      "actualHours": 1
-    },
-    {
-      "id": "task-init-004",
-      "title": "建立專案結構和開發環境",
-      "status": "completed",
-      "activeForm": "建立專案結構和開發環境中",
-      "phase": "Initialization",
-      "completedAt": "2025-09-25T18:42:00Z",
-      "estimatedHours": 2,
-      "actualHours": 1.5
-    },
-    {
-      "id": "task-doc-001",
-      "title": "產生 PRD (產品需求文檔)",
-      "status": "completed",
-      "activeForm": "產生 PRD (產品需求文檔)中",
-      "phase": "Phase 1",
-      "completedAt": "2025-09-25T18:50:00Z",
-      "estimatedHours": 2,
-      "actualHours": 1.5,
-      "deliverable": "docs/PRD.md",
-      "hubSuggestion": "workflow-template-manager"
-    },
-    {
-      "id": "task-doc-002",
-      "title": "產生架構設計文檔",
-      "status": "completed",
-      "activeForm": "產生架構設計文檔中",
-      "phase": "Phase 2",
-      "completedAt": "2025-09-25T18:51:00Z",
-      "estimatedHours": 3,
-      "actualHours": 2,
-      "deliverable": "docs/ARCHITECTURE.md",
-      "hubSuggestion": "infrastructure-agent"
-    },
-    {
-      "id": "task-doc-003",
-      "title": "產生 API 設計規格",
-      "status": "completed",
-      "activeForm": "產生 API 設計規格中",
-      "phase": "Phase 2",
-      "completedAt": "2025-09-25T18:52:00Z",
-      "estimatedHours": 2,
-      "actualHours": 1.5,
-      "deliverable": "docs/API_DESIGN.md",
-      "hubSuggestion": "infrastructure-agent"
-    },
-    {
-      "id": "task-doc-004",
-      "title": "建立 TaskMaster 資料持久化",
-      "status": "completed",
-      "activeForm": "建立 TaskMaster 資料持久化中",
-      "phase": "Phase 2",
-      "completedAt": "2025-09-25T18:53:00Z",
-      "estimatedHours": 0.5,
-      "actualHours": 0.25
-    },
-    {
-      "id": "task-gate-001",
-      "title": "駕駛員審查關門 (Phase 2.5)",
-      "status": "completed",
-      "activeForm": "駕駛員審查關門 (Phase 2.5) 中",
-      "phase": "Phase 2.5",
-      "isGate": true,
-      "priority": "CRITICAL",
-      "reviewRequired": true,
-      "completedAt": "2025-09-26T17:07:00Z",
-      "approvedBy": "human_pilot",
-      "description": "人類駕駛員需要審查所有生成的文檔並確認開發方向",
-      "checklist": [
-        "✅ 審查 PRD 的業務目標和用戶故事",
-        "✅ 驗證架構設計的技術可行性",
-        "✅ 確認 API 設計符合心理測量需求",
-        "✅ 評估 4週 MVP 時程的現實性",
-        "✅ 批准進入開發階段"
-      ],
-      "reviewResult": "APPROVED",
-      "reviewNotes": "All documentation reviewed and development phase approved by human pilot"
-    },
-    {
-      "id": "task-w1-001",
-      "title": "SQLite 資料庫設計與初始化",
-      "status": "completed",
-      "activeForm": "初始化 SQLite 資料庫設計中",
-      "phase": "Week 1",
-      "completedAt": "2025-09-26T17:19:00Z",
-      "estimatedHours": 6,
-      "actualHours": 0.5,
-      "hubSuggestion": "general-purpose",
-      "priority": "HIGH",
-      "unlockedAt": "2025-09-26T17:07:00Z",
-      "startedAt": "2025-09-26T17:17:00Z",
-      "deliverables": [
-        "src/main/resources/database/schema.sql",
-        "src/main/resources/database/seed_data.sql",
-        "src/main/resources/database/README.md",
-        "scripts/init_database.py",
-        "DATABASE_SETUP.md",
-        "gallup_strengths.db"
-      ]
-    },
-    {
-      "id": "task-w1-002",
-      "title": "FastAPI 專案架構建置",
-      "status": "completed",
-      "activeForm": "建立 FastAPI 專案架構中",
-      "phase": "Week 1",
-      "completedAt": "2025-09-26T14:00:00Z",
-      "estimatedHours": 8,
-      "actualHours": 1.5,
-      "hubSuggestion": "deployment-expert",
-      "startedAt": "2025-09-26T13:48:00Z",
-      "deliverables": [
-        "app/core/config.py",
-        "app/core/database.py",
-        "app/main.py",
-        "requirements.txt",
-        "README_API.md",
-        ".env.example"
-      ]
-    },
-    {
-      "id": "task-w1-003",
-      "title": "Mini-IPIP 題庫建立",
-      "status": "in_progress",
-      "activeForm": "建立 Mini-IPIP 題庫中",
-      "phase": "Week 1",
-      "estimatedHours": 4,
-      "hubSuggestion": "documentation-specialist",
-      "priority": "MEDIUM",
-      "unlockedAt": "2025-09-26T17:07:00Z",
-      "startedAt": "2025-09-26T18:09:00Z"
-    },
-    {
-      "id": "task-w1-004",
-      "title": "基礎 API 端點實作",
-      "status": "completed",
-      "activeForm": "實作基礎 API 端點中",
-      "phase": "Week 1",
-      "completedAt": "2025-09-26T17:52:00Z",
-      "estimatedHours": 10,
-      "actualHours": 0.5,
-      "hubSuggestion": "general-purpose",
-      "priority": "HIGH",
-      "dependsOn": ["task-w1-001"],
-      "unlockedAt": "2025-09-26T17:07:00Z",
-      "startedAt": "2025-09-26T17:49:00Z",
-      "deliverables": [
-        "app/core/exceptions.py",
-        "app/core/security.py",
-        "app/models/database/",
-        "app/schemas/",
-        "app/services/session_service.py",
-        "app/api/v1/sessions.py",
-        "Updated app/main.py"
-      ]
-    },
-    {
-      "id": "task-w1-005",
-      "title": "用戶同意與隱私合規",
-      "status": "in_progress",
-      "activeForm": "實作用戶同意與隱私合規中",
-      "phase": "Week 1",
-      "estimatedHours": 6,
-      "hubSuggestion": "security-infrastructure-auditor",
-      "priority": "HIGH",
-      "unlockedAt": "2025-09-26T17:07:00Z",
-      "startedAt": "2025-09-26T18:09:00Z"
-    },
-    {
-      "id": "task-w1-006",
-      "title": "測試框架建置",
-      "status": "in_progress",
-      "activeForm": "建置測試框架中",
-      "phase": "Week 1",
-      "estimatedHours": 4,
-      "hubSuggestion": "test-automation-engineer",
-      "priority": "MEDIUM",
-      "unlockedAt": "2025-09-26T17:07:00Z",
-      "startedAt": "2025-09-26T18:09:00Z"
-    },
-    {
-      "id": "task-w1-007",
-      "title": "週末檢查點與整合",
+      "id": "task-3.4.3",
+      "title": "報告內容生成邏輯",
       "status": "ready",
-      "activeForm": "進行週末檢查點與整合中",
-      "phase": "Week 1",
-      "estimatedHours": 2,
-      "hubSuggestion": "code-quality-specialist",
-      "priority": "LOW",
-      "dependsOn": ["task-w1-001", "task-w1-004", "task-w1-005", "task-w1-006"],
-      "unlockedAt": "2025-09-26T17:07:00Z"
+      "activeForm": "實作報告內容生成邏輯中",
+      "phase": "3.4",
+      "estimatedHours": 8,
+      "hubSuggestion": "general-purpose",
+      "priority": "HIGH",
+      "dependsOn": ["3.4.2", "3.3.5"],
+      "filePath": "src/main/python/core/report/"
+    },
+    {
+      "id": "task-3.4.5",
+      "title": "報告生成 API",
+      "status": "ready",
+      "activeForm": "實作報告生成 API 中",
+      "phase": "3.4",
+      "estimatedHours": 4,
+      "hubSuggestion": "general-purpose",
+      "priority": "HIGH",
+      "dependsOn": ["3.4.4"],
+      "filePath": "src/main/python/api/routes/"
+    },
+    {
+      "id": "task-3.4.7",
+      "title": "報告快取機制",
+      "status": "ready",
+      "activeForm": "實作報告快取機制中",
+      "phase": "3.4",
+      "estimatedHours": 3,
+      "hubSuggestion": "general-purpose",
+      "priority": "MEDIUM",
+      "dependsOn": ["3.4.6"],
+      "filePath": "src/main/python/core/report/"
     }
   ],
   "hubAnalysis": {
-    "recommendedNextAction": "開始執行 task-w1-005 (用戶同意與隱私合規) - API基礎已完成",
-    "confidence": 0.98,
-    "nextTasks": [
-      "task-w1-005",
-      "task-w1-003",
-      "task-w1-006"
-    ],
-    "parallelExecutionRecommendation": "可並行執行 task-w1-003, task-w1-005, task-w1-006 (全部獨立)",
-    "completedMilestone": "✅ API 基礎架構完成 - Session管理與資料庫整合就緒",
-    "majorAcceleration": "超高效率執行 - 10小時任務在0.5小時完成 (20倍效率)",
+    "recommendedNextAction": "完成 3.4 報告系統開發的剩餘任務",
+    "confidence": 0.95,
+    "nextTasks": ["task-3.4.3", "task-3.4.5", "task-3.4.7"],
+    "parallelExecutionRecommendation": "可並行處理前端 4.3 結果展示介面",
+    "completedMilestone": "🎉 Week 1-2 + 推薦系統完成 - 94% 後端開發完成",
+    "currentFocus": "報告系統最後 10h + 前端結果介面 14h",
     "riskFactors": [
-      "API 端點需要與資料庫模型完美對齊",
-      "確保心理測量合規性在 API 層實現"
+      "報告內容生成邏輯複雜度較高",
+      "前端與後端整合測試需要時間"
     ],
     "suggestions": [
-      "task-w1-004 現在可以開始 (依賴項 task-w1-001 已完成)",
-      "可並行處理 task-w1-003 和 task-w1-005 提升效率",
-      "重點確保 API 與資料庫的無縫整合"
+      "優先完成 task-3.4.3 (報告內容生成)",
+      "並行開發前端 4.3.3-4.3.5 (推薦結果展示、PDF下載、分享功能)",
+      "準備整合測試階段"
     ]
   }
 }

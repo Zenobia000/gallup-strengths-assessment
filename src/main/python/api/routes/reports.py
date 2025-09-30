@@ -51,7 +51,7 @@ from services.report_service import (
 
 # Initialize router
 router = APIRouter(
-    prefix="/api/reports",
+    prefix="/reports",
     tags=["Reports"],
     responses={
         404: {"description": "Report not found"},

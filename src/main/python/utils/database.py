@@ -200,7 +200,10 @@ class DatabaseManager:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_responses_session_id ON responses(session_id)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_scores_session_id ON scores(session_id)")
 
-        self.seed_assessment_items()
+            # Seed data within the same connection/transaction
+            self.seed_assessment_items(conn)
+
+        # Apply migrations after schema and seeding are completed
         self.apply_migrations()
 
     def apply_migrations(self):
@@ -231,11 +234,14 @@ class DatabaseManager:
         except Exception as e:
             print(f"Migration error: {e}")
 
-    def seed_assessment_items(self):
+    def seed_assessment_items(self, conn=None):
         """
         Seed the database with Mini-IPIP assessment items.
 
         Uses the standard 20-item Mini-IPIP with Chinese translations.
+
+        Args:
+            conn: Optional database connection to use. If None, creates new connection.
         """
         items = [
             # Extraversion items (E)
@@ -269,17 +275,25 @@ class DatabaseManager:
             ("ipip_020", "mini_ipip_v1.0", 20, "我不善於抽象思維", "I do not have a good imagination", "openness", True),
         ]
 
-        with self.get_connection() as conn:
+        def _seed_with_connection(conn_to_use):
             # Check if items already exist
-            cursor = conn.execute("SELECT COUNT(*) FROM assessment_items WHERE instrument_version = ?", ("mini_ipip_v1.0",))
+            cursor = conn_to_use.execute("SELECT COUNT(*) FROM assessment_items WHERE instrument_version = ?", ("mini_ipip_v1.0",))
             count = cursor.fetchone()[0]
 
             if count == 0:
-                conn.executemany("""
+                conn_to_use.executemany("""
                     INSERT INTO assessment_items
                     (item_id, instrument_version, item_order, text_chinese, text_english, dimension, reverse_scored)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, items)
+
+        if conn is not None:
+            # Use the provided connection (from schema initialization)
+            _seed_with_connection(conn)
+        else:
+            # Create a new connection
+            with self.get_connection() as new_conn:
+                _seed_with_connection(new_conn)
 
     # CRUD Operations
     def create_consent(self, consent_data: Dict[str, Any]) -> str:

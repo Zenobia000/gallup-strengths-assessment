@@ -107,13 +107,15 @@ def get_db() -> Generator[Session, None, None]:
 def get_db_session() -> Session:
     """取得新的資料庫會話 (手動管理)"""
     if SessionLocal is None:
-        init_database()
+        # Database should be initialized by the primary database manager
+        # init_database()
+        raise RuntimeError("Database not initialized. Use utils.database.DatabaseManager instead.")
 
     return SessionLocal()
 
 
-# 在模組載入時初始化資料庫
-init_database()
+# Database initialization moved to explicit calls to avoid import-time side effects
+# init_database() should be called explicitly when needed
 
 
 # 資料庫操作工具類

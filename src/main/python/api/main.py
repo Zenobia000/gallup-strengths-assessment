@@ -125,6 +125,10 @@ app.include_router(sessions.router, prefix="/api/v1", tags=["Sessions"])
 app.include_router(scoring.router, tags=["Scoring"])
 app.include_router(recommendations.router, tags=["Recommendations"])
 
+# Report generation routes
+from api.routes import reports
+app.include_router(reports.router, prefix="/api/v1", tags=["Reports"])
+
 
 # Application startup event
 @app.on_event("startup")

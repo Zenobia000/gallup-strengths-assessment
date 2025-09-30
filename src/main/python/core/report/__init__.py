@@ -15,14 +15,18 @@ Following Linus Torvalds' principles - simple, fast, and reliable.
 <1 second PDF generation, professional output, no unnecessary complexity.
 """
 
-from .report_generator import ReportGenerator, get_report_generator
+from .pdf_generator import PDFReportGenerator, create_pdf_generator
+from .content_generator import ContentGenerator, PersonalizedContentGenerator, ReportStructureBuilder
 from .report_template import ReportTemplate, ReportSection
 from .chart_renderer import ChartRenderer, ChartType
 from .share_link import ShareLinkManager, ShareLink
 
 __all__ = [
-    'ReportGenerator',
-    'get_report_generator',
+    'PDFReportGenerator',
+    'create_pdf_generator',
+    'ContentGenerator',
+    'PersonalizedContentGenerator',
+    'ReportStructureBuilder',
     'ReportTemplate',
     'ReportSection',
     'ChartRenderer',

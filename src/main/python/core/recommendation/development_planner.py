@@ -288,7 +288,7 @@ class DevelopmentPlanner:
     ) -> DevelopmentGoal:
         """Create goal focused on enhancing existing strengths."""
         strength_names = [s.theme.chinese_name for s in top_strengths]
-        target_date = datetime.now() + timedelta(months=6)
+        target_date = datetime.now() + timedelta(days=180)  # Approximately 6 months
 
         actions = []
         for i, strength in enumerate(top_strengths):
@@ -336,7 +336,7 @@ class DevelopmentPlanner:
         strength_profile: StrengthProfile
     ) -> DevelopmentGoal:
         """Create goal aligned with target career requirements."""
-        target_date = datetime.now() + timedelta(months=12)
+        target_date = datetime.now() + timedelta(days=365)  # Approximately 12 months
 
         actions = []
         for i, skill in enumerate(career_match.development_needs[:3]):
@@ -383,7 +383,7 @@ class DevelopmentPlanner:
         priority_areas: List[str]
     ) -> DevelopmentGoal:
         """Create goal for general skill development."""
-        target_date = datetime.now() + timedelta(months=9)
+        target_date = datetime.now() + timedelta(days=270)  # Approximately 9 months
 
         actions = []
         for i, area in enumerate(priority_areas):
