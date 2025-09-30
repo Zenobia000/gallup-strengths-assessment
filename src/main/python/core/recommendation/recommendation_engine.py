@@ -22,7 +22,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import uuid
 
-from .strength_mapper import StrengthMapper, StrengthProfile
+from .strength_mapper import StrengthMapper, StrengthProfile, StrengthDomain
 from .rule_engine import RuleEngine, RecommendationRule
 from .career_matcher import CareerMatcher, CareerMatch
 from .development_planner import DevelopmentPlanner, DevelopmentPlan
@@ -298,12 +298,14 @@ class RecommendationEngine:
 
         if len(dominant_domains) >= 2:
             domain_names = {
-                "executing": "執行力", "influencing": "影響力",
-                "relationship_building": "關係建立", "strategic_thinking": "戰略思維"
+                StrengthDomain.EXECUTING: "執行力",
+                StrengthDomain.INFLUENCING: "影響力",
+                StrengthDomain.RELATIONSHIP_BUILDING: "關係建立",
+                StrengthDomain.STRATEGIC_THINKING: "戰略思維"
             }
 
-            primary_domain = domain_names.get(dominant_domains[0][0].value, "未知")
-            secondary_domain = domain_names.get(dominant_domains[1][0].value, "未知")
+            primary_domain = domain_names.get(dominant_domains[0][0], "未知")
+            secondary_domain = domain_names.get(dominant_domains[1][0], "未知")
 
             insights.append(
                 f"您的優勢主要集中在{primary_domain}和{secondary_domain}領域，"

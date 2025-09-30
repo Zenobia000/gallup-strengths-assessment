@@ -20,6 +20,7 @@ Key Endpoints:
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from uuid import UUID
+import logging
 
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
@@ -131,6 +132,7 @@ class RecommendationResponse(BaseModel):
 
 # Initialize router
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/api/v1/recommendations/generate")
@@ -313,17 +315,19 @@ async def get_career_recommendations(
         )
 
         # Apply filters and limits
-        filtered_matches = career_matches[:max_results]
+        filtered_matches = career_matches
         if industry_filter:
             filtered_matches = [
                 match for match in filtered_matches
                 if industry_filter.lower() in match.industry_sector.lower()
-            ][:max_results]
+            ]
+
+        final_matches = filtered_matches[:max_results]
 
         # Convert to response format
         response_data = [
             _convert_career_match_to_response(match)
-            for match in filtered_matches
+            for match in final_matches
         ]
 
         return response_data
@@ -373,26 +377,35 @@ async def get_development_plan(
 
         # Generate complete recommendations to get development plan
         recommendation_engine = get_recommendation_engine()
+        
+        logger.info(f"[{session_id}] Generating recommendations for development plan...")
         recommendations = recommendation_engine.generate_recommendations(
             big_five_scores=big_five_scores,
             user_context={"session_id": session_id},
             session_id=session_id
         )
+        logger.info(f"[{session_id}] Successfully generated recommendations.")
 
         # Convert development plan to response format
+        logger.info(f"[{session_id}] Converting development plan to response format...")
         response_data = _convert_development_plan_to_response(
             recommendations.development_plan,
             include_immediate_only=include_immediate_only
         )
+        logger.info(f"[{session_id}] Successfully converted development plan.")
 
         return response_data
 
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(
+            f"Failed to get development plan for session {session_id}: {e}",
+            exc_info=True
+        )
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to get development plan: {str(e)}"
+            detail=f"Failed to get development plan: An internal error occurred."
         )
 
 
