@@ -591,7 +591,7 @@
         async function initAssessment() {
             try {
                 // Load assessment blocks from V4 API
-                const response = await fetch('/api/v4/assessment/blocks?block_count=15');
+                const response = await fetch('http://localhost:8004/api/v4/assessment/blocks?block_count=15');
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Loaded blocks from API:', data);
@@ -686,9 +686,41 @@
                 grid.appendChild(card);
             });
 
+            // Restore previous selections if any
+            if (responses[currentQuestion]) {
+                const savedResponse = responses[currentQuestion];
+                const cards = document.querySelectorAll('.statement-card');
+
+                // Restore "most like" selection
+                if (savedResponse.most_like_index !== undefined) {
+                    const mostCard = cards[savedResponse.most_like_index];
+                    if (mostCard) {
+                        const mostBtn = mostCard.querySelector('.btn-most');
+                        mostBtn.classList.add('selected');
+                        mostCard.classList.add('selected-most');
+                        const statement = mostCard.querySelector('.statement-text').textContent;
+                        document.getElementById('mostLikeSelection').textContent =
+                            statement.substring(0, 20) + '...';
+                    }
+                }
+
+                // Restore "least like" selection
+                if (savedResponse.least_like_index !== undefined) {
+                    const leastCard = cards[savedResponse.least_like_index];
+                    if (leastCard) {
+                        const leastBtn = leastCard.querySelector('.btn-least');
+                        leastBtn.classList.add('selected');
+                        leastCard.classList.add('selected-least');
+                        const statement = leastCard.querySelector('.statement-text').textContent;
+                        document.getElementById('leastLikeSelection').textContent =
+                            statement.substring(0, 20) + '...';
+                    }
+                }
+            }
+
             // Update button states
             document.getElementById('prevBtn').disabled = index === 0;
-            document.getElementById('nextBtn').disabled = true;
+            checkSelectionComplete();
         }
 
         // Create Statement Card
@@ -715,6 +747,16 @@
 
         // Handle Selection
         function selectChoice(statementId, type, button) {
+            // Check if this statement is already selected for the opposite type
+            const card = button.closest('.statement-card');
+            const oppositeType = type === 'most' ? 'least' : 'most';
+
+            // If this card is already selected for opposite type, prevent selection
+            if (card.classList.contains(`selected-${oppositeType}`)) {
+                alert(`此選項已被選為「${oppositeType === 'most' ? '最像我' : '最不像我'}」，請選擇其他選項`);
+                return;
+            }
+
             // Remove previous selection of same type
             document.querySelectorAll(`.btn-${type === 'most' ? 'most' : 'least'}.selected`).forEach(btn => {
                 btn.classList.remove('selected');
@@ -726,6 +768,19 @@
             // Add new selection
             button.classList.add('selected');
             button.closest('.statement-card').classList.add(`selected-${type === 'most' ? 'most' : 'least'}`);
+
+            // Save selection to responses
+            if (!responses[currentQuestion]) {
+                responses[currentQuestion] = {};
+            }
+            const cards = Array.from(document.querySelectorAll('.statement-card'));
+            const cardIndex = cards.indexOf(card);
+
+            if (type === 'most') {
+                responses[currentQuestion].most_like_index = cardIndex;
+            } else {
+                responses[currentQuestion].least_like_index = cardIndex;
+            }
 
             // Update display
             const statement = button.closest('.statement-card').querySelector('.statement-text').textContent;
@@ -780,7 +835,12 @@
             const mostLikeIndex = cards.indexOf(mostLikeCard);
             const leastLikeIndex = cards.indexOf(leastLikeCard);
 
+            // Update response with final data
+            if (!responses[currentQuestion]) {
+                responses[currentQuestion] = {};
+            }
             responses[currentQuestion] = {
+                ...responses[currentQuestion],
                 block_id: currentQuestion,
                 most_like_index: mostLikeIndex,
                 least_like_index: leastLikeIndex,
@@ -831,7 +891,7 @@
 
             try {
                 // Submit to API - use relative URL for better compatibility
-                const response = await fetch('/api/v4/assessment/submit', {
+                const response = await fetch('http://localhost:8004/api/v4/assessment/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

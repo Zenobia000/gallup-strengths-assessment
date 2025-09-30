@@ -296,19 +296,27 @@ async def submit_assessment(request: SubmitRequest):
         profile = norm_scorer.get_strength_profile(norm_scores)
 
         # Calculate fit statistics from theta estimation
+        # Handle se as either array or dict
+        if isinstance(theta_estimate.se, dict):
+            mean_se = float(np.mean(list(theta_estimate.se.values())))
+        else:
+            mean_se = float(np.mean(theta_estimate.se))
+
         fit_stats = {
             'log_likelihood': theta_estimate.log_likelihood,
             'converged': theta_estimate.convergence,
             'iterations': theta_estimate.n_iterations,
-            'mean_se': float(np.mean(theta_estimate.se))
+            'mean_se': mean_se
         }
 
         # Format dimension scores
         dimension_scores = []
         for dim, score in norm_scores.items():
+            # theta_scores is already a dict with dimension keys
+            theta_value = theta_scores.get(dim, 0.0) if isinstance(theta_scores, dict) else 0.0
             dimension_scores.append(DimensionScore(
                 dimension=dim,
-                theta_score=theta_scores[dim],
+                theta_score=theta_value,
                 percentile=score.percentile,
                 t_score=score.t_score,
                 stanine=score.stanine,
