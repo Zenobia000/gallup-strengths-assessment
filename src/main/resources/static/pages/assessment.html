@@ -305,6 +305,7 @@
     let currentIndex = 0;
     let answers = [];
     let sessionId = null;
+    let isSubmitting = false;
 
     // Elements
     const questionNumber = document.getElementById('question-number');
@@ -485,8 +486,10 @@
         renderQuestion();
         checkMilestone();
       } else {
-        // Submit all answers
-        await submitAssessment();
+        // Submit all answers (only if not already submitting)
+        if (!isSubmitting) {
+          await submitAssessment();
+        }
       }
     };
 
@@ -521,8 +524,19 @@
 
     // Submit assessment
     async function submitAssessment() {
+      // Prevent multiple submissions
+      if (isSubmitting) {
+        return;
+      }
+
+      isSubmitting = true;
+
       try {
         loadingScreen.classList.add('show');
+
+        // Disable the next button to prevent multiple clicks
+        nextButton.disabled = true;
+        nextButton.textContent = '提交中...';
 
         // Submit to API
         await api.submitAllAnswers(sessionId, answers);
@@ -537,8 +551,22 @@
         }, 1500);
       } catch (error) {
         console.error('Submit error:', error);
+        isSubmitting = false;
         loadingScreen.classList.remove('show');
-        alert('提交失敗,請稍後再試');
+
+        // Re-enable button on error
+        nextButton.disabled = false;
+        nextButton.textContent = '提交測驗';
+
+        // Handle specific error types
+        if (error.statusCode === 409) {
+          alert('測驗已完成，正在跳轉到結果頁面...');
+          setTimeout(() => {
+            window.location.href = `/pages/results.html?session=${sessionId}`;
+          }, 1000);
+        } else {
+          alert('提交失敗,請稍後再試');
+        }
       }
     }
 
