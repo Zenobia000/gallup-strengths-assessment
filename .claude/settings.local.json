@@ -16,7 +16,11 @@
       "Bash(python -m pytest src/test/unit/test_scoring.py --cov=src.main.python.core.scoring --cov-report=term-missing -v)",
       "Bash(python:*)",
       "Bash(curl:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(pkill:*)",
+      "Bash(PYTHONPATH=src/main/python python3 -c \"from core.scoring.quality_checker import ResponseQualityChecker; print(''QualityChecker imported successfully'')\")",
+      "Bash(PYTHONPATH=src/main/python python3 -c \"import sys; sys.path.append(''src/test/unit''); from test_mini_ipip_scorer import *; print(''Mini IPIP scorer tests imported successfully'')\")",
+      "Bash(open http://localhost:3000/test_submit.html)"
     ],
     "deny": [],
     "ask": []

@@ -491,3 +491,6 @@ class StrengthMapper:
         """自訂優勢映射配置"""
         if strength_name in self.mappings:
             self.mappings[strength_name].update(custom_config)
+
+# Alias for backward compatibility with tests
+StrengthMappingResult = StrengthsProfile

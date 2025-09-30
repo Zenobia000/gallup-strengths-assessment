@@ -82,6 +82,46 @@ async def add_request_metadata(request: Request, call_next):
 register_error_handlers(app)
 
 
+# Mini-IPIP Questions Endpoint
+@app.get("/api/v1/questions", tags=["Assessment"])
+async def get_questions():
+    """Get Mini-IPIP 20-item questionnaire."""
+    questions = [
+        {"id": 1, "text": "我很有想像力", "dimension": "openness", "reverse": False},
+        {"id": 2, "text": "我不會被藝術作品感動", "dimension": "openness", "reverse": True},
+        {"id": 3, "text": "我不善於抽象思考", "dimension": "openness", "reverse": True},
+        {"id": 4, "text": "我對許多事物都不感興趣", "dimension": "openness", "reverse": True},
+        {"id": 5, "text": "我做事總是經過深思熟慮", "dimension": "conscientiousness", "reverse": False},
+        {"id": 6, "text": "我經常忘記把東西放回原位", "dimension": "conscientiousness", "reverse": True},
+        {"id": 7, "text": "我喜歡整潔有序", "dimension": "conscientiousness", "reverse": False},
+        {"id": 8, "text": "我經常搞亂東西", "dimension": "conscientiousness", "reverse": True},
+        {"id": 9, "text": "我是聚會的靈魂人物", "dimension": "extraversion", "reverse": False},
+        {"id": 10, "text": "我不喜歡成為注意力的焦點", "dimension": "extraversion", "reverse": True},
+        {"id": 11, "text": "我在群體中保持低調", "dimension": "extraversion", "reverse": True},
+        {"id": 12, "text": "我與他人保持距離", "dimension": "extraversion", "reverse": True},
+        {"id": 13, "text": "我對他人的問題感興趣", "dimension": "agreeableness", "reverse": False},
+        {"id": 14, "text": "我對他人毫不關心", "dimension": "agreeableness", "reverse": True},
+        {"id": 15, "text": "我感受他人的情緒", "dimension": "agreeableness", "reverse": False},
+        {"id": 16, "text": "我不關心別人的問題", "dimension": "agreeableness", "reverse": True},
+        {"id": 17, "text": "我經常感到憂鬱", "dimension": "neuroticism", "reverse": False},
+        {"id": 18, "text": "我很少感到憂鬱", "dimension": "neuroticism", "reverse": True},
+        {"id": 19, "text": "我容易受到打擊", "dimension": "neuroticism", "reverse": False},
+        {"id": 20, "text": "我很少煩惱", "dimension": "neuroticism", "reverse": True}
+    ]
+
+    return {
+        "questions": questions,
+        "total_count": len(questions),
+        "instructions": "請根據您的真實感受，選擇最符合您情況的答案。1=非常不同意，2=不同意，3=中立，4=同意，5=非常同意",
+        "scale": [
+            {"value": 1, "label": "非常不同意"},
+            {"value": 2, "label": "不同意"},
+            {"value": 3, "label": "中立"},
+            {"value": 4, "label": "同意"},
+            {"value": 5, "label": "非常同意"}
+        ]
+    }
+
 # Health Check Endpoint - Simple and focused
 @app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
 async def health_check() -> HealthResponse:

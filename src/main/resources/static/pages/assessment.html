@@ -322,10 +322,32 @@
       try {
         // Check session
         sessionId = storage.getSession();
-        if (!sessionId || !storage.hasValidSession()) {
-          alert('會話已過期,請重新開始');
-          window.location.href = '/index.html';
-          return;
+
+        // Check if session ID is valid format (should start with "sess_")
+        // If it starts with "consent_", it's an old format and needs to be recreated
+        if (!sessionId || !storage.hasValidSession() || sessionId.startsWith('consent_')) {
+          // If we have consent but invalid session, create a new session
+          if (storage.hasConsent() && sessionId && sessionId.startsWith('consent_')) {
+            try {
+              // Create new session with the consent ID
+              const sessionResponse = await api.post('/sessions/start', {
+                consent_id: sessionId
+              });
+              sessionId = sessionResponse.data.session_id;
+              storage.saveSession(sessionId);
+              console.log('Created new session:', sessionId);
+            } catch (error) {
+              console.error('Failed to create session:', error);
+              alert('請重新開始測驗');
+              storage.clearSession();
+              window.location.href = '/pages/consent.html';
+              return;
+            }
+          } else {
+            alert('會話已過期,請重新開始');
+            window.location.href = '/index.html';
+            return;
+          }
         }
 
         // Check consent
@@ -337,7 +359,7 @@
 
         // Load questions
         const response = await api.getQuestions();
-        questions = response.data.questions;
+        questions = response.questions;
 
         // Load saved progress
         const savedAnswers = storage.getAnswers();

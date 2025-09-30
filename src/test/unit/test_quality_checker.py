@@ -12,6 +12,12 @@ Version: 1.0.0
 """
 
 import pytest
+import sys
+from pathlib import Path
+
+# Add the main Python source directory to the path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "main" / "python"))
+
 from models.schemas import ItemResponse
 from core.scoring.quality_checker import ResponseQualityChecker, QualityFlags
 

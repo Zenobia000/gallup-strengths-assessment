@@ -36,13 +36,13 @@
 ```bash
 # 系統健康檢查
 curl --request GET \
-  --url http://localhost:8000/api/v1/health
+  --url http://localhost:8002/api/v1/health
 
-# 開始測驗流程
+# 開始測驗流程 - 提交同意書
 curl --request POST \
-  --url http://localhost:8000/api/v1/consent \
+  --url http://localhost:8002/api/v1/consent \
   --header 'Content-Type: application/json' \
-  --data '{"agreed": true, "user_agent": "browser/1.0"}'
+  --data '{"agreed": true, "user_agent": "browser/1.0", "consent_version": "v1.0"}'
 ```
 
 ---
@@ -60,7 +60,8 @@ curl --request POST \
 ### 2.2 基本 URL (Base URL)
 ```
 Production:  https://gallup-strengths.example.com/api/v1
-Development: http://localhost:8000/api/v1
+Development: http://localhost:8002/api/v1
+Staging:     http://localhost:8003/api/v1
 ```
 
 ### 2.3 請求與回應格式

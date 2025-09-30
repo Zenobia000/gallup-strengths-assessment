@@ -97,21 +97,145 @@ source venv/bin/activate  # Linux/Mac
 # 或 venv\Scripts\activate  # Windows
 
 # 安裝依賴
-pip install fastapi uvicorn sqlite3 pydantic reportlab
+pip install -r requirements.txt
 ```
 
-### 資料庫初始化
-```bash
-# 初始化 SQLite 資料庫
-python scripts/init_database.py
+### 快速啟動系統
 
-# 載入種子資料
-python scripts/load_seed_data.py
+#### 方式一：使用啟動腳本 (推薦)
+```bash
+# 啟動後端 API 服務
+python3 scripts/utilities/run_dev.py
+
+# 啟動前端服務器
+cd src/main/resources/static
+python3 -m http.server 3000
 ```
 
-### 啟動開發服務器
+#### 方式二：直接使用 uvicorn
 ```bash
-uvicorn src.main.python.api.main:app --reload
+# 啟動後端 API 服務
+cd src/main/python
+python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8004 --reload
+
+# 啟動前端服務器
+cd src/main/resources/static
+python3 -m http.server 3000
+```
+
+### 🌐 系統訪問地址
+
+#### 前端界面 (使用者介面)
+- **主頁**: http://localhost:3000
+- **測驗界面**: http://localhost:3000/pages/assessment.html
+- **結果展示**: http://localhost:3000/pages/results.html
+
+#### 後端 API (開發/測試)
+- **健康檢查**: http://localhost:8004/api/v1/health
+- **API 文檔**: http://localhost:8004/api/v1/docs
+- **測驗問題**: http://localhost:8004/api/v1/questions
+
+### 📝 使用操作說明
+
+#### 完整測驗流程
+1. **開始測驗**
+   - 訪問 http://localhost:3000
+   - 點擊「開始測驗」按鈕
+
+2. **同意條款**
+   - 閱讀隱私政策和使用條款
+   - 填寫基本資訊（姓名、年齡、性別）
+   - 點擊「同意並繼續」
+
+3. **完成評估**
+   - 誠實回答 20 道問題
+   - 每題選擇 1-5 分 (1=非常不同意, 5=非常同意)
+   - 建議在 15-20 分鐘內完成
+
+4. **查看結果**
+   - 系統自動計算 Big Five 人格特質分數
+   - 顯示 Gallup 優勢主題推薦
+   - 提供詳細的職涯發展建議
+
+5. **下載報告**
+   - 點擊「下載 PDF 報告」
+   - 獲得專業的個人化分析報告
+
+### 🔧 開發與測試
+
+#### 運行測試套件
+```bash
+# 運行所有測試
+python scripts/run_tests.py all
+
+# 僅運行端到端測試
+python scripts/run_tests.py e2e
+
+# 僅運行效能測試
+python scripts/run_tests.py performance
+
+# 僅運行單元測試
+python scripts/run_tests.py unit
+
+# 檢查測試依賴
+python scripts/run_tests.py --check-deps
+
+# 生成覆蓋率報告
+python scripts/run_tests.py coverage
+```
+
+#### API 測試
+```bash
+# 健康檢查
+curl http://localhost:8004/api/v1/health
+
+# 獲取問題
+curl http://localhost:8004/api/v1/questions
+
+# 檢視 API 文檔
+# 瀏覽器訪問: http://localhost:8004/api/v1/docs
+```
+
+### 🛠️ 故障排除
+
+#### 常見問題
+1. **端口被占用**
+   ```bash
+   # 檢查端口使用情況
+   netstat -tulpn | grep :8004
+   netstat -tulpn | grep :3000
+
+   # 終止占用的進程
+   pkill -f "uvicorn.*api.main"
+   pkill -f "http.server"
+   ```
+
+2. **無法載入問題**
+   - 確認後端 API 服務正在運行
+   - 檢查前端 API 配置 (src/main/resources/static/js/api.js)
+   - 確認網路連接正常
+
+3. **資料庫錯誤**
+   ```bash
+   # 檢查資料庫文件
+   ls -la *.db
+
+   # 重新初始化資料庫
+   python3 -c "from utils.database import init_db; init_db()"
+   ```
+
+### 📊 系統監控
+
+#### 檢查服務狀態
+```bash
+# 檢查所有服務
+curl -s http://localhost:8004/api/v1/health | python3 -m json.tool
+
+# 檢查快取狀態
+curl -s http://localhost:8004/api/v1/cache/health | python3 -m json.tool
+
+# 檢查快取統計
+curl -s http://localhost:8004/api/v1/cache/stats | python3 -m json.tool
 ```
 
 ## 📊 API 端點設計

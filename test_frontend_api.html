@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend API Test</title>
+</head>
+<body>
+    <h1>Testing Frontend API Connection</h1>
+    <button onclick="testQuestions()">Test Questions Endpoint</button>
+    <div id="result"></div>
+
+    <script>
+        async function testQuestions() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+
+            try {
+                const response = await fetch('http://localhost:8002/api/v1/questions', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre>Success! Found ${data.questions.length} questions:\n${JSON.stringify(data.questions[0], null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<pre style="color: red;">Error: ${error.message}</pre>`;
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('DOMContentLoaded', testQuestions);
+    </script>
+</body>
+</html>

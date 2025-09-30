@@ -22,13 +22,13 @@ if __name__ == "__main__":
     print("Starting Gallup Strengths Assessment API")
     print(f"Project root: {project_root}")
     print(f"Python path: {python_path}")
-    print("API docs: http://localhost:8002/api/v1/docs")
-    print("Health check: http://localhost:8002/api/v1/health")
+    print("API docs: http://localhost:8004/api/v1/docs")
+    print("Health check: http://localhost:8004/api/v1/health")
 
     uvicorn.run(
         "api.main:app",
         host="0.0.0.0",
-        port=8002,
+        port=8004,
         reload=True,
         log_level="info"
     )

@@ -359,16 +359,21 @@
         agreeButton.textContent = '處理中...';
 
         // Submit consent to API
-        const response = await api.submitConsent({
+        const consentResponse = await api.submitConsent({
           agreed: true,
           user_agent: navigator.userAgent,
           ip_address: null, // Backend will capture this
           consent_version: "v1.0"
         });
 
-        // Save consent ID as session ID (temporary until session API is implemented)
-        const consentId = response.data.consent_id;
-        storage.saveSession(consentId);
+        // Create a new assessment session
+        const sessionResponse = await api.post('/sessions/start', {
+          consent_id: consentResponse.data.consent_id
+        });
+
+        // Save session ID
+        const sessionId = sessionResponse.data.session_id;
+        storage.saveSession(sessionId);
         storage.saveConsent(true);
 
         // Redirect to assessment page

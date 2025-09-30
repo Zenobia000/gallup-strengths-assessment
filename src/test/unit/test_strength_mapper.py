@@ -13,8 +13,14 @@ Version: 1.0.0
 """
 
 import pytest
+import sys
+from pathlib import Path
+
+# Add the main Python source directory to the path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "main" / "python"))
+
 from models.schemas import BigFiveScores, StrengthScores
-from core.scoring.strength_mapper import StrengthsMapper, StrengthMappingResult
+from core.scoring.strength_mapper import StrengthMapper, StrengthMappingResult
 
 
 class TestStrengthsMapper:
@@ -22,7 +28,7 @@ class TestStrengthsMapper:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.mapper = StrengthsMapper()
+        self.mapper = StrengthMapper()
 
         # Create test Big Five scores
         self.test_big_five = BigFiveScores(

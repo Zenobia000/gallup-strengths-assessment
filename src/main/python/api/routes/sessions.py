@@ -369,6 +369,7 @@ async def submit_assessment_responses(
             for resp in submission.responses
         ]
 
+        # save_responses already updates session status to COMPLETED
         db_manager.save_responses(session_id, responses_data)
 
         # Calculate basic Big Five scores (simplified for MVP)
