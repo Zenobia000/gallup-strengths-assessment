@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>優勢天賦評測系統 - 發現你的獨特天賦，開啟理想職涯</title>
+    <meta name="description" content="5分鐘科學測評，獲得專屬的12維度天賦分析報告。基於Thurstonian IRT模型，精準識別你的優勢。">
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Inline Critical CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Primary Colors - Trust & Professional */
+            --primary-blue: #2563EB;
+            --trust-navy: #1E3A8A;
+
+            /* Secondary Colors - Growth & Energy */
+            --growth-green: #10B981;
+            --energy-orange: #F59E0B;
+
+            /* Neutral Colors - Clear Hierarchy */
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --background: #FFFFFF;
+            --surface: #F9FAFB;
+            --border: #E5E7EB;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            background: var(--background);
+            line-height: 1.6;
+        }
+
+        /* Trust Bar */
+        .trust-bar {
+            background: var(--trust-navy);
+            color: white;
+            padding: 8px 0;
+            font-size: 14px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .trust-bar-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            padding: 16px 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .headline {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .highlight {
+            background: linear-gradient(to right, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subheadline {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* CTA Button */
+        .cta-primary {
+            background: var(--energy-orange);
+            color: white;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            background: #DC8F09;
+        }
+
+        .micro-copy {
+            font-size: 12px;
+            opacity: 0.9;
+            display: block;
+        }
+
+        /* Live Stats */
+        .live-stats {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Pulse Animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .pulse-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 8px;
+            position: relative;
+        }
+
+        .pulse-dot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Value Props Section */
+        .value-props {
+            padding: 80px 0;
+            background: var(--surface);
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 48px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .prop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .prop-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .prop-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .prop-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .prop-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .prop-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Methodology Section */
+        .methodology {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .tech-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .tech-feature {
+            display: flex;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .tech-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .tech-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tech-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Social Proof Section */
+        .social-proof {
+            padding: 80px 0;
+            background: var(--surface);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .stars {
+            color: #FFD700;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .testimonial-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .author-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .cta-subtitle {
+            font-size: 20px;
+            margin-bottom: 32px;
+            opacity: 0.95;
+        }
+
+        .countdown-timer {
+            display: inline-flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding: 16px 32px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .time-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 48px 0 24px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 48px;
+            margin-bottom: 32px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: #9CA3AF;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            padding-top: 24px;
+            text-align: center;
+            color: #9CA3AF;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .headline {
+                font-size: 36px;
+            }
+
+            .subheadline {
+                font-size: 18px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .prop-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .live-stats {
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Trust Bar -->
+    <div class="trust-bar">
+        <div class="container">
+            <div class="trust-bar-content">
+                <span class="trust-item">🔒 SSL加密保護</span>
+                <span class="trust-item">📊 基於100萬+樣本數據</span>
+                <span class="trust-item">🏆 2024最佳評測工具</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/" class="logo">優勢天賦評測™</a>
+                <div class="nav-links">
+                    <a href="#methodology" class="nav-link">科學方法</a>
+                    <a href="#testimonials" class="nav-link">成功案例</a>
+                    <a href="#pricing" class="nav-link">價格方案</a>
+                    <button class="cta-primary" onclick="startAssessment()">
+                        開始測評
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="headline">
+                    發現你的<span class="highlight">天賦優勢</span><br>
+                    開啟理想職涯
+                </h1>
+                <p class="subheadline">
+                    5分鐘科學測評，獲得專屬的12維度天賦分析報告<br>
+                    基於諾貝爾獎理論，精準識別你的獨特競爭力
+                </p>
+                <button class="cta-primary" onclick="startAssessment()">
+                    免費開始測評 →
+                    <span class="micro-copy">已有125,847人完成</span>
+                </button>
+                <div class="live-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="activeUsers">127</div>
+                        <div class="stat-label">
+                            <span class="pulse-dot"></span>人正在測評
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">95.8%</div>
+                        <div class="stat-label">準確度滿意率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4.9/5.0</div>
+                        <div class="stat-label">用戶評分</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Propositions -->
+    <section class="value-props">
+        <div class="container">
+            <h2 class="section-title">為什麼選擇我們？</h2>
+            <p class="section-subtitle">
+                結合最新心理測量學理論與AI技術，提供超越傳統的評測體驗
+            </p>
+            <div class="prop-grid">
+                <div class="prop-card">
+                    <div class="prop-icon">🎯</div>
+                    <h3 class="prop-title">精準識別</h3>
+                    <p class="prop-description">
+                        基於Thurstonian IRT模型，比傳統測評精準度提升47%，真實反映你的天賦特質
+                    </p>
+                </div>
+                <div class="prop-card">
+                    <div class="prop-icon">⚡</div>
+                    <h3 class="prop-title">快速簡單</h3>
+                    <p class="prop-description">
+                        僅需5分鐘完成測評，智能算法即時分析，立即獲得個性化報告
+                    </p>
+                </div>
+                <div class="prop-card">
+                    <div class="prop-icon">🎁</div>
+                    <h3 class="prop-title">免費體驗</h3>
+                    <p class="prop-description">
+                        基礎報告完全免費，無需註冊即可開始，零風險體驗專業評測
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section class="methodology" id="methodology">
+        <div class="container">
+            <h2 class="section-title">智能天賦識別引擎™</h2>
+            <p class="section-subtitle">
+                採用諾貝爾經濟學獎得主的決策理論，確保評測結果的科學性與可靠性
+            </p>
+            <div class="tech-highlights">
+                <div class="tech-feature">
+                    <div class="tech-icon">🧬</div>
+                    <div class="tech-content">
+                        <h3>Thurstonian IRT模型</h3>
+                        <p>諾貝爾經濟學獎理論支持，通過多維度強迫選擇，消除社會期望偏差，精準度提升47%</p>
+                    </div>
+                </div>
+                <div class="tech-feature">
+                    <div class="tech-icon">🎯</div>
+                    <div class="tech-content">
+                        <h3>12維度全面分析</h3>
+                        <p>涵蓋認知能力、情感智慧、行為模式三大領域，360度評估你的優勢組合</p>
+                    </div>
+                </div>
+                <div class="tech-feature">
+                    <div class="tech-icon">📈</div>
+                    <div class="tech-content">
+                        <h3>動態常模對比</h3>
+                        <p>實時與同齡層、同行業10萬+樣本對比，了解你在人群中的獨特定位</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="social-proof" id="testimonials">
+        <div class="container">
+            <h2 class="section-title">真實用戶故事</h2>
+            <p class="section-subtitle">
+                已幫助超過12萬人找到職涯方向，平均薪資提升35%
+            </p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">
+                        "測評結果非常準確，幫我認識到自己的創新思維優勢。轉型產品經理後，薪資提升了40%，工作滿意度大幅提高！"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SC</div>
+                        <div class="author-info">
+                            <div class="author-name">Sarah Chen</div>
+                            <div class="author-title">從會計師轉型產品經理</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">
+                        "比付費的測評還要專業！發現自己的數據分析天賦後，成功進入頂級互聯網公司，找到了真正熱愛的工作。"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">ML</div>
+                        <div class="author-info">
+                            <div class="author-name">Michael Li</div>
+                            <div class="author-title">數據科學家 @ 字節跳動</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="testimonial-text">
+                        "測評幫我找到了領導力優勢，給了我創業的信心。現在公司月營收突破100萬，感謝這個改變人生的測評！"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JW</div>
+                        <div class="author-info">
+                            <div class="author-name">Jennifer Wang</div>
+                            <div class="author-title">創業者，CEO</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="cta-title">準備好發現你的天賦了嗎？</h2>
+            <p class="cta-subtitle">限時優惠，完整報告5折特惠中</p>
+            <div class="countdown-timer">
+                <div class="time-unit">
+                    <div class="time-value" id="hours">23</div>
+                    <div class="time-label">小時</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="minutes">47</div>
+                    <div class="time-label">分鐘</div>
+                </div>
+                <div class="time-unit">
+                    <div class="time-value" id="seconds">36</div>
+                    <div class="time-label">秒</div>
+                </div>
+            </div>
+            <button class="cta-primary" onclick="startAssessment()">
+                立即開始免費測評 →
+                <span class="loading-spinner" id="loadingSpinner"></span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>關於我們</h4>
+                    <p style="color: #9CA3AF; line-height: 1.6;">
+                        優勢天賦評測系統由心理學博士團隊研發，致力於幫助每個人發現並發揮獨特天賦，創造更有意義的職涯。
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速連結</h4>
+                    <ul class="footer-links">
+                        <li><a href="#methodology">科學方法</a></li>
+                        <li><a href="#testimonials">成功案例</a></li>
+                        <li><a href="#pricing">價格方案</a></li>
+                        <li><a href="/blog">職涯指南</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>支援服務</h4>
+                    <ul class="footer-links">
+                        <li><a href="/help">幫助中心</a></li>
+                        <li><a href="/contact">聯絡我們</a></li>
+                        <li><a href="/privacy">隱私政策</a></li>
+                        <li><a href="/terms">服務條款</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>聯繫方式</h4>
+                    <ul class="footer-links">
+                        <li>📧 support@talenttest.com</li>
+                        <li>📱 +886 2 1234 5678</li>
+                        <li>📍 台北市信義區信義路五段7號</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 優勢天賦評測系統. All rights reserved. | Powered by Thurstonian IRT Engine™</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dynamic user count animation
+        function animateUserCount() {
+            const element = document.getElementById('activeUsers');
+            const baseCount = 120;
+            const variation = 20;
+
+            setInterval(() => {
+                const count = baseCount + Math.floor(Math.random() * variation);
+                element.textContent = count;
+            }, 3000);
+        }
+
+        // Countdown timer
+        function startCountdown() {
+            const endTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours from now
+
+            setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
+        // Start assessment function
+        async function startAssessment() {
+            const button = event.target;
+            const spinner = button.querySelector('.loading-spinner') || document.getElementById('loadingSpinner');
+
+            // Show loading state
+            if (spinner) {
+                spinner.style.display = 'inline-block';
+            }
+            button.disabled = true;
+
+            // Track conversion event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'start_assessment', {
+                    'event_category': 'engagement',
+                    'event_label': 'hero_cta'
+                });
+            }
+
+            // Redirect to assessment page
+            setTimeout(() => {
+                window.location.href = '/v4_assessment.html';
+            }, 800);
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.addEventListener('DOMContentLoaded', () => {
+            animateUserCount();
+            startCountdown();
+
+            // Add fade-in animation to cards
+            const cards = document.querySelectorAll('.prop-card, .testimonial-card');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

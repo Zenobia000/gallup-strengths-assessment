@@ -550,3 +550,19 @@ def get_pool_statistics() -> Dict:
     stats["context_distribution"] = context_counts
 
     return stats
+
+# Export dimension mapping for API
+DIMENSION_MAPPING = {
+    'Achiever': 'Achiever',
+    'Activator': 'Activator',
+    'Adaptability': 'Adaptability',
+    'Analytical': 'Analytical',
+    'Arranger': 'Arranger',
+    'Belief': 'Belief',
+    'Command': 'Command',
+    'Communication': 'Communication',
+    'Competition': 'Competition',
+    'Connectedness': 'Connectedness',
+    'Consistency': 'Consistency',
+    'Context': 'Context'
+}

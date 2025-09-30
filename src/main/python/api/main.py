@@ -229,6 +229,10 @@ app.include_router(reports.router, prefix="/api/v1", tags=["Reports"])
 from api.routes import cache_admin
 app.include_router(cache_admin.router, prefix="/api/v1", tags=["Cache"])
 
+# V4.0 Thurstonian IRT routes
+from api.routes import v4_assessment
+app.include_router(v4_assessment.router, tags=["V4 Assessment"])
+
 # Mount static files for frontend
 import os
 static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")

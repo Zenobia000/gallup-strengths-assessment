@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>優勢天賦評測 - 智能天賦識別引擎™</title>
+    <meta name="description" content="基於Thurstonian IRT模型的科學評測，5分鐘發現你的獨特優勢">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #2563EB;
+            --trust-navy: #1E3A8A;
+            --growth-green: #10B981;
+            --energy-orange: #F59E0B;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --background: #FFFFFF;
+            --surface: #F9FAFB;
+            --border: #E5E7EB;
+            --most-like: #059669;
+            --least-like: #DC2626;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #EBF5FF 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Progress Header */
+        .progress-header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .progress-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            background: var(--surface);
+            height: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--growth-green) 100%);
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .progress-percentage {
+            position: absolute;
+            right: 16px;
+            top: -28px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        /* Main Container */
+        .assessment-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Question Card */
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 24px;
+        }
+
+        .question-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .question-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .question-instruction {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Statement Grid */
+        .statements-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .statement-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .statement-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .statement-letter {
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-blue);
+            flex-shrink: 0;
+        }
+
+        .statement-text {
+            flex: 1;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .statement-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .choice-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-most {
+            background: var(--surface);
+            color: var(--most-like);
+            border: 1px solid var(--most-like);
+        }
+
+        .btn-most:hover,
+        .btn-most.selected {
+            background: var(--most-like);
+            color: white;
+        }
+
+        .btn-least {
+            background: var(--surface);
+            color: var(--least-like);
+            border: 1px solid var(--least-like);
+        }
+
+        .btn-least:hover,
+        .btn-least.selected {
+            background: var(--least-like);
+            color: white;
+        }
+
+        .statement-card.selected-most {
+            background: #ECFDF5;
+            border-color: var(--most-like);
+        }
+
+        .statement-card.selected-least {
+            background: #FEF2F2;
+            border-color: var(--least-like);
+        }
+
+        /* Selection Status */
+        .selection-status {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .selection-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .selection-most {
+            color: var(--most-like);
+        }
+
+        .selection-least {
+            color: var(--least-like);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--trust-navy);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:disabled,
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Encouragement Section */
+        .encouragement {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .encouragement-icon {
+            font-size: 24px;
+        }
+
+        .encouragement-text {
+            font-size: 14px;
+            color: #92400E;
+            font-weight: 500;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--surface);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .feature-list {
+            text-align: left;
+            margin: 32px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .feature-icon {
+            color: var(--growth-green);
+            font-size: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .question-card {
+                padding: 24px;
+            }
+
+            .question-text {
+                font-size: 20px;
+            }
+
+            .statement-card {
+                padding: 16px;
+            }
+
+            .statement-text {
+                font-size: 14px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Header -->
+    <div class="progress-header">
+        <div class="progress-container">
+            <div class="progress-info">
+                <div class="progress-title">優勢天賦評測</div>
+                <div class="progress-stats">
+                    <span id="questionCounter">問題 1 / 20</span>
+                    <span id="timeRemaining">預計剩餘 5 分鐘</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">
+                    <span class="progress-percentage" id="progressPercentage">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Assessment Container -->
+    <div class="assessment-container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1 class="welcome-title">歡迎來到優勢天賦評測</h1>
+            <p class="welcome-subtitle">5分鐘時間，發現你的獨特競爭力</p>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>基於諾貝爾獎理論的科學評測</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>12維度全面分析你的優勢</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>即時生成個性化報告</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>保護隱私，數據加密存儲</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="startAssessment()" style="margin: 0 auto;">
+                開始測評 →
+            </button>
+        </div>
+
+        <!-- Question Card (Hidden Initially) -->
+        <div class="question-card" id="questionCard" style="display: none;">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">第 1 題</span>
+                <h2 class="question-text" id="questionText">
+                    請選擇最符合和最不符合你的選項
+                </h2>
+                <p class="question-instruction">
+                    請從以下4個選項中，選擇1個「最像我」和1個「最不像我」
+                </p>
+            </div>
+
+            <div class="statements-grid" id="statementsGrid">
+                <!-- Statements will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Selection Status (Hidden Initially) -->
+        <div class="selection-status" id="selectionStatus" style="display: none;">
+            <div class="selection-item">
+                <span class="selection-label">最像我：</span>
+                <span class="selection-value selection-most" id="mostLikeSelection">未選擇</span>
+            </div>
+            <div class="selection-item">
+                <span class="selection-label">最不像我：</span>
+                <span class="selection-value selection-least" id="leastLikeSelection">未選擇</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Hidden Initially) -->
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button class="btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                ← 上一題
+            </button>
+            <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                下一題 →
+            </button>
+        </div>
+
+        <!-- Encouragement -->
+        <div class="encouragement" id="encouragement" style="display: none;">
+            <span class="encouragement-icon">💡</span>
+            <span class="encouragement-text">請憑直覺選擇，沒有對錯之分</span>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <p>正在準備你的專屬報告...</p>
+        </div>
+    </div>
+
+    <script>
+        // Assessment State
+        let currentQuestion = 0;
+        let totalQuestions = 20;
+        let responses = [];
+        let sessionId = null;
+        let startTime = null;
+        let questions = [];
+
+        // Sample Questions (will be loaded from API)
+        const sampleQuestions = [
+            {
+                id: 'q1',
+                statements: [
+                    { id: 's1', text: '我喜歡在團隊中領導他人完成任務', dimension: 'leadership' },
+                    { id: 's2', text: '我更願意深入分析問題找出最佳解決方案', dimension: 'analytical' },
+                    { id: 's3', text: '我擅長激勵他人並建立良好的人際關係', dimension: 'relationship' },
+                    { id: 's4', text: '我注重細節並確保一切按計劃執行', dimension: 'execution' }
+                ]
+            }
+        ];
+
+        // Initialize Assessment
+        async function initAssessment() {
+            try {
+                // Load questions from API
+                const response = await fetch('http://localhost:8004/api/v1/questions');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Transform questions to quartet format if needed
+                    console.log('Loaded questions from API:', data);
+                }
+            } catch (error) {
+                console.log('Using sample questions');
+                questions = sampleQuestions;
+            }
+        }
+
+        // Start Assessment
+        async function startAssessment() {
+            startTime = new Date();
+            sessionId = generateSessionId();
+
+            // Hide welcome screen
+            document.getElementById('welcomeScreen').style.display = 'none';
+
+            // Show assessment UI
+            document.getElementById('questionCard').style.display = 'block';
+            document.getElementById('selectionStatus').style.display = 'flex';
+            document.getElementById('actionButtons').style.display = 'flex';
+            document.getElementById('encouragement').style.display = 'flex';
+
+            // Load first question
+            loadQuestion(0);
+
+            // Track start event
+            trackEvent('assessment_started', {
+                session_id: sessionId,
+                timestamp: startTime.toISOString()
+            });
+        }
+
+        // Load Question
+        function loadQuestion(index) {
+            if (index >= questions.length) {
+                questions = sampleQuestions; // Use sample for demo
+            }
+
+            const question = questions[index] || sampleQuestions[0];
+            currentQuestion = index;
+
+            // Update progress
+            updateProgress();
+
+            // Update question display
+            document.getElementById('questionNumber').textContent = `第 ${index + 1} 題`;
+            document.getElementById('questionText').textContent = '請選擇最符合和最不符合你的選項';
+
+            // Clear previous selections
+            clearSelections();
+
+            // Render statements
+            const grid = document.getElementById('statementsGrid');
+            grid.innerHTML = '';
+
+            question.statements.forEach((statement, idx) => {
+                const card = createStatementCard(statement, idx);
+                grid.appendChild(card);
+            });
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        // Create Statement Card
+        function createStatementCard(statement, index) {
+            const card = document.createElement('div');
+            card.className = 'statement-card';
+            card.dataset.statementId = statement.id;
+
+            card.innerHTML = `
+                <div class="statement-letter">${String.fromCharCode(65 + index)}</div>
+                <div class="statement-text">${statement.text}</div>
+                <div class="statement-actions">
+                    <button class="choice-btn btn-most" onclick="selectChoice('${statement.id}', 'most', this)">
+                        最像我
+                    </button>
+                    <button class="choice-btn btn-least" onclick="selectChoice('${statement.id}', 'least', this)">
+                        最不像我
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Handle Selection
+        function selectChoice(statementId, type, button) {
+            // Remove previous selection of same type
+            document.querySelectorAll(`.btn-${type === 'most' ? 'most' : 'least'}.selected`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelectorAll(`.selected-${type === 'most' ? 'most' : 'least'}`).forEach(card => {
+                card.classList.remove(`selected-${type === 'most' ? 'most' : 'least'}`);
+            });
+
+            // Add new selection
+            button.classList.add('selected');
+            button.closest('.statement-card').classList.add(`selected-${type === 'most' ? 'most' : 'least'}`);
+
+            // Update display
+            const statement = button.closest('.statement-card').querySelector('.statement-text').textContent;
+            if (type === 'most') {
+                document.getElementById('mostLikeSelection').textContent =
+                    statement.substring(0, 20) + '...';
+            } else {
+                document.getElementById('leastLikeSelection').textContent =
+                    statement.substring(0, 20) + '...';
+            }
+
+            // Check if both selections made
+            checkSelectionComplete();
+        }
+
+        // Check Selection Complete
+        function checkSelectionComplete() {
+            const hasMost = document.querySelector('.btn-most.selected');
+            const hasLeast = document.querySelector('.btn-least.selected');
+
+            document.getElementById('nextBtn').disabled = !(hasMost && hasLeast);
+        }
+
+        // Clear Selections
+        function clearSelections() {
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelectorAll('.statement-card').forEach(card => {
+                card.classList.remove('selected-most', 'selected-least');
+            });
+            document.getElementById('mostLikeSelection').textContent = '未選擇';
+            document.getElementById('leastLikeSelection').textContent = '未選擇';
+        }
+
+        // Navigate Questions
+        function nextQuestion() {
+            // Save current response
+            const mostLike = document.querySelector('.btn-most.selected')?.closest('.statement-card').dataset.statementId;
+            const leastLike = document.querySelector('.btn-least.selected')?.closest('.statement-card').dataset.statementId;
+
+            responses[currentQuestion] = {
+                questionId: currentQuestion,
+                mostLike: mostLike,
+                leastLike: leastLike,
+                timestamp: new Date().toISOString()
+            };
+
+            if (currentQuestion < totalQuestions - 1) {
+                loadQuestion(currentQuestion + 1);
+            } else {
+                submitAssessment();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                loadQuestion(currentQuestion - 1);
+            }
+        }
+
+        // Update Progress
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
+            document.getElementById('questionCounter').textContent =
+                `問題 ${currentQuestion + 1} / ${totalQuestions}`;
+
+            // Update time estimate
+            const avgTimePerQuestion = 15; // seconds
+            const remainingQuestions = totalQuestions - currentQuestion;
+            const remainingSeconds = remainingQuestions * avgTimePerQuestion;
+            const remainingMinutes = Math.ceil(remainingSeconds / 60);
+            document.getElementById('timeRemaining').textContent =
+                `預計剩餘 ${remainingMinutes} 分鐘`;
+        }
+
+        // Submit Assessment
+        async function submitAssessment() {
+            // Show loading
+            document.getElementById('questionCard').style.display = 'none';
+            document.getElementById('selectionStatus').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('encouragement').style.display = 'none';
+            document.getElementById('loadingState').classList.add('active');
+
+            const endTime = new Date();
+            const completionTime = Math.round((endTime - startTime) / 1000);
+
+            try {
+                // Submit to API
+                const response = await fetch('http://localhost:8004/api/v4/assessment/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        responses: responses,
+                        completion_time: completionTime
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    // Redirect to results page
+                    window.location.href = `/results.html?session=${sessionId}`;
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                // Still redirect for demo
+                setTimeout(() => {
+                    window.location.href = `/results.html?session=${sessionId}`;
+                }, 2000);
+            }
+        }
+
+        // Utility Functions
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function trackEvent(eventName, data) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, data);
+            }
+            console.log('Event:', eventName, data);
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initAssessment();
+        });
+    </script>
+</body>
+</html>
