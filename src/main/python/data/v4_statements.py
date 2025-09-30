@@ -552,17 +552,8 @@ def get_pool_statistics() -> Dict:
     return stats
 
 # Export dimension mapping for API
-DIMENSION_MAPPING = {
-    'Achiever': 'Achiever',
-    'Activator': 'Activator',
-    'Adaptability': 'Adaptability',
-    'Analytical': 'Analytical',
-    'Arranger': 'Arranger',
-    'Belief': 'Belief',
-    'Command': 'Command',
-    'Communication': 'Communication',
-    'Competition': 'Competition',
-    'Connectedness': 'Connectedness',
-    'Consistency': 'Consistency',
-    'Context': 'Context'
-}
+# Build dimension mapping from statement IDs to dimensions
+DIMENSION_MAPPING = {}
+for dimension, statements in STATEMENT_POOL.items():
+    for stmt in statements:
+        DIMENSION_MAPPING[stmt['statement_id']] = dimension
