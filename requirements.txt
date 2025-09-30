@@ -13,8 +13,10 @@ pydantic-settings==2.0.3  # Settings management with environment variables
 starlette==0.27.0        # ASGI framework (FastAPI dependency)
 python-multipart==0.0.6  # Form data parsing support
 
-# Database
-# SQLite is built into Python - no additional database driver needed
+# Database and SQLAlchemy ORM
+sqlalchemy==2.0.23        # Async-capable SQL toolkit and ORM
+aiosqlite==0.19.0         # Async SQLite driver for Python
+alembic==1.13.0           # Database migration tool
 
 # Development and Testing
 pytest==7.4.3           # Testing framework
