@@ -580,16 +580,25 @@
 
             // Toggle selection logic
             if (currentResponse.most_like_index === index) {
+                // Clicking on selected "most like" - deselect it
                 currentResponse.most_like_index = null;
             } else if (currentResponse.least_like_index === index) {
+                // Clicking on selected "least like" - deselect it
                 currentResponse.least_like_index = null;
             } else if (currentResponse.most_like_index === null) {
+                // No "most like" selected - select this as "most like"
                 currentResponse.most_like_index = index;
-            } else if (currentResponse.least_like_index === null && index !== currentResponse.most_like_index) {
-                currentResponse.least_like_index = index;
+            } else if (currentResponse.least_like_index === null) {
+                // "Most like" selected but no "least like" - select as "least like"
+                // But ensure it's not the same as "most like"
+                if (index !== currentResponse.most_like_index) {
+                    currentResponse.least_like_index = index;
+                }
             } else {
-                // Replace most_like
-                currentResponse.most_like_index = index;
+                // Both are selected - determine which to replace based on context
+                // If clicking a third option, replace the older selection
+                // For now, we'll show a message and not change anything
+                alert('請先取消選擇其中一個選項，再選擇新的陳述');
             }
 
             responses[currentBlockIndex] = currentResponse;
