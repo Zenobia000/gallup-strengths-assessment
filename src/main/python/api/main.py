@@ -230,9 +230,10 @@ from api.routes import cache_admin
 app.include_router(cache_admin.router, prefix="/api/v1", tags=["Cache"])
 
 # V4.0 Thurstonian IRT routes
-from api.routes import v4_assessment, v4_data_collection
+from api.routes import v4_assessment, v4_data_collection, analysis
 app.include_router(v4_assessment.router, tags=["V4 Assessment"])
 app.include_router(v4_data_collection.router, tags=["V4 Data Collection"])
+app.include_router(analysis.router, prefix="/api/v1/analysis", tags=["Analysis"])
 
 # Mount static files for frontend
 import os
