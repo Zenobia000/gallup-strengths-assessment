@@ -255,74 +255,115 @@ class API {
    * @returns {Promise<Object>} Results data with strengths
    */
   async getResults(sessionId) {
-    // For MVP, return properly formatted mock data that matches what results.html expects
-    // This will be replaced with actual API endpoint later
-    return {
-      success: true,
-      data: {
-        session_id: sessionId,
-        scores: {
-          openness: 85,
-          conscientiousness: 78,
-          extraversion: 72,
-          agreeableness: 80,
-          neuroticism: 45
-        },
-        strengths: [
-          {
-            name: "Strategic",
-            score: 92.5,
-            description: "您擅長制定長遠計劃，能夠看到大局並預見潛在的挑戰和機會。"
-          },
-          {
-            name: "Learner",
-            score: 88.3,
-            description: "您熱愛學習新知識，不斷追求自我提升和成長。"
-          },
-          {
-            name: "Analytical",
-            score: 85.7,
-            description: "您善於分析複雜問題，用邏輯和數據支持決策。"
-          },
-          {
-            name: "Achiever",
-            score: 82.1,
-            description: "您有強烈的成就動機，每天都需要完成一些事情來感到滿足。"
-          },
-          {
-            name: "Responsibility",
-            score: 79.4,
-            description: "您對承諾非常認真，值得信賴，總是信守諾言。"
-          },
-          {
-            name: "Input",
-            score: 76.8,
-            description: "您喜歡收集和歸檔各種資訊，是一個知識的收藏家。"
-          },
-          {
-            name: "Intellection",
-            score: 74.2,
-            description: "您喜歡思考，享受獨處和深度思考的時光。"
-          },
-          {
-            name: "Focus",
-            score: 71.5,
-            description: "您能夠確定優先順序，保持專注，朝著目標前進。"
-          },
-          {
-            name: "Deliberative",
-            score: 68.9,
-            description: "您做決定時謹慎小心，仔細考慮所有選項。"
-          },
-          {
-            name: "Relator",
-            score: 65.3,
-            description: "您享受與親近的人建立深厚的關係。"
-          }
-        ],
-        message: "您的優勢分析已完成"
+    // First, try to get results from localStorage (most recent session)
+    try {
+      const storedResults = localStorage.getItem('assessment_results');
+      if (storedResults) {
+        const parsedResults = JSON.parse(storedResults);
+
+        // Check if the stored results match the requested session and are recent (within 1 hour)
+        const isRecent = Date.now() - parsedResults.timestamp < 60 * 60 * 1000;
+        const isMatchingSession = !sessionId || parsedResults.session_id === sessionId;
+
+        if (isRecent && isMatchingSession && parsedResults.scores) {
+          return {
+            success: true,
+            data: {
+              session_id: parsedResults.session_id,
+              scores: parsedResults.scores,
+              strengths: this._computeBasicStrengths(parsedResults.scores),
+              message: "基於您最近的評估結果",
+              source: "localStorage"
+            }
+          };
+        }
       }
+    } catch (localStorageError) {
+      console.warn('Failed to parse localStorage results:', localStorageError);
+    }
+
+    // Try to get results from the results API endpoint
+    try {
+      return await this.get(`/results/${sessionId}`);
+    } catch (error) {
+      // If results endpoint fails, try to get raw scores and construct basic results
+      console.warn('Results endpoint failed, trying to construct from raw scores:', error);
+
+      try {
+        // Check if we can get the scores from the database via a different endpoint
+        const scoringData = await this.get(`/scores/${sessionId}`);
+
+        if (scoringData && scoringData.raw_scores) {
+          return {
+            success: true,
+            data: {
+              session_id: sessionId,
+              scores: scoringData.raw_scores,
+              strengths: this._computeBasicStrengths(scoringData.raw_scores),
+              message: "基於您的評估分數生成的基本優勢分析",
+              source: "database"
+            }
+          };
+        }
+
+        throw new Error('No scoring data available');
+      } catch (secondError) {
+        console.error('Failed to get any results data:', secondError);
+
+        // Return a basic error message instead of hardcoded mock data
+        return {
+          success: false,
+          error: {
+            message: "無法載入評估結果，請稍後再試或重新進行評估",
+            code: "RESULTS_NOT_AVAILABLE"
+          }
+        };
+      }
+    }
+  }
+
+  /**
+   * Compute basic strengths from Big Five scores
+   * @param {Object} scores - Big Five scores
+   * @returns {Array} Basic strengths list
+   */
+  _computeBasicStrengths(scores) {
+    const strengthsMapping = {
+      openness: { name: "創新思維", baseScore: 70 },
+      conscientiousness: { name: "執行力", baseScore: 65 },
+      extraversion: { name: "影響力", baseScore: 60 },
+      agreeableness: { name: "協作精神", baseScore: 55 },
+      neuroticism: { name: "壓力管理", baseScore: 50, reverse: true }
     };
+
+    const strengthsList = [];
+
+    Object.entries(scores).forEach(([dimension, score]) => {
+      const mapping = strengthsMapping[dimension];
+      if (mapping) {
+        let adjustedScore = mapping.baseScore;
+
+        // Adjust score based on dimension score (normalized from raw score)
+        const normalizedScore = Math.max(0, Math.min(100, (score / 20) * 100));
+
+        if (mapping.reverse) {
+          // For neuroticism, higher score means better stress management
+          adjustedScore = mapping.baseScore + (100 - normalizedScore) * 0.3;
+        } else {
+          adjustedScore = mapping.baseScore + normalizedScore * 0.3;
+        }
+
+        strengthsList.push({
+          name: mapping.name,
+          score: Math.round(adjustedScore * 100) / 100,
+          description: `基於您在${dimension}向度的表現計算得出`,
+          dimension: dimension
+        });
+      }
+    });
+
+    // Sort by score descending
+    return strengthsList.sort((a, b) => b.score - a.score);
   }
 
   /**

@@ -731,6 +731,16 @@
         // Submit to scoring API
         const result = await api.submitForScoring(submissionData);
 
+        // Store results for the results page
+        if (result.success && result.data) {
+          localStorage.setItem('assessment_results', JSON.stringify({
+            session_id: sessionId,
+            scores: result.data.big_five_scores,
+            timestamp: Date.now(),
+            total_questions: questions.length
+          }));
+        }
+
         // Clear storage
         storage.clearProgress();
         storage.clearSession();
