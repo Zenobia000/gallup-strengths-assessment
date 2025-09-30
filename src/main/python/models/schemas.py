@@ -111,13 +111,32 @@ class SessionStartResponse(BaseModel):
 
 
 # Assessment Item Models
+class QuestionType(str, Enum):
+    """Question type classifications."""
+    TRADITIONAL = "traditional"
+    SITUATIONAL = "situational"
+
+
+class ResponseOption(BaseModel):
+    """Response option for situational questions."""
+    value: int = Field(..., description="Response value")
+    text: str = Field(..., description="Response option text")
+    dimensions: Optional[Dict[str, float]] = Field(None, description="Dimension weights for this option")
+
+
 class AssessmentItem(BaseModel):
-    """Individual assessment item model."""
+    """Individual assessment item model with support for situational questions."""
     item_id: str = Field(..., description="Unique item identifier")
     text: str = Field(..., description="Item text content")
     scale_type: ScaleType = Field(..., description="Response scale type")
     reverse_scored: bool = Field(..., description="Whether item is reverse scored")
     dimension: str = Field(..., description="Personality dimension measured")
+
+    # New fields for situational questions
+    question_type: QuestionType = Field(default=QuestionType.TRADITIONAL, description="Type of question")
+    scenario_context: Optional[str] = Field(None, description="Scenario context for situational questions")
+    response_options: Optional[List[ResponseOption]] = Field(None, description="Custom response options for situational questions")
+    dimension_weights: Optional[Dict[str, float]] = Field(None, description="Multi-dimensional weights for scoring")
 
 
 class ScaleLabels(BaseModel):
@@ -147,7 +166,7 @@ class ItemsResponse(BaseModel):
 # Response Submission Models
 class QuestionResponse(BaseModel):
     """Mini-IPIP question response model for scoring engine."""
-    question_id: int = Field(..., ge=1, le=20, description="Question ID (1-20)")
+    question_id: int = Field(..., ge=1, le=23, description="Question ID (1-23)")
     score: int = Field(..., ge=1, le=5, description="Likert scale score (1-5)")
 
     @validator('score')
@@ -341,24 +360,32 @@ class SessionData(BaseModel):
 # New Scoring API Models
 class ResponseItem(BaseModel):
     """Individual response item for scoring."""
-    question_id: int = Field(..., ge=1, le=20, description="Question identifier (1-20)")
+    question_id: int = Field(..., ge=1, le=23, description="Question identifier (1-23)")
     response_value: int = Field(..., ge=1, le=7, description="Likert scale response (1-7)")
 
 
 class ScoringRequest(BaseModel):
-    """Big Five scoring request model."""
+    """Big Five scoring request model with situational support."""
     session_id: str = Field(..., description="Assessment session identifier")
-    responses: List[ResponseItem] = Field(..., min_items=20, max_items=20, description="20 Mini-IPIP responses")
+    responses: List[ResponseItem] = Field(..., min_items=20, max_items=23, description="20-23 Mini-IPIP responses (20 traditional + up to 3 situational)")
 
     @validator('responses')
     def validate_complete_responses(cls, v):
-        """Ensure all 20 questions are answered."""
+        """Ensure all required questions are answered."""
         question_ids = {r.question_id for r in v}
-        expected_ids = set(range(1, 21))
-        if question_ids != expected_ids:
-            missing = expected_ids - question_ids
-            extra = question_ids - expected_ids
-            raise ValueError(f"Invalid question IDs. Missing: {missing}, Extra: {extra}")
+
+        # Traditional questions (1-20) are required
+        traditional_ids = set(range(1, 21))
+        missing_traditional = traditional_ids - question_ids
+        if missing_traditional:
+            raise ValueError(f"Missing required traditional questions: {missing_traditional}")
+
+        # Situational questions (21-23) are optional
+        situational_ids = set(range(21, 24))
+        extra_ids = question_ids - traditional_ids - situational_ids
+        if extra_ids:
+            raise ValueError(f"Invalid question IDs: {extra_ids}")
+
         return v
 
 
@@ -392,7 +419,7 @@ class StrengthsResponse(BaseModel):
 class QualityCheckRequest(BaseModel):
     """Response quality check request model."""
     session_id: Optional[str] = Field(None, description="Session identifier")
-    responses: List[ResponseItem] = Field(..., min_items=20, max_items=20, description="20 Mini-IPIP responses")
+    responses: List[ResponseItem] = Field(..., min_items=20, max_items=23, description="20-23 Mini-IPIP responses")
     completion_time_seconds: Optional[float] = Field(None, ge=0, description="Assessment completion time in seconds")
 
 

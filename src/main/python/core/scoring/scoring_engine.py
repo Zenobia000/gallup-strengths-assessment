@@ -151,14 +151,21 @@ class ScoringEngine:
             - returned dict has all 5 dimension keys
             - all scores are in range [4, 20]
         """
-        # Validate total response count
-        if len(responses) != 20:
-            raise ValueError(f"Expected 20 responses, got {len(responses)}")
+        # Validate minimum response count (traditional questions are required)
+        traditional_responses = [r for r in responses if 1 <= r.question_id <= 20]
+        if len(traditional_responses) != 20:
+            raise ValueError(f"Expected 20 traditional responses (questions 1-20), got {len(traditional_responses)}")
+
+        # Log info about situational questions
+        situational_responses = [r for r in responses if 21 <= r.question_id <= 23]
+        if situational_responses:
+            print(f"Found {len(situational_responses)} situational responses, will be used for enhanced analysis")
 
         # Group responses by dimension
         dimension_responses = {dim: [] for dim in self.valid_dimensions}
 
-        for response in responses:
+        # Only process traditional responses for Big Five scoring
+        for response in traditional_responses:
             # Find which dimension this question belongs to
             for dim, question_ids in self.dimension_mapping.items():
                 if response.question_id in question_ids:
