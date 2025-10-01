@@ -10,7 +10,7 @@ System Constants and Configuration
 Linus 原則：所有魔術數字都應該有名稱和意義
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
 

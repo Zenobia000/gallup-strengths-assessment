@@ -86,8 +86,8 @@ class MiniIPIPScoringStrategy:
         import time
         start_time = time.time()
 
-        # 導入現有的計分邏輯
-        from core.scoring import ScoringEngine, QuestionResponse
+        # 使用簡化的 Mini-IPIP 計分邏輯
+        # 原 core.scoring 模組已移除，使用簡化實作
 
         # 轉換為舊格式
         question_responses = [
@@ -95,12 +95,8 @@ class MiniIPIPScoringStrategy:
             for r in responses
         ]
 
-        # 使用現有的計分引擎
-        scoring_engine = ScoringEngine()
-        dimension_scores = scoring_engine.calculate_dimension_scores(question_responses)
-
-        # 計算標準化分數和百分位
-        raw_scores = dimension_scores.to_dict()
+        # 簡化的 Mini-IPIP 計分邏輯
+        raw_scores = self._calculate_mini_ipip_scores(question_responses)
 
         # 簡化的標準化（實際應使用常模資料）
         normalized_scores = {dim: min(100, max(0, score * 5)) for dim, score in raw_scores.items()}
@@ -119,6 +115,39 @@ class MiniIPIPScoringStrategy:
             processing_time_ms=processing_time,
             metadata=metadata or {}
         )
+
+    def _calculate_mini_ipip_scores(self, responses) -> Dict[str, float]:
+        """簡化的 Mini-IPIP 計分實作"""
+        # Mini-IPIP 維度定義（每個維度 4 題）
+        dimension_mapping = {
+            1: 'extraversion', 2: 'extraversion', 3: 'extraversion', 4: 'extraversion',
+            5: 'agreeableness', 6: 'agreeableness', 7: 'agreeableness', 8: 'agreeableness',
+            9: 'conscientiousness', 10: 'conscientiousness', 11: 'conscientiousness', 12: 'conscientiousness',
+            13: 'neuroticism', 14: 'neuroticism', 15: 'neuroticism', 16: 'neuroticism',
+            17: 'openness', 18: 'openness', 19: 'openness', 20: 'openness'
+        }
+
+        # 反向計分題目
+        reverse_scored = {2, 4, 6, 8, 10, 12, 14, 16, 18, 20}
+
+        dimension_scores = {
+            'extraversion': 0, 'agreeableness': 0, 'conscientiousness': 0,
+            'neuroticism': 0, 'openness': 0
+        }
+
+        for resp in responses:
+            question_id = resp.question_id
+            score = resp.score
+
+            # 反向計分
+            if question_id in reverse_scored:
+                score = 8 - score
+
+            dimension = dimension_mapping.get(question_id)
+            if dimension:
+                dimension_scores[dimension] += score
+
+        return dimension_scores
 
     def _score_to_percentile(self, score: float) -> float:
         """簡化的分數到百分位轉換"""

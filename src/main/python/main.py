@@ -15,11 +15,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from pathlib import Path
+from datetime import datetime
 
 # 導入 v4 核心組件
 from api.routes.v4_assessment import router as v4_assessment_router
 from api.routes.consent import router as consent_router
-from api.routes.reports import router as reports_router
+from api.routes.reports_v4_only import router as reports_router
 from api.routes.cache_admin import router as cache_router
 from api.error_handlers import setup_error_handlers
 from core.constants import get_system_config

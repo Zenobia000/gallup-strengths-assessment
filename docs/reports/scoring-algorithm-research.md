@@ -1,13 +1,13 @@
 # Talent Assessment Scoring & Interpretation Framework
 
-> **Document Version**: 4.0 (Thurstonian IRT Model Upgrade)
-> **Date**: 2025-09-30
+> **Document Version**: 5.0 (Hierarchical IRT & Balance Metrics)
+> **Date**: 2025-10-01
 > **Author**: TaskMaster Design Agent
-> **Status**: Ready for Implementation (Pending Calibration)
+> **Status**: Ready for Implementation
 
 ## Executive Summary
 
-This document outlines the scientific foundation for the strength assessment system, refactored to incorporate a state-of-the-art **Thurstonian Item Response Theory (TIRT) model**. We are moving from a simple tallying method to a robust psychometric framework that addresses the limitations of ipsative data. The assessment will now use **multi-statement blocks (e.g., quartets)** instead of pairs, allowing for a more balanced design and richer data collection. The final output remains a **Talent Tier Profile**, but it is now backed by normative scores that are comparable across individuals, providing a scientifically defensible and highly reliable talent map.
+This document outlines the scientific foundation for the strength assessment system, refactored to incorporate a state-of-the-art **Hierarchical Multi-dimensional Thurstonian Item Response Theory (H-MIRT) model**. We are moving from a single-layer estimation to a structured psychometric framework that models talents at both the **facet (12) and domain (4) levels**. The assessment will use multi-statement blocks (quartets) generated via a **Balanced Incomplete Block Design (BIBD)** approach to ensure fairness. The final output is a **Talent Tier Profile** backed by normative scores, now supplemented with **Domain Balance Metrics (DBI, Entropy, Gini)** to provide a scientifically defensible and holistic talent map.
 
 ## 1. Assessment Instrument: Multi-Statement Forced-Choice Model
 
@@ -32,34 +32,42 @@ This "pick most/least from 4" format provides significantly more psychometric in
 
 ## 2. Detailed Scoring Methodology
 
-### 2.1 Core Scoring Algorithm: Thurstonian IRT (TIRT)
+### 2.1 Core Scoring Algorithm: Hierarchical Thurstonian IRT (H-MIRT)
 
-We are replacing the "Preference Tallying" algorithm with a Thurstonian IRT model. This is the cornerstone of the v4.0 redesign.
+We are replacing the previous model with a Hierarchical Thurstonian IRT model. This is the cornerstone of the v5.0 redesign.
 
 **Core Concept:**
-Instead of just counting preferences, the TIRT model assumes that each statement has a certain "utility" or attractiveness for an individual based on their underlying latent traits. By analyzing the patterns of which statements are chosen as "most" and "least" liked across numerous blocks, the model can statistically estimate the strength of the 12 underlying latent talent traits (θ scores).
+The H-MIRT model assumes a two-level structure of talent:
+1.  **Facet Level (θ)**: 12 specific talent facets are directly measured from the user's choices using a Thurstonian IRT model.
+2.  **Domain Level (η)**: 4 broader talent domains are modeled as higher-order factors that explain the correlations between the 12 talent facets.
+
+The relationship is defined as:
+\[ \boldsymbol{\theta}_{facet} = \mathbf{\Lambda}\boldsymbol{\eta}_{domain} + \boldsymbol{\epsilon} \]
+where \( \mathbf{\Lambda} \) is a 12x4 loading matrix defining which facets belong to which domain, and \( \boldsymbol{\epsilon} \) is the facet-specific residual variance.
 
 **Key Advantages:**
-- **Solves the Ipsative Problem**: The model's primary output is a set of **normative trait scores**, which exist on an interval scale and are comparable across different individuals.
-- **Scientifically Valid**: This approach is extensively documented and validated in psychometric literature (e.g., Brown & Maydeu-Olivares, 2011).
+- **Solves the Ipsative Problem**: The model's primary output is a set of **normative trait scores** (for both facets and domains) that are comparable across individuals.
+- **Structural Validity**: It scientifically validates the "4 Domains x 3 Talents" structure, providing a more robust and theoretically grounded interpretation.
+- **Scoring Efficiency**: It allows for more stable estimation of domain scores, even with a limited number of items per facet.
 
 **Scoring Process Overview:**
 1.  **Response Collection**: For each block, the user's "most" and "least" choices are recorded.
-2.  **Apply Pre-calibrated IRT Model**: The scoring engine applies a pre-calibrated TIRT model to the full set of responses. This involves complex statistical estimation, likely using a library capable of IRT analysis (e.g., `mirt` in R, or Python equivalents).
-3.  **Estimate Latent Traits (θ)**: The model outputs a vector of 12 latent trait scores (thetas) for the user. These scores represent the user's standing on each talent facet relative to the calibration sample.
-4.  **Convert to Normative Scores**: The theta scores are then converted into more interpretable normative scores, such as T-scores (Mean=50, SD=10) or Percentiles (0-100).
+2.  **Apply Pre-calibrated H-MIRT Model**: The scoring engine applies a pre-calibrated H-MIRT model. This involves complex statistical estimation (e.g., MCMC or EM algorithms) using a library capable of IRT analysis.
+3.  **Estimate Latent Traits (θ & η)**: The model simultaneously outputs a vector of 12 facet scores (\(\theta\)) and 4 domain scores (\(\eta\)) for the user.
+4.  **Convert to Normative Scores**: The theta and eta scores are then converted into more interpretable normative scores, such as T-scores or Percentiles (0-100).
 
-### 2.2 Block Design: Approximating Balance
+### 2.2 Block Design: Balanced Incomplete Block Design (BIBD)
 
-The design of the statement blocks is critical for the model's accuracy. We will move away from the simple pairwise matrix to an **approximately balanced incomplete block design (BIBD)**.
+The design of the statement blocks is critical for the model's accuracy. We will adopt principles from **Balanced Incomplete Block Design (BIBD)** or use **Integer Linear Programming (ILP)** to construct the questionnaire.
 
 - **Block Size (k)**: **4** statements per block.
 - **Goal**:
-    1.  Each of the 12 talent facets should appear a roughly equal number of times across all blocks.
-    2.  Each possible *pair* of talents should be compared a roughly equal number of times.
-    3.  Within each block, the four statements should be matched for social desirability to avoid obvious "good" or "bad" choices.
+    1.  Each of the 12 talent facets appears an equal number of times (r) across all blocks.
+    2.  Each possible *pair* of talents is compared a nearly equal number of times (λ).
+    3.  Each block is designed to have statements from 3-4 different domains to maximize information and reduce construct overlap.
+    4.  Within each block, the four statements should be matched for social desirability.
 
-This requires a dedicated psychometric design phase, but it is essential for the validity of the final scores.
+This scientific approach to test construction minimizes measurement bias and ensures the fairness and validity of the final scores.
 
 ## 3. Pre-computation Step: Item Calibration
 
@@ -75,7 +83,7 @@ The output of this phase is a set of item parameters that the live scoring engin
 
 ## 4. Talent Tier Interpretation Framework (Refined)
 
-The tiered framework remains central, but its application is now more nuanced and statistically sound.
+The tiered framework remains central, but it is now applied to both domain and facet scores, and is supplemented with balance metrics.
 
 ### 4.1 Tier Classification Logic
 
@@ -88,7 +96,33 @@ The tiered framework remains central, but its application is now more nuanced an
 
 **Handling Ties**: Since scores are now continuous latent trait estimates, true ties are rare. Any apparent ties in rounded percentiles can be resolved by referring back to the more precise underlying theta scores.
 
-## 5. Implementation Recommendations
+### 4.2 Report Balance Metrics (New)
+To provide users with insight into their overall development profile, we introduce three quantitative balance indicators calculated from the four domain percentile scores (\( \mathbf{p} \)).
+
+1.  **Domain Balance Index (DBI)**: Measures the uniformity of domain scores.
+    \[ \mathrm{DBI} = 1 - \frac{\mathrm{Var}(\mathbf{p})}{\mathrm{Var}_{max}} \]
+    A score closer to 1 indicates a more balanced profile across the four domains.
+
+2.  **Relative Entropy (H)**: Measures the evenness of the score distribution.
+    \[ \pi_i = \frac{p_i}{\sum_j p_j}, \quad H_{rel} = -\frac{\sum_{i=1}^{4}\pi_i\log \pi_i}{\log 4} \]
+    A score closer to 1 suggests that the user's strengths are more evenly distributed among the domains.
+
+3.  **Gini Coefficient (G)**: Measures the inequality of the score distribution.
+    \[ G = \frac{\sum_{i}\sum_{j}|p_i - p_j|}{2 \cdot 4 \sum_i p_i} \]
+    A score closer to 0 indicates a more equal (balanced) distribution. The report may display `1 - Gini` for consistency.
+
+## 5. Quality Assurance & Validation (New)
+
+To ensure the scientific rigor of the assessment, a comprehensive validation strategy will be implemented.
+
+*   **Measurement Equivalence**: We will use multi-group CFA/MIRT to test for measurement invariance (configural, metric, scalar) across key demographic groups (e.g., gender, age) to ensure the test is fair.
+*   **Differential Item Functioning (DIF)**: Individual items will be analyzed to ensure they function equivalently for all subgroups, preventing item-level bias.
+*   **Reliability**: Reliability will be reported using modern metrics such as marginal reliability from IRT, which is more appropriate than classical alpha.
+*   **Validity**:
+    *   **Convergent & Discriminant Validity**: Correlate scores with other established psychological measures to ensure our constructs are measuring what they intend to measure and are distinct from other constructs.
+    *   **Criterion-related Validity**: Correlate assessment scores with external, objective performance metrics (e.g., job performance ratings, 360-degree feedback) to demonstrate the test's predictive power.
+
+## 6. Implementation Recommendations
 
 The implementation pipeline must be updated to reflect this new, sophisticated model.
 
@@ -101,7 +135,7 @@ The implementation pipeline must be updated to reflect this new, sophisticated m
     *   **Score Estimation**: Load the pre-calibrated IRT parameters and apply the model to the user's responses to estimate the 12 latent trait scores (thetas).
     *   **Score Transformation**: Convert thetas to percentiles.
     *   **Talent Tiering**: Classify the percentiles into Dominant, Supporting, and Lesser tiers based on thresholds.
-    *   **Storage**: Save the complete tiered profile, including the normative scores and confidence intervals, to the database.
+    *   **Storage**: Save the complete tiered profile, including the normative scores for both facets and domains, and the balance metrics, to the database.
 
 ---
-This updated research document provides the foundation for a psychometrically robust, professional-grade talent assessment. It replaces a simple heuristic with a validated scientific model, ensuring the results are reliable, comparable, and truly insightful.
+This updated research document provides the foundation for a psychometrically robust, professional-grade talent assessment. It replaces a single-layer model with a structured, hierarchical scientific model, ensuring the results are reliable, comparable, and truly insightful.
