@@ -122,8 +122,9 @@ class ArchetypeService:
             for i, match in enumerate(career_matches[:10]):  # 取前10個推薦
                 recommendation_type = self._determine_recommendation_type(match.match_score, i)
 
+                formatted_job_role = self._format_job_role(match.job_role)
                 rec = JobRecommendation(
-                    job_role=self._format_job_role(match.job_role),
+                    job_role=formatted_job_role,
                     recommendation_type=recommendation_type,
                     match_score=match.match_score / 100.0,  # 轉換為0-1範圍
                     strength_alignment=match.strength_alignment,
@@ -404,7 +405,7 @@ class ArchetypeService:
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     session_id,
-                    rec.job_role['role_id'],
+                    rec.job_role['role_id'] if isinstance(rec.job_role, dict) else rec.job_role.role_id,
                     rec.recommendation_type,
                     rec.match_score,
                     json.dumps(rec.strength_alignment),
