@@ -22,30 +22,53 @@
         }
 
         :root {
-            /* Primary Colors - Trust & Professional */
-            --primary-blue: #2563EB;
-            --trust-navy: #1E3A8A;
+            /* 領域色彩（主要） */
+            --executing: #7C3AED;        /* 執行力 - 紫色 */
+            --influencing: #F59E0B;      /* 影響力 - 橙色 */
+            --relationship: #0EA5E9;     /* 關係建立 - 藍色 */
+            --strategic: #10B981;        /* 戰略思維 - 綠色 */
 
-            /* Secondary Colors - Growth & Energy */
-            --growth-green: #10B981;
-            --energy-orange: #F59E0B;
+            /* 中性色調 */
+            --neutral-50: #F9FAFB;
+            --neutral-100: #F3F4F6;
+            --neutral-200: #E5E7EB;
+            --neutral-500: #6B7280;
+            --neutral-600: #4B5563;
+            --neutral-700: #374151;
+            --neutral-900: #111827;
 
-            /* Neutral Colors - Clear Hierarchy */
-            --text-primary: #111827;
-            --text-secondary: #6B7280;
+            /* 功能色彩 */
+            --emerald-500: #10B981;
+            --emerald-600: #059669;
+            --red-500: #EF4444;
+            --amber-500: #F59E0B;
+
+            /* 語義色彩 */
+            --success: var(--emerald-500);
+            --warning: var(--amber-500);
+            --error: var(--red-500);
+            --info: var(--relationship);
+
+            /* 兼容性別名 */
+            --primary-blue: var(--relationship);
+            --trust-navy: var(--neutral-900);
+            --growth-green: var(--strategic);
+            --energy-orange: var(--influencing);
+            --text-primary: var(--neutral-900);
+            --text-secondary: var(--neutral-500);
             --background: #FFFFFF;
-            --surface: #F9FAFB;
-            --border: #E5E7EB;
+            --surface: var(--neutral-50);
+            --border: var(--neutral-200);
 
-            /* Shadows */
+            /* 陰影系統 */
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
             color: var(--text-primary);
             background: var(--background);
             line-height: 1.6;
@@ -121,11 +144,11 @@
             color: var(--primary-blue);
         }
 
-        /* Hero Section */
+        /* Hero Section - 使用設計系統色彩 */
         .hero {
-            padding: 80px 0;
+            padding: 5rem 0; /* py-20 */
             text-align: center;
-            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            background: linear-gradient(135deg, var(--strategic) 0%, var(--relationship) 100%);
             color: white;
             position: relative;
             overflow: hidden;
@@ -170,29 +193,34 @@
             margin-right: auto;
         }
 
-        /* CTA Button */
+        /* CTA Button - 統一按鈕系統 */
         .cta-primary {
-            background: var(--energy-orange);
+            background: var(--neutral-900);
             color: white;
-            padding: 16px 32px;
-            font-size: 18px;
-            font-weight: 600;
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500;
             border: none;
-            border-radius: 8px;
+            border-radius: 0.75rem; /* rounded-xl */
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
         }
 
         .cta-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-xl);
-            background: #DC8F09;
+            background: var(--neutral-700);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-primary.large {
+            padding: 1rem 2rem;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
         }
 
         .micro-copy {
@@ -295,16 +323,17 @@
 
         .prop-card {
             background: white;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
+            padding: 2rem; /* p-8 */
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: var(--shadow-sm);
             text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.2s ease;
         }
 
         .prop-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .prop-icon {
@@ -373,9 +402,10 @@
 
         .testimonial-card {
             background: white;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-md);
+            padding: 2rem; /* p-8 */
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: var(--shadow-sm);
         }
 
         .stars {
@@ -598,7 +628,7 @@
                     5分鐘科學測評，獲得專屬的12維度天賦分析報告<br>
                     基於諾貝爾獎理論，精準識別你的獨特競爭力
                 </p>
-                <button class="cta-primary" onclick="window.location.href='assessment.html'">
+                <button class="cta-primary large" onclick="window.location.href='assessment.html'">
                     免費開始測評 →
                     <span class="micro-copy">已有125,847人完成</span>
                 </button>
@@ -758,7 +788,7 @@
                     <div class="time-label">秒</div>
                 </div>
             </div>
-            <button class="cta-primary" onclick="startAssessment()">
+            <button class="cta-primary large" onclick="startAssessment()">
                 立即開始免費測評 →
                 <span class="loading-spinner" id="loadingSpinner"></span>
             </button>
