@@ -91,31 +91,216 @@ graph TD;
 
 ---
 
-### 7. 報告內容增強：融合 MBTI 職業原型參考
+### 7. 職業原型系統：基於凱爾西氣質理論的動態匹配
 
-為了讓報告的建議更具體、更易於連結到使用者已有的認知框架，我們的報告生成系統在最後一步，會智慧地將使用者的天賦階層輪廓，與廣為人知的 **MBTI 職業原型** 進行映射參考。
+> **系統版本**: v4.0 - 完整資料庫驅動的職業原型系統
+> **實作日期**: 2025-10-01
+> **技術架構**: 資料庫持久化 + 動態匹配算法 + API整合
 
-#### 7.1 映射邏輯：從天賦組合到職業原型
+為了提供更科學、更個人化的職業指導，我們建立了一套完整的職業原型分析系統，基於凱爾西氣質理論（Keirsey Temperament Theory），將天賦評估結果轉化為具體的職業發展建議。
 
-我們**不會**直接進行一次 MBTI 測驗，而是透過分析使用者**主導才幹**的組合，推導出一個最匹配的「職業原型」。這個過程更科學，因為它基於更豐富的數據點。
+#### 7.1 理論基礎：凱爾西氣質理論
 
-*   **原型推導**：系統會分析使用者 Top 4 主導才幹的屬性。
-    *   **範例1**：如果主導才幹集中在「**結構化執行 (T1)**」、「**分析與洞察 (T4)**」和「**紀律與信任 (T9)**」，系統會將其標記為**「系統建構者」**原型，這個原型在 MBTI 中與 **ISTJ / INTJ** 的特質高度相關。
-    *   **範例2**：如果主導才幹集中在「**影響與倡議 (T5)**」、「**協作與共好 (T6)**」和「**學習與成長 (T8)**」，系統會將其標記為**「關係拓展者」**原型，與 **ENFP / ENFJ** 的特質高度相關。
+我們採用凱爾西氣質理論作為職業原型分類的科學基礎，該理論將人格特質歸納為四大氣質類型：
 
-#### 7.2 職業建議的整合
+| 原型代碼 | 原型名稱 | 凱爾西氣質 | MBTI對應 | 核心特質 |
+|:---------|:---------|:-----------|:---------|:---------|
+| **ARCHITECT** | **系統建構者** | 理性者 (Rational) | INTJ, INTP, ENTJ, ENTP | 系統性思維、邏輯分析、長期規劃 |
+| **GUARDIAN** | **組織守護者** | 守護者 (Guardian) | ISTJ, ISFJ, ESTJ, ESFJ | 責任感、紀律性、品質導向 |
+| **IDEALIST** | **人文關懷家** | 理想主義者 (Idealist) | INFJ, INFP, ENFJ, ENFP | 同理心、價值導向、成長導向 |
+| **ARTISAN** | **推廣實踐家** | 工匠 (Artisan) | ESTP, ESFP, ISTP, ISFP | 行動導向、適應靈活、結果導向 |
 
-推導出職業原型後，系統會從一個預先建立的、基於 MBTI 理論的職業資料庫中，提取與該原型相關的**建議職業列表**。
+#### 7.2 才幹維度映射：T1-T12 與職業原型的關聯
 
-*   **雙重驗證**：這份職業列表會與基於使用者單一天賦（如「分析與洞察」適合數據科學家）的建議進行交叉驗證，最終產出一份既符合其**天賦組合**、又經過**經典職業類型理論**印證的綜合建議。
+每個職業原型都有其特定的才幹偏好組合，我們建立了詳細的映射關係：
 
-*   **呈現方式**：在最終報告中，這部分會以「**職業原型參考**」的形式出現，明確告知使用者這是一個基於其天賦輪廓的延伸洞察，旨在提供更廣泛的職涯探索方向。
+**系統建構者 (ARCHITECT)**:
+- **主要才幹**: T4 (分析與洞察), T1 (結構化執行)
+- **次要才幹**: T3 (探索與創新), T8 (學習與成長), T12 (責任與當責)
+- **特徵**: 擅長系統設計、策略規劃、問題分析
 
-這種融合策略，讓我們的報告在保持自身科學核心的同時，也「說著使用者聽得懂的語言」，極大地增強了報告的實用性與說服力。
+**組織守護者 (GUARDIAN)**:
+- **主要才幹**: T12 (責任與當責), T9 (紀律與信任)
+- **次要才幹**: T2 (品質與完備), T1 (結構化執行), T6 (協作與共好)
+- **特徵**: 重視穩定、品質控制、流程優化
+
+**人文關懷家 (IDEALIST)**:
+- **主要才幹**: T6 (協作與共好), T8 (學習與成長)
+- **次要才幹**: T5 (影響與倡議), T11 (衝突整合), T7 (客戶導向)
+- **特徵**: 關注人員發展、團隊和諧、價值導向
+
+**推廣實踐家 (ARTISAN)**:
+- **主要才幹**: T5 (影響與倡議), T10 (壓力調節)
+- **次要才幹**: T3 (探索與創新), T7 (客戶導向), T11 (衝突整合)
+- **特徵**: 靈活應變、人際影響、即時反應
+
+#### 7.3 動態匹配算法
+
+我們的職業原型匹配算法採用加權評分機制：
+
+```python
+# 原型匹配分數計算
+def calculate_archetype_score(user_talents, archetype):
+    score = 0
+
+    # 主要才幹匹配（權重 3.0）
+    for primary_talent in archetype.primary_talents:
+        if primary_talent in user_dominant_talents:
+            score += 3.0
+
+    # 次要才幹匹配（權重 1.0）
+    for secondary_talent in archetype.secondary_talents:
+        if secondary_talent in user_dominant_talents:
+            score += 1.0
+
+    return score
+```
+
+#### 7.4 資料庫架構
+
+職業原型系統採用完整的資料庫持久化設計：
+
+**核心表格**:
+- `career_archetypes` (4筆): 職業原型定義
+- `talent_dimensions` (12筆): T1-T12才幹維度
+- `archetype_talents` (20筆): 原型與才幹的關聯映射
+- `job_roles` (5+筆): 具體職位角色定義
+- `user_archetype_results`: 用戶原型分析結果
+- `job_recommendations`: 個人化職位推薦
+
+**外鍵關係**:
+```sql
+user_archetype_results.session_id → assessment_sessions.session_id
+user_archetype_results.primary_archetype_id → career_archetypes.archetype_id
+job_recommendations.session_id → assessment_sessions.session_id
+job_recommendations.role_id → job_roles.role_id
+```
+
+#### 7.5 API整合與前端呈現
+
+**API端點**: `/api/v4/assessment/results/{session_id}`
+**回應格式**:
+```json
+{
+  "career_prototype": {
+    "prototype_name": "系統建構者",
+    "prototype_hint": "把複雜轉為結構，可對應 INTJ/ISTJ 原型",
+    "suggested_roles": ["產品經理", "資料科學家", "解決方案架構師"],
+    "key_contexts": ["策略規劃", "跨部門協作", "決策支援"],
+    "blind_spots": ["避免過度分析", "設定決策截止點"],
+    "partnership_suggestions": ["配對強『影響力/關係』夥伴共同推進"],
+    "mbti_correlation": "可對應 INTJ/ISTJ 原型"
+  },
+  "archetype_analysis": {
+    "primary_archetype": {
+      "archetype_id": "ARCHITECT",
+      "archetype_name": "系統建構者",
+      "description": "天生的系統思考者與建構者..."
+    },
+    "confidence_score": 0.85,
+    "archetype_scores": {
+      "ARCHITECT": 8,
+      "GUARDIAN": 5,
+      "IDEALIST": 2,
+      "ARTISAN": 1
+    }
+  },
+  "job_recommendations": [
+    {
+      "role_name": "軟體架構師",
+      "match_score": 0.87,
+      "recommendation_type": "primary",
+      "industry_sector": "Technology"
+    }
+  ]
+}
+```
+
+#### 7.6 品質保證與容錯機制
+
+**信心分數計算**:
+- 基於主導才幹的明確程度
+- 原型分數的區分度
+- 才幹分布的一致性
+
+**容錯設計**:
+- API失敗時提供預設原型資訊
+- 前端保留本地原型推導邏輯
+- 資料庫約束確保資料完整性
+
+**測試驗證**:
+- 單元測試覆蓋核心算法
+- 整合測試驗證API回應格式
+- 性能測試確保分析速度 (<2秒)
+
+#### 7.7 職業推薦邏輯
+
+**推薦分類**:
+- **Primary**: 高匹配度職位 (>80%匹配，前3名)
+- **Stretch**: 挑戰性職位 (60-80%匹配)
+- **Development**: 發展型職位 (<60%匹配，需技能補強)
+
+**匹配因子**:
+1. 原型適配度 (40%)
+2. 才幹對齊度 (40%)
+3. 經驗等級匹配 (10%)
+4. 產業偏好 (10%)
+
+這套職業原型系統將天賦評估的科學性與職業發展的實用性完美結合，為用戶提供個人化、具體化的職涯指導建議。
 
 ---
 
-### 8. 附錄：12項才幹維度定義與理論基礎
+### 8. 系統技術實作細節
+
+#### 8.1 服務層架構
+
+**ArchetypeService** 職業原型服務層:
+```python
+class ArchetypeService:
+    def analyze_user_archetype(session_id, talent_scores)
+    def generate_job_recommendations(session_id, user_context)
+    def get_career_prototype_info(session_id)
+```
+
+**核心依賴**:
+- `ArchetypeMapper`: 原有的原型映射邏輯
+- `CareerMatcher`: 職位匹配算法
+- `DatabaseManager`: 資料庫連接管理
+
+#### 8.2 前端整合實作
+
+**JavaScript函數更新**:
+```javascript
+// 動態原型生成（支援API數據）
+function generatePrototype(byTier, apiData = null) {
+    if (apiData && apiData.career_prototype) {
+        return {
+            name: apiData.career_prototype.prototype_name,
+            hint: apiData.career_prototype.prototype_hint
+        };
+    }
+    // 容錯邏輯...
+}
+
+// 原型資訊更新
+function updatePrototypeInfo(prototypeData) {
+    document.getElementById('prototypeName').textContent = prototypeData.prototype_name;
+    document.getElementById('prototypeHint').textContent = prototypeData.prototype_hint;
+    // 動態更新建議職位、關鍵情境等...
+}
+```
+
+#### 8.3 資料庫遷移記錄
+
+**Migration 004**: Career Archetypes System
+- 執行日期: 2025-10-01
+- 表格建立: 7個職業原型相關表格
+- 種子資料: 4種原型定義 + 12個才幹維度 + 20筆關聯映射 + 5個基礎職位
+- 索引優化: 10個查詢效能索引
+
+---
+
+### 9. 附錄：12項才幹維度定義與理論基礎
 
 | 代號 | 才幹維度 | 定義 | 理論基礎 (學理背書) |
 | :--- | :--- | :--- | :--- |

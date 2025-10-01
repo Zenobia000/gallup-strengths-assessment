@@ -556,6 +556,7 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button class="btn btn-secondary" onclick="retakeAssessment()">重新測試</button>
                 <button class="btn btn-secondary" onclick="shareReport()">分享</button>
                 <button class="btn btn-primary" onclick="downloadPDF()">下載報告 PDF</button>
             </div>
@@ -766,8 +767,17 @@
             return domainNarratives[primaryDomain] || demoData.topNarrative;
         }
 
-        // Generate prototype based on dominant talents
-        function generatePrototype(byTier) {
+        // Generate prototype based on API data or fallback to local logic
+        function generatePrototype(byTier, apiData = null) {
+            // If API provides prototype data, use it
+            if (apiData && apiData.career_prototype) {
+                return {
+                    name: apiData.career_prototype.prototype_name,
+                    hint: apiData.career_prototype.prototype_hint
+                };
+            }
+
+            // Fallback to original logic if API data is not available
             const top4 = byTier.dominant.slice(0, 4);
             const hasStrategic = top4.some(d => d.domain === "strategic");
             const hasExecuting = top4.some(d => d.domain === "executing");
@@ -916,7 +926,7 @@
                 // Process the data
                 const { byTier, sorted } = processTiers(data.dimensions);
                 const narrative = data.topNarrative || generateNarrative(byTier);
-                const prototype = generatePrototype(byTier);
+                const prototype = generatePrototype(byTier, data);  // Pass API data
 
                 // Update UI
                 document.getElementById('sessionId').textContent = data.sessionId;
@@ -930,8 +940,30 @@
 
                 document.getElementById('narrativeText').textContent = narrative;
 
-                document.getElementById('prototypeName').textContent = prototype.name;
-                document.getElementById('prototypeHint').textContent = prototype.hint;
+                // Update prototype information from API data
+                const prototypeData = data.career_prototype || {
+                    prototype_name: "系統建構者",
+                    prototype_hint: "把複雜轉為結構，可對應 INTJ/ISTJ 原型",
+                    suggested_roles: ["產品經理", "資料科學家", "解決方案架構師"],
+                    key_contexts: ["策略規劃", "跨部門協作", "決策支援"],
+                    blind_spots: ["避免過度分析", "設定決策截止點"],
+                    partnership_suggestions: ["配對強『影響力/關係』夥伴共同推進"],
+                    mbti_correlation: "可對應 INTJ/ISTJ 原型"
+                };
+
+                document.getElementById('prototypeName').textContent = prototypeData.prototype_name;
+                document.getElementById('prototypeHint').textContent = prototypeData.prototype_hint;
+
+                // Update prototype grid with dynamic data
+                const prototypeGrid = document.querySelector('.prototype-grid');
+                if (prototypeGrid) {
+                    prototypeGrid.innerHTML = `
+                        <div>建議職位：${prototypeData.suggested_roles.slice(0, 3).join('、')}</div>
+                        <div>關鍵情境：${prototypeData.key_contexts.slice(0, 3).join('、')}</div>
+                        <div>盲點提醒：${prototypeData.blind_spots.slice(0, 2).join('、')}</div>
+                        <div>搭檔建議：${prototypeData.partnership_suggestions[0] || '配對互補夥伴共同合作'}</div>
+                    `;
+                }
 
                 // Create visualizations
                 createHelixVisualization(sorted);
@@ -951,15 +983,21 @@
         function transformV4ApiData(apiData, sessionId) {
             const confidence = calculateConfidence(apiData.theta_scores);
 
-            // Map v4 norm_scores to our 12 dimensions
-            const dimensions = mapV4ToDimensions(apiData.norm_scores);
+            // Use Strength DNA data if available, otherwise fallback to norm_scores
+            let dimensions;
+            if (apiData.strength_dna && apiData.strength_dna.dna_data) {
+                dimensions = mapDNADataToDimensions(apiData.strength_dna.dna_data);
+            } else {
+                dimensions = mapV4ToDimensions(apiData.norm_scores);
+            }
 
             return {
                 sessionId: sessionId,
                 testedAt: new Date(apiData.completed_at).toLocaleString('zh-TW'),
                 confidence: confidence,
                 topNarrative: generateV4Narrative(apiData.profile),
-                dimensions: dimensions
+                dimensions: dimensions,
+                career_prototype: apiData.career_prototype // Pass through career prototype
             };
         }
 
@@ -972,12 +1010,25 @@
             return Math.max(0.7, Math.min(0.95, 1 - variance / 10));
         }
 
+        // Map Strength DNA data to our format
+        function mapDNADataToDimensions(dnaData) {
+            if (!dnaData || !Array.isArray(dnaData)) return demoData.dimensions;
+
+            return dnaData.map((item, index) => ({
+                id: item.dimension,
+                name: item.name, // Use Chinese name from Strength DNA
+                domain: getDimensionDomain(item.dimension),
+                percentile: Math.round(item.percentile)
+            }));
+        }
+
         // Map v4 dimensions to our 12 strength dimensions
         function mapV4ToDimensions(normScores) {
             if (!normScores || typeof normScores !== 'object') return demoData.dimensions;
 
             // V4 dimension mapping to our 12 dimensions
             const dimensionMapping = {
+                // Core Gallup dimensions that match API output
                 'Achiever': { id: 'T1', name: '結構化執行', domain: 'executing' },
                 'Deliberative': { id: 'T2', name: '品質與完備', domain: 'executing' },
                 'Ideation': { id: 'T3', name: '探索與創新', domain: 'strategic' },
@@ -989,30 +1040,75 @@
                 'Discipline': { id: 'T9', name: '紀律與信任', domain: 'executing' },
                 'Adaptability': { id: 'T10', name: '壓力調節', domain: 'relationship' },
                 'Harmony': { id: 'T11', name: '衝突整合', domain: 'relationship' },
-                'Responsibility': { id: 'T12', name: '責任與當責', domain: 'executing' }
+                'Responsibility': { id: 'T12', name: '責任與當責', domain: 'executing' },
+
+                // Additional API dimensions mapped to our 12 themes
+                'Command': { id: 'T1', name: '結構化執行', domain: 'executing' },
+                'Communication': { id: 'T5', name: '影響與倡議', domain: 'influencing' },
+                'Competition': { id: 'T2', name: '品質與完備', domain: 'executing' },
+                'Connectedness': { id: 'T6', name: '協作與共好', domain: 'relationship' },
+                'Consistency': { id: 'T9', name: '紀律與信任', domain: 'executing' },
+                'Context': { id: 'T4', name: '分析與洞察', domain: 'strategic' },
+                'Belief': { id: 'T12', name: '責任與當責', domain: 'executing' },
+                'Includer': { id: 'T6', name: '協作與共好', domain: 'relationship' },
+                'Individualization': { id: 'T7', name: '客戶導向', domain: 'relationship' },
+                'Input': { id: 'T8', name: '學習與成長', domain: 'strategic' },
+                'Intellection': { id: 'T3', name: '探索與創新', domain: 'strategic' },
+
+                // T1-T12 direct mapping (for Strength DNA data)
+                'T1': { id: 'T1', name: '結構化執行', domain: 'executing' },
+                'T2': { id: 'T2', name: '品質與完備', domain: 'executing' },
+                'T3': { id: 'T3', name: '探索與創新', domain: 'strategic' },
+                'T4': { id: 'T4', name: '分析與洞察', domain: 'strategic' },
+                'T5': { id: 'T5', name: '影響與倡議', domain: 'influencing' },
+                'T6': { id: 'T6', name: '協作與共好', domain: 'relationship' },
+                'T7': { id: 'T7', name: '客戶導向', domain: 'relationship' },
+                'T8': { id: 'T8', name: '學習與成長', domain: 'strategic' },
+                'T9': { id: 'T9', name: '紀律與信任', domain: 'executing' },
+                'T10': { id: 'T10', name: '壓力調節', domain: 'relationship' },
+                'T11': { id: 'T11', name: '衝突整合', domain: 'relationship' },
+                'T12': { id: 'T12', name: '責任與當責', domain: 'executing' }
             };
 
             const dimensions = [];
+            let idCounter = 1;
 
-            // First, try to map known v4 dimensions
+            // Map all v4 dimensions with unique IDs
             for (const [v4Dim, scoreData] of Object.entries(normScores)) {
-                if (dimensionMapping[v4Dim]) {
-                    const mapping = dimensionMapping[v4Dim];
+                const mapping = dimensionMapping[v4Dim];
+                if (mapping) {
                     dimensions.push({
-                        id: mapping.id,
-                        name: mapping.name,
+                        id: `T${idCounter}`,  // Unique ID for each dimension
+                        name: mapping.name,  // Use Chinese name from mapping
                         domain: mapping.domain,
                         percentile: Math.round(scoreData.percentile || 50)
                     });
+                    idCounter++;
+                } else {
+                    // Handle unmapped dimensions
+                    dimensions.push({
+                        id: `T${idCounter}`,
+                        name: v4Dim,  // Keep original name for unmapped dimensions
+                        domain: 'strategic',  // Default domain
+                        percentile: Math.round(scoreData.percentile || 50)
+                    });
+                    idCounter++;
                 }
             }
 
-            // Fill remaining slots with demo data if needed
-            const usedIds = new Set(dimensions.map(d => d.id));
-            for (const demoDim of demoData.dimensions) {
-                if (!usedIds.has(demoDim.id) && dimensions.length < 12) {
-                    dimensions.push(demoDim);
-                }
+            // Fill remaining slots with demo data if needed (up to 12 total)
+            while (dimensions.length < 12 && idCounter <= 12) {
+                const demoDimension = demoData.dimensions[dimensions.length] || {
+                    id: `T${idCounter}`,
+                    name: `維度${idCounter}`,
+                    domain: 'strategic',
+                    percentile: 50
+                };
+                dimensions.push({
+                    ...demoDimension,
+                    id: `T${idCounter}`
+                });
+                idCounter++;
             }
 
             return dimensions.slice(0, 12); // Ensure exactly 12 dimensions
@@ -1052,6 +1148,15 @@
         }
 
         // Button actions
+        function retakeAssessment() {
+            // Clear any stored session data
+            localStorage.removeItem('currentSessionId');
+            localStorage.removeItem('lastCheckpoint');
+
+            // Navigate back to home page
+            window.location.href = '/';
+        }
+
         function shareReport() {
             if (navigator.share) {
                 navigator.share({

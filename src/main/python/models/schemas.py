@@ -42,6 +42,37 @@ class JobCategory(str, Enum):
     TEAM_COLLABORATION = "team_collaboration"
 
 
+class ArchetypeType(str, Enum):
+    """職業原型類型枚舉"""
+    ARCHITECT = "ARCHITECT"
+    GUARDIAN = "GUARDIAN"
+    IDEALIST = "IDEALIST"
+    ARTISAN = "ARTISAN"
+
+
+class TalentType(str, Enum):
+    """才幹類型枚舉"""
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    NEUTRAL = "neutral"
+    AVOID = "avoid"
+
+
+class RecommendationType(str, Enum):
+    """推薦類型枚舉"""
+    PRIMARY = "primary"
+    STRETCH = "stretch"
+    DEVELOPMENT = "development"
+
+
+class SeniorityLevel(str, Enum):
+    """資深程度枚舉"""
+    ENTRY = "entry"
+    MID = "mid"
+    SENIOR = "senior"
+    EXECUTIVE = "executive"
+
+
 # Base Response Models
 class APIResponse(BaseModel):
     """Standard API response wrapper with metadata."""
@@ -435,3 +466,111 @@ class ScoreResultResponse(BaseModel):
     big_five_scores: Dict[str, Any] = Field(..., description="Big Five personality scores")
     strengths_profile: Optional[Dict[str, Any]] = Field(None, description="Strengths profile if available")
     metadata: Dict[str, Any] = Field(..., description="Scoring metadata and timestamps")
+
+
+# Career Archetype System Models
+class CareerArchetypeBase(BaseModel):
+    """基礎職業原型模型"""
+    archetype_id: str = Field(..., description="原型唯一識別碼")
+    archetype_name: str = Field(..., description="原型中文名稱")
+    archetype_name_en: str = Field(..., description="原型英文名稱")
+    keirsey_temperament: str = Field(..., description="凱爾西氣質理論分類")
+    description: str = Field(..., description="原型描述")
+
+
+class CareerArchetype(CareerArchetypeBase):
+    """完整職業原型模型"""
+    mbti_correlates: List[str] = Field(..., description="相關MBTI類型")
+    core_characteristics: List[str] = Field(..., description="核心特質")
+    work_environment_preferences: Dict[str, Any] = Field(..., description="工作環境偏好")
+    leadership_style: Optional[str] = Field(None, description="領導風格")
+    decision_making_style: Optional[str] = Field(None, description="決策風格")
+    communication_style: Optional[str] = Field(None, description="溝通風格")
+    stress_indicators: Optional[List[str]] = Field(None, description="壓力指標")
+    development_areas: Optional[List[str]] = Field(None, description="發展領域")
+
+
+class TalentDimension(BaseModel):
+    """才幹維度模型"""
+    dimension_id: str = Field(..., description="維度識別碼 (T1-T12)")
+    dimension_name: str = Field(..., description="維度中文名稱")
+    dimension_name_en: str = Field(..., description="維度英文名稱")
+    category: str = Field(..., description="才幹類別")
+    description: str = Field(..., description="維度描述")
+
+
+class ArchetypeTalentMapping(BaseModel):
+    """原型才幹映射模型"""
+    archetype_id: str = Field(..., description="原型識別碼")
+    dimension_id: str = Field(..., description="才幹維度識別碼")
+    talent_type: str = Field(..., description="才幹類型: primary, secondary, neutral, avoid")
+    weight: float = Field(..., description="權重分數")
+    importance_level: int = Field(..., description="重要性等級 (1-5)")
+
+
+class JobRole(BaseModel):
+    """職位角色模型"""
+    role_id: str = Field(..., description="職位識別碼")
+    role_name: str = Field(..., description="職位名稱")
+    role_name_en: Optional[str] = Field(None, description="職位英文名稱")
+    industry_sector: str = Field(..., description="產業部門")
+    job_family: str = Field(..., description="職位類別")
+    seniority_level: str = Field(..., description="資深程度: entry, mid, senior, executive")
+    description: str = Field(..., description="職位描述")
+    key_responsibilities: List[str] = Field(..., description="主要職責")
+    required_skills: List[str] = Field(..., description="必備技能")
+    preferred_skills: Optional[List[str]] = Field(None, description="優先技能")
+    salary_range_min: Optional[int] = Field(None, description="薪資範圍最小值")
+    salary_range_max: Optional[int] = Field(None, description="薪資範圍最大值")
+    work_arrangement: Optional[str] = Field(None, description="工作安排")
+
+
+class UserArchetypeResult(BaseModel):
+    """用戶職業原型分析結果"""
+    session_id: str = Field(..., description="會話識別碼")
+    primary_archetype: CareerArchetypeBase = Field(..., description="主要原型")
+    secondary_archetype: Optional[CareerArchetypeBase] = Field(None, description="次要原型")
+    archetype_scores: Dict[str, float] = Field(..., description="所有原型分數")
+    dominant_talents: List[Dict[str, Any]] = Field(..., description="主導才幹")
+    supporting_talents: List[Dict[str, Any]] = Field(..., description="支援才幹")
+    lesser_talents: List[Dict[str, Any]] = Field(..., description="較弱才幹")
+    confidence_score: float = Field(..., description="信心分數")
+
+
+class JobRecommendation(BaseModel):
+    """職位推薦模型"""
+    job_role: JobRole = Field(..., description="推薦職位")
+    recommendation_type: str = Field(..., description="推薦類型: primary, stretch, development")
+    match_score: float = Field(..., description="匹配分數 (0-1)")
+    strength_alignment: Dict[str, float] = Field(..., description="優勢對齊")
+    development_gaps: Optional[List[str]] = Field(None, description="發展缺口")
+    recommendation_reasoning: Dict[str, Any] = Field(..., description="推薦理由")
+    priority_rank: int = Field(..., description="優先級排名")
+    confidence_level: float = Field(..., description="信心水平")
+
+
+class ArchetypeAnalysisRequest(BaseModel):
+    """職業原型分析請求"""
+    session_id: str = Field(..., description="評測會話識別碼")
+    talent_scores: Optional[Dict[str, float]] = Field(None, description="才幹分數字典")
+    user_context: Optional[Dict[str, Any]] = Field(None, description="用戶背景資訊")
+
+
+class ArchetypeAnalysisResponse(BaseModel):
+    """職業原型分析回應"""
+    session_id: str = Field(..., description="會話識別碼")
+    archetype_result: UserArchetypeResult = Field(..., description="原型分析結果")
+    job_recommendations: List[JobRecommendation] = Field(..., description="職位推薦列表")
+    analysis_metadata: Dict[str, Any] = Field(..., description="分析元資料")
+    generated_at: datetime = Field(..., description="生成時間")
+
+
+class CareerPrototypeInfo(BaseModel):
+    """職業原型資訊 - 用於前端顯示"""
+    prototype_name: str = Field(..., description="原型名稱")
+    prototype_hint: str = Field(..., description="原型提示")
+    suggested_roles: List[str] = Field(..., description="建議職位")
+    key_contexts: List[str] = Field(..., description="關鍵情境")
+    blind_spots: List[str] = Field(..., description="盲點提醒")
+    partnership_suggestions: List[str] = Field(..., description="搭檔建議")
+    mbti_correlation: Optional[str] = Field(None, description="MBTI關聯")
