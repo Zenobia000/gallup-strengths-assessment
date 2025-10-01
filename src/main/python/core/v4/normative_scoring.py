@@ -68,12 +68,10 @@ class NormativeScorer:
             self._initialize_default_norms()
 
     def _initialize_default_norms(self):
-        """初始化預設常模（標準常態分佈）"""
+        """初始化預設常模（標準常態分佈）- T1-T12 框架"""
         dimensions = [
-            'Achiever', 'Activator', 'Adaptability',
-            'Analytical', 'Arranger', 'Belief',
-            'Command', 'Communication', 'Competition',
-            'Connectedness', 'Consistency', 'Context'
+            'T1', 'T2', 'T3', 'T4', 'T5', 'T6',
+            'T7', 'T8', 'T9', 'T10', 'T11', 'T12'
         ]
 
         for dim in dimensions:
@@ -374,13 +372,24 @@ class NormativeScorer:
 
         # 整體統計
         all_percentiles = [score.percentile for _, score in norm_scores.items()]
-        profile_stats = {
-            'mean_percentile': np.mean(all_percentiles),
-            'sd_percentile': np.std(all_percentiles),
-            'min_percentile': np.min(all_percentiles),
-            'max_percentile': np.max(all_percentiles),
-            'range': np.max(all_percentiles) - np.min(all_percentiles)
-        }
+
+        # 防護：如果沒有分數，使用預設值
+        if not all_percentiles:
+            profile_stats = {
+                'mean_percentile': 50.0,
+                'sd_percentile': 0.0,
+                'min_percentile': 50.0,
+                'max_percentile': 50.0,
+                'range': 0.0
+            }
+        else:
+            profile_stats = {
+                'mean_percentile': np.mean(all_percentiles),
+                'sd_percentile': np.std(all_percentiles),
+                'min_percentile': np.min(all_percentiles),
+                'max_percentile': np.max(all_percentiles),
+                'range': np.max(all_percentiles) - np.min(all_percentiles)
+            }
 
         # 優勢類別分布
         category_distribution = self._analyze_categories(norm_scores)
@@ -395,12 +404,12 @@ class NormativeScorer:
 
     def _analyze_categories(self,
                           norm_scores: Dict[str, NormScore]) -> Dict[str, Dict]:
-        """分析優勢類別分布"""
+        """分析優勢類別分布 - T1-T12 框架"""
         categories = {
-            'execution': ['Achiever', 'Arranger', 'Belief', 'Consistency'],
-            'influencing': ['Activator', 'Command', 'Communication', 'Competition'],
-            'relationship': ['Adaptability', 'Connectedness'],
-            'thinking': ['Analytical', 'Context']
+            'execution': ['T1', 'T2', 'T9', 'T12'],  # 執行力類別：結構化執行、品質與完備、紀律與信任、責任與當責
+            'influencing': ['T5', 'T7'],             # 影響力類別：影響與倡議、客戶導向
+            'relationship': ['T6', 'T10', 'T11'],    # 關係類別：協作與共好、壓力調節、衝突整合
+            'thinking': ['T3', 'T4', 'T8']           # 思考類別：探索與創新、分析與洞察、學習與成長
         }
 
         category_stats = {}
@@ -414,7 +423,7 @@ class NormativeScorer:
             if cat_scores:
                 category_stats[cat_name] = {
                     'mean_percentile': np.mean(cat_scores),
-                    'max_percentile': np.max(cat_scores),
+                    'max_percentile': np.max(cat_scores) if cat_scores else 0.0,
                     'count_top5': sum(1 for s in cat_scores if s >= 85)
                 }
 
@@ -436,24 +445,22 @@ class NormativeScorer:
 
 
 def create_sample_norms():
-    """創建範例常模資料"""
+    """創建範例常模資料 - T1-T12 框架"""
     np.random.seed(42)
 
-    # 模擬12個維度的樣本資料
+    # 模擬12個T維度的樣本資料
     dimensions = [
-        'Achiever', 'Activator', 'Adaptability',
-        'Analytical', 'Arranger', 'Belief',
-        'Command', 'Communication', 'Competition',
-        'Connectedness', 'Consistency', 'Context'
+        'T1', 'T2', 'T3', 'T4', 'T5', 'T6',
+        'T7', 'T8', 'T9', 'T10', 'T11', 'T12'
     ]
 
     theta_samples = {}
     for dim in dimensions:
         # 生成略有偏態的分佈
         samples = np.random.normal(0, 1, 1000)
-        if dim in ['Achiever', 'Communication']:
+        if dim in ['T1', 'T5']:  # 結構化執行、影響與倡議
             samples += 0.2  # 輕微正偏
-        elif dim in ['Competition', 'Command']:
+        elif dim in ['T12', 'T9']:  # 責任與當責、紀律與信任
             samples -= 0.1  # 輕微負偏
 
         theta_samples[dim] = samples.tolist()

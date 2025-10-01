@@ -732,7 +732,32 @@
         };
 
         // Tier processing function
-        function processTiers(dimensions) {
+        function processTiers(dimensions, talentClassification = null) {
+            // Use scientific classification if available from API
+            if (talentClassification && talentClassification.classified_talents) {
+                const classified = talentClassification.classified_talents;
+                const byTier = {
+                    dominant: classified.dominant || [],
+                    supporting: classified.supporting || [],
+                    lesser: classified.developing || []  // Map 'developing' to 'lesser' for display
+                };
+
+                // Create sorted array from all classified talents
+                const allTalents = [...byTier.dominant, ...byTier.supporting, ...byTier.lesser];
+                const sorted = allTalents.sort((a, b) => b.percentile - a.percentile);
+
+                console.log('🧬 Using scientific talent classification:', {
+                    dominant: byTier.dominant.length,
+                    supporting: byTier.supporting.length,
+                    developing: byTier.lesser.length,
+                    classification_summary: talentClassification.classification_summary
+                });
+
+                return { byTier, sorted };
+            }
+
+            // Fallback to old arbitrary thresholds if classification not available
+            console.warn('⚠️  Scientific classification not available, using fallback thresholds');
             const byTier = { dominant: [], supporting: [], lesser: [] };
             const sorted = [...dimensions].sort((a, b) => b.percentile - a.percentile);
 
@@ -907,7 +932,7 @@
                 if (sessionId) {
                     try {
                         // Try to fetch real data from API (correct v4 endpoint)
-                        const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
+                        const apiBase = window.location.port === '3000' ? 'http://localhost:8002' : '';
                         const response = await fetch(`${apiBase}/api/v4/assessment/results/${sessionId}`);
 
                         if (response.ok) {
@@ -923,8 +948,8 @@
                     }
                 }
 
-                // Process the data
-                const { byTier, sorted } = processTiers(data.dimensions);
+                // Process the data with scientific classification
+                const { byTier, sorted } = processTiers(data.dimensions, data.talent_classification);
                 const narrative = data.topNarrative || generateNarrative(byTier);
                 const prototype = generatePrototype(byTier, data);  // Pass API data
 

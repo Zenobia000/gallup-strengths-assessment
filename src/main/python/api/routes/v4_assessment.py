@@ -19,6 +19,7 @@ from core.v4.irt_scorer import ThurstonianIRTScorer
 from core.v4.normative_scoring import NormativeScorer
 from core.v4.irt_calibration import ThurstonianIRTCalibrator
 from core.v4.performance_optimizer import get_optimizer, cached_computation
+from core.v4.talent_classification import ScientificTalentClassifier, get_tier_display_config
 from data.v4_statements import STATEMENT_POOL, DIMENSION_MAPPING, get_all_statements
 from utils.database import get_database_manager
 from models.v4.forced_choice import Statement as FCStatement
@@ -509,23 +510,69 @@ async def get_results(session_id: str):
                     "mbti_correlation": "可對應 INTJ/ISTJ 原型"
                 }
 
-            # Generate Strength DNA visualization for results
+            # Generate norm_scores and Strength DNA visualization for results
             try:
                 from core.v4.strength_dna_visualizer import create_fancy_dna_visualization
                 from core.v4.normative_scoring import NormativeScorer
                 from pathlib import Path
 
-                # Recreate norm_scores from stored data for DNA visualization
-                norm_scorer = NormativeScorer(Path('data/v4_normative_data.json'))
+                # Recreate norm_scores from stored data
+                norm_scorer = NormativeScorer(Path('/home/os-sunnie.gd.weng/python_workstation/side-project/strength-system/src/main/python/data/v4_normative_data.json'))
                 theta_scores = basic_results["theta_scores"]
 
                 if theta_scores:
                     norm_scores = norm_scorer.compute_norm_scores(theta_scores)
+
+                    # Convert NormScore objects to dictionaries for JSON serialization
+                    norm_scores_dict = {}
+                    for dim, score in norm_scores.items():
+                        norm_scores_dict[dim] = {
+                            "dimension": score.dimension,
+                            "raw_theta": score.raw_theta,
+                            "percentile": score.percentile,
+                            "t_score": score.t_score,
+                            "stanine": score.stanine,
+                            "sten": score.sten,
+                            "z_score": score.z_score,
+                            "interpretation": score.interpretation
+                        }
+
+                    # Add norm_scores to basic_results
+                    basic_results["norm_scores"] = norm_scores_dict
+
+                    # Apply scientific talent classification
+                    classifier = ScientificTalentClassifier()
+                    classified_talents = classifier.classify_talents(norm_scores)
+                    classification_summary = classifier.get_classification_summary(classified_talents)
+                    tier_config = get_tier_display_config()
+
+                    # Format classified talents for frontend consumption
+                    basic_results["talent_classification"] = {
+                        "classified_talents": {
+                            tier: [
+                                {
+                                    "dimension": talent.dimension,
+                                    "percentile": talent.percentile,
+                                    "t_score": talent.t_score,
+                                    "stanine": talent.stanine,
+                                    "tier": talent.tier.value,
+                                    "interpretation": talent.interpretation,
+                                    "confidence": talent.confidence
+                                }
+                                for talent in talents
+                            ]
+                            for tier, talents in classified_talents.items()
+                        },
+                        "classification_summary": classification_summary,
+                        "tier_display_config": tier_config
+                    }
+
+                    # Generate strength DNA visualization
                     strength_dna = create_fancy_dna_visualization(norm_scores)
                     basic_results["strength_dna"] = strength_dna
 
             except Exception as dna_error:
-                logger.warning(f"Strength DNA generation failed for session {session_id}: {dna_error}")
+                logger.warning(f"Norm scores/DNA generation failed for session {session_id}: {dna_error}")
 
             return basic_results
 

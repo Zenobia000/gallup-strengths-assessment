@@ -84,7 +84,7 @@ class Config {
     const currentOrigin = window.location.origin;
 
     // If we're on a specific port, try common API ports
-    const apiPorts = [8004, 8000, 5000, 3001];
+    const apiPorts = [8002, 8000, 5000, 3001];
 
     // Extract current port
     const currentPort = window.location.port;
@@ -94,8 +94,8 @@ class Config {
       return `${currentOrigin}/api/v1`;
     }
 
-    // Default to port 8004 for FastAPI
-    return `${window.location.protocol}//${window.location.hostname}:8004/api/v1`;
+    // Default to port 8002 for FastAPI
+    return `${window.location.protocol}//${window.location.hostname}:8002/api/v1`;
   }
 
   /**
