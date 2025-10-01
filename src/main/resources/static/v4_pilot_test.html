@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>優勢天賦評測 V4.0 - 智能天賦識別引擎™</title>
+    <!-- Version: 2.0 - Updated UI without dimension labels -->
     <meta name="description" content="基於Thurstonian IRT模型的科學評測，5分鐘發現你的獨特優勢">
 
     <!-- Fonts -->
@@ -154,6 +155,23 @@
             font-size: 12px;
             font-weight: 600;
             margin-bottom: 24px;
+        }
+
+        .feature-list {
+            text-align: left;
+            margin: 32px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .feature-icon {
+            color: var(--growth-green);
+            font-size: 20px;
         }
 
         /* Registration Form */
@@ -557,8 +575,27 @@
         <!-- Welcome & Registration Screen -->
         <div class="welcome-screen" id="welcomeScreen">
             <span class="version-badge">V4.0 預測試版</span>
-            <h1 class="welcome-title">優勢天賦評測</h1>
-            <p class="welcome-subtitle">四選二強制選擇測驗 - 更精準的天賦識別</p>
+            <h1 class="welcome-title">歡迎來到優勢天賦評測</h1>
+            <p class="welcome-subtitle">5分鐘時間，發現你的獨特競爭力</p>
+
+            <div class="feature-list" style="margin: 32px 0;">
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>基於諾貝爾獎理論的科學評測</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>四選二強制選擇，更精準識別</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>12維度全面分析你的優勢</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>保護隱私，數據加密存儲</span>
+                </div>
+            </div>
 
             <form class="registration-form" id="registrationForm">
                 <div class="form-group">
@@ -598,9 +635,9 @@
                 <div class="form-group">
                     <label class="form-label">測試組別</label>
                     <select class="form-select" id="testGroup" required>
-                        <option value="balanced">平衡組</option>
-                        <option value="adaptive">適性組</option>
-                        <option value="random">隨機組</option>
+                        <option value="pilot">先導測試組</option>
+                        <option value="calibration">校準組</option>
+                        <option value="validation">驗證組</option>
                     </select>
                 </div>
 
@@ -677,8 +714,9 @@
     </div>
 
     <script>
-        // API Configuration
-        const API_BASE = '/api/v4/data-collection';
+        // API Configuration - detect environment
+        const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
+        const API_BASE = `${apiBase}/api/v4/data-collection`;
 
         // State Management
         let participantId = null;
@@ -700,6 +738,8 @@
                 test_group: document.getElementById('testGroup').value
             };
 
+            console.log('Registration data:', registration);
+
             try {
                 showLoading(true);
 
@@ -710,7 +750,11 @@
                     body: JSON.stringify(registration)
                 });
 
-                if (!regResponse.ok) throw new Error('註冊失敗');
+                if (!regResponse.ok) {
+                    const errorText = await regResponse.text();
+                    console.error('Registration failed:', regResponse.status, errorText);
+                    throw new Error('註冊失敗: ' + regResponse.statusText);
+                }
 
                 const regData = await regResponse.json();
                 participantId = regData.participant_id;
@@ -725,7 +769,11 @@
                     })
                 });
 
-                if (!sessionResponse.ok) throw new Error('無法開始測驗');
+                if (!sessionResponse.ok) {
+                    const errorText = await sessionResponse.text();
+                    console.error('Session start failed:', sessionResponse.status, errorText);
+                    throw new Error('無法開始測驗: ' + sessionResponse.statusText);
+                }
 
                 const sessionData = await sessionResponse.json();
                 sessionId = sessionData.session_id;
