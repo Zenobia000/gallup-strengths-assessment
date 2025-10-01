@@ -733,6 +733,9 @@
             // Use scientific classification if available from API
             if (talentClassification && talentClassification.classified_talents) {
                 const classified = talentClassification.classified_talents;
+
+                console.log('🔍 Debug: Raw talent classification:', classified);
+
                 const byTier = {
                     dominant: classified.dominant || [],
                     supporting: classified.supporting || [],
@@ -743,14 +746,43 @@
                 const allTalents = [...byTier.dominant, ...byTier.supporting, ...byTier.lesser];
                 const sorted = allTalents.sort((a, b) => b.percentile - a.percentile);
 
+                // Convert to format expected by visualization functions
+                const formattedByTier = {
+                    dominant: byTier.dominant.map(t => ({
+                        id: t.dimension,
+                        name: getDimensionName(t.dimension), // Will be mapped by getDimensionName
+                        domain: getDimensionDomain(t.dimension),
+                        percentile: Math.round(t.percentile)
+                    })),
+                    supporting: byTier.supporting.map(t => ({
+                        id: t.dimension,
+                        name: getDimensionName(t.dimension),
+                        domain: getDimensionDomain(t.dimension),
+                        percentile: Math.round(t.percentile)
+                    })),
+                    lesser: byTier.lesser.map(t => ({
+                        id: t.dimension,
+                        name: getDimensionName(t.dimension),
+                        domain: getDimensionDomain(t.dimension),
+                        percentile: Math.round(t.percentile)
+                    }))
+                };
+
+                const formattedSorted = sorted.map(t => ({
+                    id: t.dimension,
+                    name: t.dimension,
+                    domain: getDimensionDomain(t.dimension),
+                    percentile: Math.round(t.percentile)
+                }));
+
                 console.log('🧬 Using scientific talent classification:', {
-                    dominant: byTier.dominant.length,
-                    supporting: byTier.supporting.length,
-                    developing: byTier.lesser.length,
+                    dominant: formattedByTier.dominant.length,
+                    supporting: formattedByTier.supporting.length,
+                    developing: formattedByTier.lesser.length,
                     classification_summary: talentClassification.classification_summary
                 });
 
-                return { byTier, sorted };
+                return { byTier: formattedByTier, sorted: formattedSorted };
             }
 
             // Fallback to old arbitrary thresholds if classification not available
@@ -946,7 +978,21 @@
                 }
 
                 // Process the data with scientific classification
+                // Debug: Check data structure
+                console.log('🔍 Debug: API data structure:', {
+                    dimensions: data.dimensions ? data.dimensions.length : 'none',
+                    talent_classification: data.talent_classification ? 'exists' : 'none',
+                    classification_keys: data.talent_classification ? Object.keys(data.talent_classification) : []
+                });
+
                 const { byTier, sorted } = processTiers(data.dimensions, data.talent_classification);
+
+                console.log('🔍 Debug: ProcessTiers result:', {
+                    dominant: byTier.dominant.length,
+                    supporting: byTier.supporting.length,
+                    lesser: byTier.lesser.length,
+                    sorted: sorted.length
+                });
 
                 const narrative = data.topNarrative || generateNarrative(byTier);
 
