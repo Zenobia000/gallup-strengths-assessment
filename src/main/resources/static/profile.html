@@ -11,11 +11,45 @@
             box-sizing: border-box;
         }
 
+        :root {
+            /* 領域色彩（主要） */
+            --executing: #7C3AED;        /* 執行力 - 紫色 */
+            --influencing: #F59E0B;      /* 影響力 - 橙色 */
+            --relationship: #0EA5E9;     /* 關係建立 - 藍色 */
+            --strategic: #10B981;        /* 戰略思維 - 綠色 */
+
+            /* 中性色調 */
+            --neutral-50: #F9FAFB;
+            --neutral-100: #F3F4F6;
+            --neutral-200: #E5E7EB;
+            --neutral-500: #6B7280;
+            --neutral-600: #4B5563;
+            --neutral-700: #374151;
+            --neutral-900: #111827;
+
+            /* 功能色彩 */
+            --emerald-500: #10B981;
+            --emerald-600: #059669;
+            --red-500: #EF4444;
+            --amber-500: #F59E0B;
+
+            /* 語義色彩 */
+            --success: var(--emerald-500);
+            --warning: var(--amber-500);
+            --error: var(--red-500);
+            --info: var(--relationship);
+
+            /* 陰影系統 */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f7fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: var(--neutral-50);
             min-height: 100vh;
-            color: #2d3748;
+            color: var(--neutral-900);
             line-height: 1.6;
         }
 
@@ -23,10 +57,11 @@
         .navbar {
             background: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 1px solid var(--neutral-200);
         }
 
         .nav-container {
@@ -38,12 +73,19 @@
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--neutral-900);
             cursor: pointer;
+            text-decoration: none;
+        }
+
+        .logo::before {
+            content: "🎯";
+            font-size: 1.5rem;
         }
 
         .nav-menu {
@@ -53,18 +95,18 @@
         }
 
         .nav-link {
-            color: #4a5568;
+            color: var(--neutral-600);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
         }
 
         .nav-link:hover {
-            color: #667eea;
+            color: var(--strategic);
         }
 
         .nav-link.active {
-            color: #667eea;
+            color: var(--strategic);
         }
 
         /* 主容器 */
@@ -80,10 +122,11 @@
         /* 側邊欄 */
         .sidebar {
             background: white;
-            border-radius: 16px;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
             padding: 2rem;
             height: fit-content;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
             position: sticky;
             top: 90px;
         }
@@ -91,33 +134,33 @@
         .profile-header {
             text-align: center;
             padding-bottom: 2rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--neutral-200);
         }
 
         .avatar {
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--strategic);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1rem;
             font-size: 2.5rem;
             color: white;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .user-name {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #2d3748;
+            color: var(--neutral-900);
             margin-bottom: 0.25rem;
         }
 
         .user-email {
             font-size: 0.875rem;
-            color: #718096;
+            color: var(--neutral-500);
         }
 
         .membership-badge {
@@ -141,21 +184,21 @@
             align-items: center;
             padding: 0.75rem 1rem;
             margin-bottom: 0.5rem;
-            border-radius: 10px;
-            color: #4a5568;
+            border-radius: 0.5rem;
+            color: var(--neutral-600);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
         }
 
         .side-nav-item:hover {
-            background: #f7fafc;
-            color: #667eea;
+            background: var(--neutral-50);
+            color: var(--strategic);
         }
 
         .side-nav-item.active {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            color: #667eea;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--strategic);
             font-weight: 600;
         }
 
@@ -180,9 +223,10 @@
 
         .stat-card {
             background: white;
-            border-radius: 16px;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
             padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -231,9 +275,10 @@
         /* 評測歷史 */
         .section-card {
             background: white;
-            border-radius: 16px;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
             padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
         }
 
         .section-header {

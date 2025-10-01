@@ -3,39 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>你的天賦優勢報告 - Gallup Strengths</title>
+    <title>優勢評測結果 - 優勢評測系統 v4.1</title>
     <style>
-        :root {
-            --primary-blue: #2563eb;
-            --secondary-blue: #3b82f6;
-            --primary-green: #10b981;
-            --gold: #f59e0b;
-            --silver: #6b7280;
-            --bronze: #92400e;
-            --danger: #ef4444;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --surface: #f9fafb;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
-            min-height: 100vh;
+        :root {
+            /* 領域色彩（主要） */
+            --executing: #7C3AED;        /* 執行力 - 紫色 */
+            --influencing: #F59E0B;      /* 影響力 - 橙色 */
+            --relationship: #0EA5E9;     /* 關係建立 - 藍色 */
+            --strategic: #10B981;        /* 戰略思維 - 綠色 */
+
+            /* 中性色調 */
+            --neutral-50: #F9FAFB;
+            --neutral-100: #F3F4F6;
+            --neutral-200: #E5E7EB;
+            --neutral-500: #6B7280;
+            --neutral-600: #4B5563;
+            --neutral-700: #374151;
+            --neutral-900: #111827;
+
+            /* 功能色彩 */
+            --emerald-500: #10B981;
+            --emerald-600: #059669;
+            --emerald-50: #ECFDF5;
+            --emerald-100: #D1FAE5;
+            --sky-50: #F0F9FF;
+            --red-500: #EF4444;
+            --amber-500: #F59E0B;
+
+            /* 語義色彩 */
+            --success: var(--emerald-500);
+            --warning: var(--amber-500);
+            --error: var(--red-500);
+            --info: var(--relationship);
+
+            /* 陰影系統 */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
-        /* Loading State */
-        .loading-container {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: var(--neutral-50);
+            min-height: 100vh;
+            color: var(--neutral-900);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .header-container {
+            max-width: 72rem;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.75rem;
+            background: var(--strategic);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--neutral-900);
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border-radius: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--neutral-700);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--neutral-50);
+            border-color: var(--neutral-300);
+        }
+
+        .btn-primary {
+            background: var(--neutral-900);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--neutral-700);
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 72rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Session strip */
+        .session-strip {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .session-info {
+            font-size: 0.875rem;
+        }
+
+        .session-id {
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .confidence-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .confidence-bar {
+            width: 8rem;
+            height: 0.5rem;
+            background: var(--neutral-100);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--emerald-500);
+            border-radius: 9999px;
+            transition: width 0.5s ease;
+        }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .kpi-title {
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .kpi-desc {
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+            margin-top: 0.25rem;
+        }
+
+        /* Narrative section */
+        .narrative-section {
+            background: linear-gradient(to bottom right, var(--emerald-50), var(--sky-50));
+            border: 1px solid var(--emerald-100);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .narrative-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .narrative-text {
+            color: var(--neutral-700);
+            line-height: 1.7;
+        }
+
+        /* DNA Helix */
+        .helix-section {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .helix-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .helix-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .domain-legend {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--neutral-600);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .legend-color {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 0.125rem;
+        }
+
+        /* Tier Lists */
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tier-card {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .tier-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .tier-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tier-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .tier-item:not(:last-child) {
+            border-bottom: 1px solid var(--neutral-100);
+        }
+
+        .tier-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dimension-dot {
+            width: 0.625rem;
+            height: 0.625rem;
+            border-radius: 50%;
+        }
+
+        .dimension-name {
+            font-size: 0.875rem;
+        }
+
+        .domain-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.625rem;
+            font-weight: 500;
+        }
+
+        .badge-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .percentile-value {
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+        }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .action-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .prototype-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .prototype-hint {
+            font-size: 0.875rem;
+            color: var(--neutral-600);
+            margin-bottom: 0.75rem;
+        }
+
+        .prototype-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--neutral-700);
+        }
+
+        .prototype-disclaimer {
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+            margin-top: 0.75rem;
+        }
+
+        .action-list {
+            list-style: decimal;
+            padding-left: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-list li {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            background: var(--emerald-600);
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .btn-action:hover {
+            background: var(--emerald-500);
+        }
+
+        /* Method section */
+        .method-section {
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .method-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--neutral-700);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2.5rem 0;
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+        }
+
+        /* Loading state */
+        .loading {
             display: none;
             position: fixed;
             top: 0;
@@ -49,707 +484,543 @@
             flex-direction: column;
         }
 
-        .loading-container.active {
+        .loading.active {
             display: flex;
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #e5e7eb;
-            border-top-color: var(--primary-blue);
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid var(--neutral-100);
+            border-top-color: var(--strategic);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        /* Header */
-        .header {
-            background: var(--bg-gradient);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-        }
+            .session-strip {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-        .header p {
-            font-size: 1.125rem;
-            opacity: 0.9;
-        }
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+            .tier-grid {
+                grid-template-columns: 1fr;
+            }
 
-        /* DNA Visualization */
-        .dna-visualization {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-xl);
-        }
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .dna-title {
-            text-align: center;
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 40px;
-        }
+            .prototype-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .dna-container {
-            position: relative;
-            height: 600px;
-            margin: 0 auto;
-            max-width: 800px;
-        }
-
-        .dna-helix {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .dna-strand {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .dna-node {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .dna-node:hover {
-            transform: scale(1.2);
-            z-index: 20;
-        }
-
-        .dna-node.dominant {
-            background: linear-gradient(135deg, #f59e0b, #f97316);
-            box-shadow: 0 8px 16px rgba(245, 158, 11, 0.4);
-            width: 80px;
-            height: 80px;
-            font-size: 16px;
-        }
-
-        .dna-node.supporting {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .dna-node.lesser {
-            background: linear-gradient(135deg, #9ca3af, #6b7280);
-            box-shadow: 0 4px 8px rgba(107, 114, 128, 0.2);
-            width: 40px;
-            height: 40px;
-            font-size: 12px;
-        }
-
-        .dna-connection {
-            position: absolute;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                rgba(37, 99, 235, 0.2) 50%,
-                transparent 100%);
-            height: 2px;
-            transform-origin: left center;
-        }
-
-        .dna-tooltip {
-            position: absolute;
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: var(--shadow-xl);
-            display: none;
-            z-index: 30;
-            min-width: 250px;
-        }
-
-        .dna-tooltip.active {
-            display: block;
-        }
-
-        .tooltip-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .tooltip-score {
-            color: var(--primary-blue);
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .tooltip-desc {
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* Strength Categories */
-        .strength-categories {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-top: 40px;
-        }
-
-        .category-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .category-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .category-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .category-icon.dominant {
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .category-icon.supporting {
-            background: rgba(37, 99, 235, 0.1);
-        }
-
-        .category-icon.lesser {
-            background: rgba(107, 114, 128, 0.1);
-        }
-
-        .category-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .strength-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .strength-item:last-child {
-            border-bottom: none;
-        }
-
-        .strength-name {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .strength-score-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .score-bar {
-            width: 100px;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .score-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 1s ease;
-        }
-
-        .score-fill.dominant {
-            background: linear-gradient(90deg, #f59e0b, #f97316);
-        }
-
-        .score-fill.supporting {
-            background: linear-gradient(90deg, #3b82f6, #2563eb);
-        }
-
-        .score-fill.lesser {
-            background: linear-gradient(90deg, #9ca3af, #6b7280);
-        }
-
-        .score-value {
-            font-weight: 600;
-            color: var(--text-primary);
-            min-width: 30px;
-            text-align: right;
-        }
-
-        /* Action Buttons */
-        .action-section {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-            margin-left: 16px;
-        }
-
-        .btn-secondary:hover {
-            background: var(--surface);
+            .method-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading State -->
-    <div class="loading-container active" id="loadingContainer">
-        <div class="loading-spinner"></div>
-        <p style="margin-top: 20px; color: var(--text-secondary);">正在生成您的天賦報告...</p>
+    <!-- Loading state -->
+    <div class="loading" id="loadingState">
+        <div class="spinner"></div>
+        <p>正在分析您的評測結果...</p>
     </div>
 
     <!-- Header -->
-    <div class="header">
-        <h1>🧬 你的天賦DNA圖譜</h1>
-        <p>基於科學評估的個人優勢分析報告</p>
-    </div>
-
-    <div class="container">
-        <!-- DNA Visualization -->
-        <div class="dna-visualization">
-            <h2 class="dna-title">天賦DNA螺旋圖</h2>
-            <div class="dna-container" id="dnaContainer">
-                <div class="dna-helix" id="dnaHelix"></div>
+    <header class="header">
+        <div class="header-container">
+            <div class="brand-info">
+                <div class="brand-icon">🎯</div>
+                <div class="brand-text">
+                    <div class="brand-title">優勢評測系統 v4.1</div>
+                    <div class="brand-subtitle">Thurstonian IRT • 常模化百分位</div>
+                </div>
             </div>
-            <div class="dna-tooltip" id="dnaTooltip">
-                <div class="tooltip-title"></div>
-                <div class="tooltip-score"></div>
-                <div class="tooltip-desc"></div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="shareReport()">分享</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">下載報告 PDF</button>
             </div>
         </div>
+    </header>
 
-        <!-- Strength Categories -->
-        <div class="strength-categories" id="strengthCategories">
-            <!-- Will be populated dynamically -->
+    <!-- Main content -->
+    <main class="main-container">
+        <!-- Session strip -->
+        <div class="session-strip">
+            <div class="session-info">
+                Session：<span class="session-id" id="sessionId">載入中...</span>
+            </div>
+            <div class="session-info" id="testTime">測試時間：載入中...</div>
+            <div class="confidence-container">
+                <span>置信度</span>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+                <span class="confidence-text" id="confidenceText">0%</span>
+            </div>
         </div>
 
-        <!-- Action Section -->
-        <div class="action-section">
-            <button class="btn btn-primary" onclick="downloadReport()">
-                下載完整PDF報告
-            </button>
-            <button class="btn btn-secondary" onclick="shareResults()">
-                分享結果
-            </button>
-        </div>
-    </div>
+        <!-- KPI Summary -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">主導才幹</div>
+                <div class="kpi-value" id="dominantCount">0</div>
+                <div class="kpi-desc">>75 百分位</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">支援才幹</div>
+                <div class="kpi-value" id="supportingCount">0</div>
+                <div class="kpi-desc">25–75 百分位</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">待管理領域</div>
+                <div class="kpi-value" id="lesserCount">0</div>
+                <div class="kpi-desc"><25 百分位</div>
+            </div>
+        </section>
 
-    <script>
-        // Sample data structure (will be replaced with API data)
-        const strengthData = {
-            T1: { name: "結構化執行", score: 75, desc: "擅長將複雜目標拆解為清晰可執行的計畫" },
-            T2: { name: "品質與完備", score: 82, desc: "注重細節、追求精確與完美" },
-            T3: { name: "探索與創新", score: 91, desc: "充滿好奇心，樂於嘗試新方法" },
-            T4: { name: "分析與洞察", score: 88, desc: "深入研究數據，發現核心問題" },
-            T5: { name: "影響與倡議", score: 79, desc: "善於說服他人，激勵團隊前進" },
-            T6: { name: "協作與共好", score: 70, desc: "珍視團隊合作，創造和諧氛圍" },
-            T7: { name: "客戶導向", score: 65, desc: "理解並滿足客戶需求" },
-            T8: { name: "學習與成長", score: 95, desc: "對新知識充滿熱情，持續學習" },
-            T9: { name: "紀律與信任", score: 72, desc: "做事有條不紊，贏得他人信賴" },
-            T10: { name: "壓力調節", score: 45, desc: "在壓力下保持冷靜客觀" },
-            T11: { name: "衝突整合", score: 58, desc: "尋找共識與最佳解決方案" },
-            T12: { name: "責任與當責", score: 86, desc: "對承諾言出必行，負起全責" }
-        };
+        <!-- Narrative -->
+        <section class="narrative-section">
+            <div class="narrative-title">個人化摘要</div>
+            <p class="narrative-text" id="narrativeText">正在生成您的個人化摘要...</p>
+        </section>
 
-        // Categorize strengths
-        function categorizeStrengths(data) {
-            const sorted = Object.entries(data)
-                .sort((a, b) => b[1].score - a[1].score)
-                .map((item, index) => ({
-                    id: item[0],
-                    ...item[1],
-                    rank: index + 1
-                }));
-
-            const dominant = sorted.filter(s => s.score >= 75);
-            const supporting = sorted.filter(s => s.score >= 25 && s.score < 75);
-            const lesser = sorted.filter(s => s.score < 25);
-
-            return { dominant, supporting, lesser };
-        }
-
-        // Create DNA Helix Visualization
-        function createDNAHelix() {
-            const container = document.getElementById('dnaHelix');
-            const categorized = categorizeStrengths(strengthData);
-            const allStrengths = [
-                ...categorized.dominant,
-                ...categorized.supporting,
-                ...categorized.lesser
-            ];
-
-            // Create double helix pattern
-            allStrengths.forEach((strength, index) => {
-                const angle = (index / allStrengths.length) * Math.PI * 4; // 2 full rotations
-                const y = (index / allStrengths.length) * 550;
-
-                // Left strand
-                const x1 = 250 + Math.sin(angle) * 150;
-                // Right strand
-                const x2 = 250 - Math.sin(angle) * 150;
-
-                // Determine category
-                let category = 'lesser';
-                if (strength.score >= 75) category = 'dominant';
-                else if (strength.score >= 25) category = 'supporting';
-
-                // Create nodes
-                createNode(container, strength, x1, y, category, 'left');
-                if (index % 2 === 0) { // Only create right nodes for every other item
-                    const nextStrength = allStrengths[(index + 1) % allStrengths.length];
-                    if (nextStrength) {
-                        createNode(container, nextStrength, x2, y + 30, category, 'right');
-
-                        // Create connection
-                        createConnection(container, x1, y + 30, x2, y + 30);
-                    }
-                }
-            });
-        }
-
-        function createNode(container, strength, x, y, category, side) {
-            const node = document.createElement('div');
-            node.className = `dna-node ${category}`;
-            node.style.left = `${x}px`;
-            node.style.top = `${y}px`;
-            node.textContent = strength.id;
-
-            node.addEventListener('mouseenter', (e) => {
-                showTooltip(e, strength);
-            });
-
-            node.addEventListener('mouseleave', () => {
-                hideTooltip();
-            });
-
-            container.appendChild(node);
-        }
-
-        function createConnection(container, x1, y1, x2, y2) {
-            const connection = document.createElement('div');
-            connection.className = 'dna-connection';
-
-            const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-            const angle = Math.atan2(y2 - y1, x2 - x1);
-
-            connection.style.width = `${length}px`;
-            connection.style.left = `${x1}px`;
-            connection.style.top = `${y1}px`;
-            connection.style.transform = `rotate(${angle}rad)`;
-
-            container.appendChild(connection);
-        }
-
-        function showTooltip(event, strength) {
-            const tooltip = document.getElementById('dnaTooltip');
-            const rect = event.target.getBoundingClientRect();
-
-            tooltip.querySelector('.tooltip-title').textContent = strength.name;
-            tooltip.querySelector('.tooltip-score').textContent = strength.score;
-            tooltip.querySelector('.tooltip-desc').textContent = strength.desc;
-
-            tooltip.style.left = `${rect.left + rect.width / 2 - 125}px`;
-            tooltip.style.top = `${rect.bottom + 10}px`;
-            tooltip.classList.add('active');
-        }
-
-        function hideTooltip() {
-            document.getElementById('dnaTooltip').classList.remove('active');
-        }
-
-        // Populate strength categories
-        function populateCategories() {
-            const container = document.getElementById('strengthCategories');
-            const categorized = categorizeStrengths(strengthData);
-
-            // Dominant Strengths
-            if (categorized.dominant.length > 0) {
-                container.appendChild(createCategoryCard(
-                    '主導才幹',
-                    '🌟',
-                    'dominant',
-                    categorized.dominant
-                ));
-            }
-
-            // Supporting Strengths
-            if (categorized.supporting.length > 0) {
-                container.appendChild(createCategoryCard(
-                    '輔助才幹',
-                    '💪',
-                    'supporting',
-                    categorized.supporting
-                ));
-            }
-
-            // Lesser Strengths
-            if (categorized.lesser.length > 0) {
-                container.appendChild(createCategoryCard(
-                    '較弱才幹',
-                    '📈',
-                    'lesser',
-                    categorized.lesser
-                ));
-            }
-        }
-
-        function createCategoryCard(title, icon, category, strengths) {
-            const card = document.createElement('div');
-            card.className = 'category-card';
-
-            card.innerHTML = `
-                <div class="category-header">
-                    <div class="category-icon ${category}">${icon}</div>
-                    <div class="category-title">${title}</div>
-                </div>
-                <div class="strength-list">
-                    ${strengths.map(s => `
-                        <div class="strength-item">
-                            <span class="strength-name">${s.name}</span>
-                            <div class="strength-score-bar">
-                                <div class="score-bar">
-                                    <div class="score-fill ${category}" style="width: ${s.score}%"></div>
-                                </div>
-                                <span class="score-value">${s.score}</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            return card;
-        }
-
-        // Load results from API
-        async function loadResults() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionId = urlParams.get('session');
-
-            if (sessionId) {
-                try {
-                    // Try both possible endpoints
-                    let response = await fetch(`/api/v1/scoring/results/${sessionId}`);
-
-                    if (!response.ok) {
-                        // Try alternative endpoint
-                        response = await fetch(`http://localhost:8004/api/v1/scoring/results/${sessionId}`);
-                    }
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('Loaded results:', data);
-
-                        // Update strengthData with actual API data
-                        if (data.strengths_profile) {
-                            try {
-                                const profileData = JSON.parse(data.strengths_profile);
-                                updateStrengthDataFromProfile(profileData);
-                            } catch (e) {
-                                console.warn('Could not parse strengths_profile:', e);
-                            }
-                        }
-
-                        // Update from standardized scores if available
-                        if (data.standardized_scores) {
-                            try {
-                                const scoresData = JSON.parse(data.standardized_scores);
-                                updateStrengthDataFromScores(scoresData);
-                            } catch (e) {
-                                console.warn('Could not parse standardized_scores:', e);
-                            }
-                        }
-
-                        // Add session info to the page
-                        addSessionInfo(data, sessionId);
-                    } else {
-                        console.warn(`Session ${sessionId} not found, using demo data`);
-                        addDemoWarning(sessionId);
-                    }
-                } catch (error) {
-                    console.error('Error loading results:', error);
-                    addErrorMessage(sessionId);
-                }
-            } else {
-                console.log('No session ID provided, showing demo data');
-                addDemoInfo();
-            }
-
-            // Hide loading and show results
-            document.getElementById('loadingContainer').classList.remove('active');
-
-            // Initialize visualizations
-            createDNAHelix();
-            populateCategories();
-        }
-
-        function updateStrengthDataFromProfile(profileData) {
-            // Update strength data based on profile structure
-            if (Array.isArray(profileData)) {
-                profileData.forEach((item, index) => {
-                    const key = `T${index + 1}`;
-                    if (strengthData[key] && item.score !== undefined) {
-                        strengthData[key].score = Math.round(item.score);
-                        if (item.name) strengthData[key].name = item.name;
-                        if (item.description) strengthData[key].desc = item.description;
-                    }
-                });
-            }
-        }
-
-        function updateStrengthDataFromScores(scoresData) {
-            // Map standardized scores to strength data
-            Object.entries(scoresData).forEach(([key, score]) => {
-                if (strengthData[key]) {
-                    strengthData[key].score = Math.round(score);
-                }
-            });
-        }
-
-        function addSessionInfo(data, sessionId) {
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'session-metadata';
-            infoDiv.innerHTML = `
-                <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 12px 0; color: #1f2937;">📋 測評資訊</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px; color: #6b7280;">
-                        <div><strong>Session ID:</strong> ${sessionId}</div>
-                        <div><strong>測評時間:</strong> ${data.created_at ? new Date(data.created_at).toLocaleString('zh-TW') : '未知'}</div>
-                        <div><strong>信心等級:</strong> ${data.confidence_level ?
-                            (data.confidence_level === 'high' ? '高' : data.confidence_level === 'medium' ? '中' : '低') : '未知'}</div>
-                        <div><strong>評分版本:</strong> ${data.scoring_version || 'v1.0'}</div>
+        <!-- DNA Helix -->
+        <section class="helix-section">
+            <div class="helix-header">
+                <div class="helix-title">Strength DNA 雙軌色帶（1→12 強度排序）</div>
+                <div class="domain-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--executing)"></div>
+                        <span>執行力</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--influencing)"></div>
+                        <span>影響力</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--relationship)"></div>
+                        <span>關係建立</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--strategic)"></div>
+                        <span>戰略思維</span>
                     </div>
                 </div>
-            `;
-            document.querySelector('.container').insertBefore(infoDiv, document.querySelector('.dna-visualization'));
-        }
+            </div>
+            <svg id="helixSVG" viewBox="0 0 960 180" style="width: 100%; height: auto;">
+                <!-- Will be populated by JavaScript -->
+            </svg>
+        </section>
 
-        function addDemoWarning(sessionId) {
-            const warningDiv = document.createElement('div');
-            warningDiv.innerHTML = `
-                <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #92400e;">
-                        ⚠️ 找不到 Session ID: <code>${sessionId}</code> 的測評結果，正在顯示示範資料。
-                        <a href="assessment.html" style="color: #2563eb; text-decoration: underline;">點此重新測評</a>
-                    </p>
+        <!-- Tier Lists -->
+        <section class="tier-grid">
+            <div class="tier-card">
+                <div class="tier-title">主導才幹 (Dominant)</div>
+                <ul class="tier-list" id="dominantList">
+                    <!-- Will be populated by JavaScript -->
+                </ul>
+            </div>
+            <div class="tier-card">
+                <div class="tier-title">支援才幹 (Supporting)</div>
+                <ul class="tier-list" id="supportingList">
+                    <!-- Will be populated by JavaScript -->
+                </ul>
+            </div>
+            <div class="tier-card">
+                <div class="tier-title">較弱才幹 (Lesser)</div>
+                <ul class="tier-list" id="lesserList">
+                    <!-- Will be populated by JavaScript -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Action Grid -->
+        <section class="action-grid">
+            <div class="action-card">
+                <div class="action-title">職業原型參考（Beta）</div>
+                <div class="prototype-name" id="prototypeName">系統建構者</div>
+                <div class="prototype-hint" id="prototypeHint">把複雜轉為結構，可對應 INTJ/ISTJ 原型</div>
+                <div class="prototype-grid">
+                    <div>建議職位：產品經理、資料科學家、解決方案架構師</div>
+                    <div>關鍵情境：策略規劃、跨部門協作、決策支援</div>
+                    <div>盲點提醒：避免過度分析，設定決策截止點</div>
+                    <div>搭檔建議：配對強『影響力/關係』夥伴共同推進</div>
                 </div>
-            `;
-            document.querySelector('.container').insertBefore(warningDiv, document.querySelector('.dna-visualization'));
-        }
-
-        function addDemoInfo() {
-            const infoDiv = document.createElement('div');
-            infoDiv.innerHTML = `
-                <div style="background: #dbeafe; border: 1px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #1e40af;">
-                        💡 這是示範報告。要查看您的個人化結果，請先
-                        <a href="assessment.html" style="color: #2563eb; text-decoration: underline;">完成測評</a>
-                    </p>
+                <div class="prototype-disclaimer">* 參考自你的主導才幹組合，作為探索線索，非定性標籤。</div>
+            </div>
+            <div class="action-card">
+                <div class="action-title">下一步行動</div>
+                <ol class="action-list">
+                    <li>下載 PDF 報告（可加入履歷或個人頁）。</li>
+                    <li>建立 30/60/90 天行動計畫：選擇 1–2 個主導才幹，綁定情境與產出。</li>
+                    <li>邀請 1 名互補夥伴（影響力/關係）共同驗證一個 PoC。</li>
+                </ol>
+                <div class="action-buttons">
+                    <button class="btn btn-action" onclick="generateActionPlan()">生成行動計畫</button>
+                    <button class="btn btn-secondary" onclick="shareWithManager()">與主管分享</button>
                 </div>
-            `;
-            document.querySelector('.container').insertBefore(infoDiv, document.querySelector('.dna-visualization'));
+            </div>
+        </section>
+
+        <!-- Method explanation -->
+        <section class="method-section">
+            <div class="method-title">方法論與解讀門檻</div>
+            <div class="method-grid">
+                <div>Thurstonian IRT：由強制選擇完整作答模式推估 12 維度潛在分數 θ。</div>
+                <div>常模百分位：與代表性樣本對比，支持跨人比較（Normative）。</div>
+                <div>分層規則：PR>75 主導；PR 25–75 支援；PR<25 較弱。</div>
+                <div>置信度：基於題項資訊量與收斂準則計算（可見上方指示條）。</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2025 Strengths Report UI v4.1 — Demo Wireframe
+    </footer>
+
+    <script>
+        // Domain metadata
+        const DOMAIN_META = {
+            executing: { zh: "執行力", en: "EXECUTING", color: "#7C3AED" },
+            influencing: { zh: "影響力", en: "INFLUENCING", color: "#F59E0B" },
+            relationship: { zh: "關係建立", en: "RELATIONSHIP", color: "#0EA5E9" },
+            strategic: { zh: "戰略思維", en: "STRATEGIC", color: "#10B981" }
+        };
+
+        // Demo data (will be replaced by API call)
+        const demoData = {
+            sessionId: "S-2025-10-01-XYZ",
+            testedAt: "2025-10-01 10:32",
+            confidence: 0.93,
+            topNarrative: "你的主導天賦聚焦於『戰略思維』與『執行力』，擅長將複雜資訊轉譯為可落地的路線圖。",
+            dimensions: [
+                { id: "T1", name: "結構化執行", domain: "executing", percentile: 88 },
+                { id: "T2", name: "品質與完備", domain: "executing", percentile: 61 },
+                { id: "T3", name: "探索與創新", domain: "strategic", percentile: 72 },
+                { id: "T4", name: "分析與洞察", domain: "strategic", percentile: 91 },
+                { id: "T5", name: "影響與倡議", domain: "influencing", percentile: 69 },
+                { id: "T6", name: "協作與共好", domain: "relationship", percentile: 54 },
+                { id: "T7", name: "客戶導向", domain: "relationship", percentile: 47 },
+                { id: "T8", name: "學習與成長", domain: "strategic", percentile: 86 },
+                { id: "T9", name: "紀律與信任", domain: "executing", percentile: 78 },
+                { id: "T10", name: "壓力調節", domain: "relationship", percentile: 58 },
+                { id: "T11", name: "衝突整合", domain: "relationship", percentile: 34 },
+                { id: "T12", name: "責任與當責", domain: "executing", percentile: 22 }
+            ]
+        };
+
+        // Tier processing function
+        function processTiers(dimensions) {
+            const byTier = { dominant: [], supporting: [], lesser: [] };
+            const sorted = [...dimensions].sort((a, b) => b.percentile - a.percentile);
+
+            for (const d of sorted) {
+                if (d.percentile > 75) byTier.dominant.push(d);
+                else if (d.percentile < 25) byTier.lesser.push(d);
+                else byTier.supporting.push(d);
+            }
+
+            return { byTier, sorted };
         }
 
-        function addErrorMessage(sessionId) {
-            const errorDiv = document.createElement('div');
-            errorDiv.innerHTML = `
-                <div style="background: #fee2e2; border: 1px solid #ef4444; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #991b1b;">
-                        ❌ 載入 Session ${sessionId} 時發生錯誤。正在顯示示範資料。
-                        <a href="assessment.html" style="color: #2563eb; text-decoration: underline;">重新測評</a>
-                    </p>
-                </div>
-            `;
-            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.dna-visualization'));
+        // Generate narrative based on top dimensions
+        function generateNarrative(byTier) {
+            const topDomains = byTier.dominant.map(d => d.domain);
+            const domainCounts = {};
+            topDomains.forEach(domain => {
+                domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+            });
+
+            const primaryDomain = Object.keys(domainCounts).reduce((a, b) =>
+                domainCounts[a] > domainCounts[b] ? a : b
+            );
+
+            const domainNarratives = {
+                strategic: "你的主導天賦聚焦於『戰略思維』領域，擅長分析複雜情況並制定有效策略。",
+                executing: "你的主導天賦集中在『執行力』領域，具備將想法轉化為具體成果的能力。",
+                influencing: "你的主導天賦體現在『影響力』領域，善於激勵他人並推動變革。",
+                relationship: "你的主導天賦展現在『關係建立』領域，擅長建立連結與協作。"
+            };
+
+            return domainNarratives[primaryDomain] || demoData.topNarrative;
         }
 
-        function downloadReport() {
-            alert('PDF報告生成功能開發中...');
-        }
+        // Generate prototype based on dominant talents
+        function generatePrototype(byTier) {
+            const top4 = byTier.dominant.slice(0, 4);
+            const hasStrategic = top4.some(d => d.domain === "strategic");
+            const hasExecuting = top4.some(d => d.domain === "executing");
+            const hasInfluencing = top4.some(d => d.domain === "influencing");
+            const hasRelationship = top4.some(d => d.domain === "relationship");
 
-        function shareResults() {
-            if (navigator.share) {
-                navigator.share({
-                    title: '我的天賦優勢報告',
-                    text: '來看看我的Gallup優勢測評結果！',
-                    url: window.location.href
-                });
+            if (hasStrategic && hasExecuting) {
+                return {
+                    name: "系統建構者",
+                    hint: "把複雜轉為結構，可對應 INTJ/ISTJ 原型"
+                };
+            } else if (hasInfluencing && hasRelationship) {
+                return {
+                    name: "關係拓展者",
+                    hint: "擅長連結與倡議，可對應 ENFP/ENFJ 原型"
+                };
+            } else if (hasStrategic && hasInfluencing) {
+                return {
+                    name: "策略推動者",
+                    hint: "結合遠見與執行，可對應 ENTJ/ENTP 原型"
+                };
             } else {
-                alert('分享功能開發中...');
+                return {
+                    name: "均衡整合者",
+                    hint: "跨域協同，面向多職能場景"
+                };
             }
         }
 
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(loadResults, 1000); // Add slight delay for effect
-        });
+        // Create helix visualization
+        function createHelixVisualization(dimensions) {
+            const svg = document.getElementById('helixSVG');
+            const width = 960;
+            const height = 180;
+            const padding = 24;
+            const laneY1 = 60;
+            const laneY2 = 120;
+            const len = Math.max(2, dimensions.length);
+            const step = (width - padding * 2) / (len - 1);
+
+            // Clear existing content
+            svg.innerHTML = '';
+
+            // Create lanes
+            const lane1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            lane1.setAttribute('d', `M ${padding} ${laneY1} L ${width - padding} ${laneY1}`);
+            lane1.setAttribute('stroke', '#E5E7EB');
+            lane1.setAttribute('stroke-width', '2');
+            svg.appendChild(lane1);
+
+            const lane2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            lane2.setAttribute('d', `M ${padding} ${laneY2} L ${width - padding} ${laneY2}`);
+            lane2.setAttribute('stroke', '#E5E7EB');
+            lane2.setAttribute('stroke-width', '2');
+            svg.appendChild(lane2);
+
+            // Create nodes and connections
+            dimensions.forEach((d, i) => {
+                const x = padding + i * step;
+                const y = i % 2 === 0 ? laneY1 : laneY2;
+                const color = DOMAIN_META[d.domain].color;
+                const radius = 7 + (d.percentile / 100) * 6;
+
+                // Connection line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', y === laneY1 ? laneY2 : laneY1);
+                line.setAttribute('stroke', color);
+                line.setAttribute('stroke-opacity', '0.25');
+                svg.appendChild(line);
+
+                // Node circle
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', radius);
+                circle.setAttribute('fill', color);
+                circle.setAttribute('fill-opacity', '0.9');
+
+                // Add hover title
+                const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                title.textContent = `${d.name} (${d.percentile}%)`;
+                circle.appendChild(title);
+
+                svg.appendChild(circle);
+            });
+        }
+
+        // Populate tier list
+        function populateTierList(listId, items) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+
+            items.forEach(d => {
+                const li = document.createElement('li');
+                li.className = 'tier-item';
+
+                li.innerHTML = `
+                    <div class="tier-content">
+                        <div class="dimension-dot" style="background: ${DOMAIN_META[d.domain].color}"></div>
+                        <span class="dimension-name">${d.name}</span>
+                        <div class="domain-badge" style="background: ${DOMAIN_META[d.domain].color}1A; color: ${DOMAIN_META[d.domain].color}">
+                            <div class="badge-dot" style="background: ${DOMAIN_META[d.domain].color}"></div>
+                            ${DOMAIN_META[d.domain].zh}
+                        </div>
+                    </div>
+                    <span class="percentile-value">PR ${d.percentile}</span>
+                `;
+
+                list.appendChild(li);
+            });
+        }
+
+        // Load and display results
+        async function loadResults() {
+            try {
+                document.getElementById('loadingState').classList.add('active');
+
+                // Try to load from API first
+                const sessionId = new URLSearchParams(window.location.search).get('session') ||
+                                localStorage.getItem('currentSessionId');
+
+                let data = demoData; // fallback to demo data
+
+                if (sessionId) {
+                    try {
+                        // Try to fetch real data from API
+                        const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
+                        const response = await fetch(`${apiBase}/api/v4/scoring/results/${sessionId}`);
+
+                        if (response.ok) {
+                            const apiData = await response.json();
+                            // Transform API data to match our format
+                            data = transformApiData(apiData, sessionId);
+                        }
+                    } catch (error) {
+                        console.warn('API call failed, using demo data:', error);
+                    }
+                }
+
+                // Process the data
+                const { byTier, sorted } = processTiers(data.dimensions);
+                const narrative = data.topNarrative || generateNarrative(byTier);
+                const prototype = generatePrototype(byTier);
+
+                // Update UI
+                document.getElementById('sessionId').textContent = data.sessionId;
+                document.getElementById('testTime').textContent = `測試時間：${data.testedAt}`;
+                document.getElementById('confidenceFill').style.width = `${data.confidence * 100}%`;
+                document.getElementById('confidenceText').textContent = `${Math.round(data.confidence * 100)}%`;
+
+                document.getElementById('dominantCount').textContent = byTier.dominant.length;
+                document.getElementById('supportingCount').textContent = byTier.supporting.length;
+                document.getElementById('lesserCount').textContent = byTier.lesser.length;
+
+                document.getElementById('narrativeText').textContent = narrative;
+
+                document.getElementById('prototypeName').textContent = prototype.name;
+                document.getElementById('prototypeHint').textContent = prototype.hint;
+
+                // Create visualizations
+                createHelixVisualization(sorted);
+                populateTierList('dominantList', byTier.dominant);
+                populateTierList('supportingList', byTier.supporting);
+                populateTierList('lesserList', byTier.lesser);
+
+            } catch (error) {
+                console.error('Error loading results:', error);
+                alert('載入結果時發生錯誤，請重新整理頁面');
+            } finally {
+                document.getElementById('loadingState').classList.remove('active');
+            }
+        }
+
+        // Transform API data to our format
+        function transformApiData(apiData, sessionId) {
+            return {
+                sessionId: sessionId,
+                testedAt: new Date().toLocaleString('zh-TW'),
+                confidence: apiData.confidence || 0.9,
+                topNarrative: apiData.narrative || null,
+                dimensions: apiData.scores ? Object.entries(apiData.scores).map(([id, score]) => ({
+                    id: id,
+                    name: getDimensionName(id),
+                    domain: getDimensionDomain(id),
+                    percentile: Math.round(score.percentile || score * 100)
+                })) : demoData.dimensions
+            };
+        }
+
+        // Helper functions for API data transformation
+        function getDimensionName(id) {
+            const names = {
+                'T1': '結構化執行', 'T2': '品質與完備', 'T3': '探索與創新',
+                'T4': '分析與洞察', 'T5': '影響與倡議', 'T6': '協作與共好',
+                'T7': '客戶導向', 'T8': '學習與成長', 'T9': '紀律與信任',
+                'T10': '壓力調節', 'T11': '衝突整合', 'T12': '責任與當責'
+            };
+            return names[id] || id;
+        }
+
+        function getDimensionDomain(id) {
+            const domains = {
+                'T1': 'executing', 'T2': 'executing', 'T9': 'executing', 'T12': 'executing',
+                'T3': 'strategic', 'T4': 'strategic', 'T8': 'strategic',
+                'T5': 'influencing',
+                'T6': 'relationship', 'T7': 'relationship', 'T10': 'relationship', 'T11': 'relationship'
+            };
+            return domains[id] || 'strategic';
+        }
+
+        // Button actions
+        function shareReport() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '我的優勢評測結果',
+                    text: '我剛完成了優勢天賦評測，發現了我的獨特優勢組合！',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('報告連結已複製到剪貼板！');
+            }
+        }
+
+        function downloadPDF() {
+            alert('PDF 下載功能開發中...');
+        }
+
+        function generateActionPlan() {
+            window.location.href = 'action-plan.html?session=' + (new URLSearchParams(window.location.search).get('session') || 'demo');
+        }
+
+        function shareWithManager() {
+            const text = '我剛完成了優勢天賦評測，以下是我的報告連結：' + window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: '優勢評測結果分享',
+                    text: text
+                });
+            } else {
+                navigator.clipboard.writeText(text);
+                alert('分享內容已複製到剪貼板！');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadResults);
+
+        // Save checkpoint
+        localStorage.setItem('lastCheckpoint', 'results_viewed');
     </script>
 </body>
 </html>
