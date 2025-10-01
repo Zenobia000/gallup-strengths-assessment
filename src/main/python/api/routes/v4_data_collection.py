@@ -117,12 +117,15 @@ async def start_test_session(request: TestSessionRequest):
             blocks_data=blocks_data
         )
 
+        # Return full blocks data for v4, not just IDs
+        return_blocks = blocks_response.blocks if request.test_version == "v4" else blocks_data
+
         return {
             "status": "success",
             "session_id": session_id,
             "test_version": request.test_version,
-            "blocks": blocks_data if request.test_version == "v4" else blocks_response.blocks,
-            "total_blocks": len(blocks_data)
+            "blocks": return_blocks,
+            "total_blocks": len(return_blocks)
         }
 
     except Exception as e:

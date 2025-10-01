@@ -3,140 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>v4.0 小規模預測試 - Thurstonian IRT 系統</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-        }
+    <title>優勢天賦評測 V4.0 - 智能天賦識別引擎™</title>
+    <meta name="description" content="基於Thurstonian IRT模型的科學評測，5分鐘發現你的獨特優勢">
 
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-blue: #2563EB;
+            --trust-navy: #1E3A8A;
+            --growth-green: #10B981;
+            --energy-orange: #F59E0B;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --background: #FFFFFF;
+            --surface: #F9FAFB;
+            --border: #E5E7EB;
+            --most-like: #059669;
+            --least-like: #DC2626;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #EBF5FF 0%, #F3F4F6 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
             line-height: 1.6;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+        /* Progress Header */
+        .progress-header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header {
+        .progress-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            background: var(--surface);
+            height: 8px;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--growth-green) 100%);
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .progress-percentage {
+            position: absolute;
+            right: 16px;
+            top: -28px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        /* Main Container */
+        .assessment-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
             text-align: center;
-            margin-bottom: 3rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
         }
 
-        .header p {
-            color: var(--text-muted);
+        .welcome-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
         }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+        .version-badge {
+            display: inline-block;
+            background: var(--energy-orange);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 24px;
         }
 
-        .section-title {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            color: var(--text);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
+        /* Registration Form */
+        .registration-form {
+            text-align: left;
+            margin: 32px 0;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 24px;
         }
 
-        label {
+        .form-label {
             display: block;
-            margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--text);
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
-        input[type="number"],
-        select {
+        .form-input, .form-select {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
         }
 
-        input[type="number"]:focus,
-        select:focus {
+        .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .radio-group {
             display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
+            gap: 24px;
         }
 
-        .radio-option {
+        .radio-item {
             display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-item input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-item label {
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 24px;
+        }
+
+        .question-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: var(--primary-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .question-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .question-instruction {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Statement Grid */
+        .statements-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .statement-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .statement-card:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .statement-letter {
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-blue);
+            flex-shrink: 0;
+        }
+
+        .statement-text {
+            flex: 1;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .statement-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-most {
+            background: var(--most-like);
+            color: white;
+        }
+
+        .badge-least {
+            background: var(--least-like);
+            color: white;
+        }
+
+        .statement-card.selected-most {
+            background: #ECFDF5;
+            border-color: var(--most-like);
+        }
+
+        .statement-card.selected-least {
+            background: #FEF2F2;
+            border-color: var(--least-like);
+        }
+
+        /* Selection Status */
+        .selection-status {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .radio-option input[type="radio"] {
-            margin-right: 0.5rem;
+        .selection-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .selection-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .selection-most {
+            color: var(--most-like);
+        }
+
+        .selection-least {
+            color: var(--least-like);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
         }
 
         .btn {
-            padding: 0.75rem 2rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            display: inline-block;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: var(--primary-blue);
             color: white;
         }
 
-        .btn-primary:hover {
-            background: #1d4ed8;
+        .btn-primary:hover:not(:disabled) {
+            background: var(--trust-navy);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-secondary {
-            background: var(--secondary);
-            color: white;
+            background: white;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
         }
 
-        .btn-secondary:hover {
-            background: #475569;
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--primary-blue);
+            color: white;
         }
 
         .btn:disabled {
@@ -144,313 +410,277 @@
             cursor: not-allowed;
         }
 
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        #testSection {
-            display: none;
-        }
-
-        .block-container {
-            background: #f1f5f9;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .statements {
-            margin: 1rem 0;
-        }
-
-        .statement-item {
-            padding: 1rem;
+        /* Results Section */
+        .results-card {
             background: white;
-            border: 2px solid transparent;
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
         }
 
-        .statement-item:hover {
-            border-color: var(--border);
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
         }
 
-        .statement-item.most-like {
-            border-color: var(--success);
-            background: #f0fdf4;
+        .results-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 16px;
         }
 
-        .statement-item.least-like {
-            border-color: var(--warning);
-            background: #fef3c7;
-        }
-
-        .statement-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .statement-index {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--secondary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-weight: bold;
-        }
-
-        .dimension-tag {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: var(--bg);
-            color: var(--text-muted);
-            border-radius: 12px;
-            font-size: 0.875rem;
-            margin-left: auto;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            transition: width 0.5s;
+        .results-message {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 24px;
+            margin: 32px 0;
         }
 
         .stat-card {
-            background: var(--bg);
-            padding: 1rem;
-            border-radius: 4px;
-            text-align: center;
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
 
         .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
         }
 
         .stat-label {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
-        .alert {
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #86efac;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-        }
-
-        .timer {
-            text-align: center;
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin: 1rem 0;
-        }
-
-        #loadingOverlay {
+        /* Loading State */
+        .loading {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading.active {
+            display: block;
         }
 
         .spinner {
-            border: 3px solid var(--border);
-            border-top: 3px solid var(--primary);
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--surface);
+            border-top-color: var(--primary-blue);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
             animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        @media (max-width: 640px) {
-            .container {
-                padding: 0 0.5rem;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .question-card, .welcome-screen, .results-card {
+                padding: 24px;
             }
 
-            .card {
-                padding: 1rem;
+            .question-text {
+                font-size: 20px;
             }
 
-            .button-group {
+            .statement-card {
+                padding: 16px;
+            }
+
+            .statement-text {
+                font-size: 14px;
+            }
+
+            .action-buttons {
                 flex-direction: column;
+                gap: 16px;
             }
 
             .btn {
                 width: 100%;
             }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hide elements */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>v4.0 小規模預測試</h1>
-            <p>Thurstonian IRT 模型校準資料收集</p>
-        </div>
-
-        <!-- Registration Section -->
-        <div id="registrationSection" class="card">
-            <h2 class="section-title">參與者註冊</h2>
-
-            <div class="alert alert-info">
-                <strong>研究目的：</strong>收集優勢測驗v4.0版本的校準資料，以建立標準化常模。
+    <!-- Progress Header (Hidden Initially) -->
+    <div class="progress-header hidden" id="progressHeader">
+        <div class="progress-container">
+            <div class="progress-info">
+                <div class="progress-title">優勢天賦評測 V4.0</div>
+                <div class="progress-stats">
+                    <span id="blockCounter">區組 1 / 15</span>
+                    <span id="timer">00:00</span>
+                </div>
             </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">
+                    <span class="progress-percentage" id="progressPercentage">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <form id="registrationForm">
+    <!-- Main Assessment Container -->
+    <div class="assessment-container">
+        <!-- Welcome & Registration Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <span class="version-badge">V4.0 預測試版</span>
+            <h1 class="welcome-title">優勢天賦評測</h1>
+            <p class="welcome-subtitle">四選二強制選擇測驗 - 更精準的天賦識別</p>
+
+            <form class="registration-form" id="registrationForm">
                 <div class="form-group">
-                    <label for="age">年齡：</label>
-                    <input type="number" id="age" min="18" max="100" placeholder="請輸入年齡（18-100）">
+                    <label class="form-label">年齡</label>
+                    <input type="number" class="form-input" id="age" min="18" max="100" placeholder="請輸入年齡">
                 </div>
 
                 <div class="form-group">
-                    <label>性別：</label>
+                    <label class="form-label">性別</label>
                     <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="male" name="gender" value="male">
+                        <div class="radio-item">
+                            <input type="radio" name="gender" value="male" id="male">
                             <label for="male">男性</label>
                         </div>
-                        <div class="radio-option">
-                            <input type="radio" id="female" name="gender" value="female">
+                        <div class="radio-item">
+                            <input type="radio" name="gender" value="female" id="female">
                             <label for="female">女性</label>
                         </div>
-                        <div class="radio-option">
-                            <input type="radio" id="other" name="gender" value="other">
+                        <div class="radio-item">
+                            <input type="radio" name="gender" value="other" id="other">
                             <label for="other">其他</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="prefer_not" name="gender" value="prefer_not_to_say">
-                            <label for="prefer_not">不願透露</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="education">教育程度：</label>
-                    <select id="education">
+                    <label class="form-label">教育程度</label>
+                    <select class="form-select" id="education">
                         <option value="">請選擇</option>
                         <option value="high_school">高中職</option>
-                        <option value="bachelor">學士</option>
+                        <option value="bachelor">大學</option>
                         <option value="master">碩士</option>
-                        <option value="doctorate">博士</option>
-                        <option value="other">其他</option>
+                        <option value="phd">博士</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="testGroup">測試組別：</label>
-                    <select id="testGroup">
-                        <option value="pilot">預測試組</option>
-                        <option value="calibration">校準組</option>
-                        <option value="validation">驗證組</option>
+                    <label class="form-label">測試組別</label>
+                    <select class="form-select" id="testGroup" required>
+                        <option value="balanced">平衡組</option>
+                        <option value="adaptive">適性組</option>
+                        <option value="random">隨機組</option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">開始測試</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    開始測評 →
+                </button>
             </form>
         </div>
 
-        <!-- Test Section -->
-        <div id="testSection" class="card">
-            <h2 class="section-title">優勢測驗 v4.0</h2>
-
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar"></div>
+        <!-- Question Card (Hidden Initially) -->
+        <div class="question-card hidden" id="questionCard">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">區組 1</span>
+                <h2 class="question-text">
+                    請選擇最符合和最不符合你的選項
+                </h2>
+                <p class="question-instruction">
+                    從以下4個陳述中，選擇1個「最像我」和1個「最不像我」
+                </p>
             </div>
 
-            <div class="timer" id="timer">00:00</div>
-
-            <div id="blockContainer">
-                <!-- Blocks will be inserted here -->
-            </div>
-
-            <div class="button-group">
-                <button id="prevBtn" class="btn btn-secondary" onclick="previousBlock()">上一題</button>
-                <button id="nextBtn" class="btn btn-primary" onclick="nextBlock()">下一題</button>
+            <div class="statements-grid" id="statementsGrid">
+                <!-- Statements will be dynamically inserted here -->
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div id="resultsSection" class="card" style="display: none;">
-            <h2 class="section-title">測試完成</h2>
-
-            <div class="alert alert-success">
-                感謝您的參與！您的資料已成功提交。
+        <!-- Selection Status (Hidden Initially) -->
+        <div class="selection-status hidden" id="selectionStatus">
+            <div class="selection-item">
+                <span class="selection-label">最像我：</span>
+                <span class="selection-value selection-most" id="mostLikeSelection">未選擇</span>
             </div>
+            <div class="selection-item">
+                <span class="selection-label">最不像我：</span>
+                <span class="selection-value selection-least" id="leastLikeSelection">未選擇</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons (Hidden Initially) -->
+        <div class="action-buttons hidden" id="actionButtons">
+            <button class="btn btn-secondary" id="prevBtn" onclick="previousBlock()" disabled>
+                ← 上一題
+            </button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextBlock()" disabled>
+                下一題 →
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <p>正在處理您的回答...</p>
+        </div>
+
+        <!-- Results Section (Hidden Initially) -->
+        <div class="results-card hidden" id="resultsSection">
+            <div class="success-icon">✅</div>
+            <h2 class="results-title">測試完成！</h2>
+            <p class="results-message">感謝您的參與，您的資料已成功提交。</p>
 
             <div class="stats-grid" id="statsContainer">
-                <!-- Stats will be inserted here -->
+                <!-- Stats will be dynamically inserted -->
             </div>
 
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="location.reload()">再測一次</button>
-                <button class="btn btn-secondary" onclick="viewStats()">查看統計</button>
+            <div style="margin-top: 32px;">
+                <button class="btn btn-primary" onclick="location.reload()">
+                    再測一次
+                </button>
+                <button class="btn btn-secondary" onclick="viewStats()">
+                    查看統計
+                </button>
             </div>
         </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
     </div>
 
     <script>
+        // API Configuration
         const API_BASE = '/api/v4/data-collection';
 
+        // State Management
         let participantId = null;
         let sessionId = null;
         let testBlocks = [];
@@ -459,7 +689,7 @@
         let startTime = null;
         let timerInterval = null;
 
-        // Registration
+        // Registration Form Handler
         document.getElementById('registrationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -480,7 +710,7 @@
                     body: JSON.stringify(registration)
                 });
 
-                if (!regResponse.ok) throw new Error('Registration failed');
+                if (!regResponse.ok) throw new Error('註冊失敗');
 
                 const regData = await regResponse.json();
                 participantId = regData.participant_id;
@@ -495,7 +725,7 @@
                     })
                 });
 
-                if (!sessionResponse.ok) throw new Error('Failed to start session');
+                if (!sessionResponse.ok) throw new Error('無法開始測驗');
 
                 const sessionData = await sessionResponse.json();
                 sessionId = sessionData.session_id;
@@ -515,12 +745,20 @@
         });
 
         function startTest() {
-            document.getElementById('registrationSection').style.display = 'none';
-            document.getElementById('testSection').style.display = 'block';
+            // Hide welcome screen
+            document.getElementById('welcomeScreen').style.display = 'none';
 
+            // Show test components
+            document.getElementById('progressHeader').classList.remove('hidden');
+            document.getElementById('questionCard').classList.remove('hidden');
+            document.getElementById('selectionStatus').classList.remove('hidden');
+            document.getElementById('actionButtons').classList.remove('hidden');
+
+            // Start timer
             startTime = Date.now();
             startTimer();
 
+            // Display first block
             displayBlock(0);
         }
 
@@ -530,94 +768,170 @@
 
             // Update progress
             const progress = ((index + 1) / testBlocks.length) * 100;
-            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
+            document.getElementById('blockCounter').textContent = `區組 ${index + 1} / ${testBlocks.length}`;
+            document.getElementById('questionNumber').textContent = `區組 ${index + 1}`;
 
-            // Build block HTML
-            let html = `
-                <div class="block-container">
-                    <h3>區組 ${index + 1} / ${testBlocks.length}</h3>
-                    <p class="alert alert-info">請選擇<strong>最符合</strong>和<strong>最不符合</strong>您的陳述（各選一項）</p>
-                    <div class="statements">
-            `;
+            // Clear previous selections
+            clearSelections();
 
-            block.statements.forEach((stmt, i) => {
-                html += `
-                    <div class="statement-item" id="stmt-${i}" onclick="selectStatement(${i})">
-                        <div class="statement-header">
-                            <div class="statement-index">${i + 1}</div>
-                            <span>${stmt.text}</span>
-                            <span class="dimension-tag">${stmt.dimension}</span>
-                        </div>
-                    </div>
-                `;
+            // Render statements
+            const grid = document.getElementById('statementsGrid');
+            grid.innerHTML = '';
+
+            block.statements.forEach((stmt, idx) => {
+                const card = createStatementCard(stmt, idx);
+                grid.appendChild(card);
             });
-
-            html += `
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('blockContainer').innerHTML = html;
 
             // Restore previous selection if exists
             if (responses[index]) {
-                updateBlockDisplay(responses[index].most_like_index, responses[index].least_like_index);
+                const savedResponse = responses[index];
+                if (savedResponse.most_like_index !== null) {
+                    selectStatement(savedResponse.most_like_index, 'most');
+                }
+                if (savedResponse.least_like_index !== null) {
+                    selectStatement(savedResponse.least_like_index, 'least');
+                }
             }
 
             // Update navigation buttons
             document.getElementById('prevBtn').disabled = index === 0;
             document.getElementById('nextBtn').textContent =
-                index === testBlocks.length - 1 ? '提交' : '下一題';
+                index === testBlocks.length - 1 ? '提交' : '下一題 →';
+
+            // Check if selections are complete
+            checkSelectionComplete();
         }
 
-        function selectStatement(index) {
+        function createStatementCard(statement, index) {
+            const card = document.createElement('div');
+            card.className = 'statement-card';
+            card.dataset.index = index;
+            card.onclick = () => handleStatementClick(index);
+
+            card.innerHTML = `
+                <div class="statement-letter">${String.fromCharCode(65 + index)}</div>
+                <div class="statement-text">${statement.text}</div>
+                <span class="statement-badge badge-most hidden">最像我</span>
+                <span class="statement-badge badge-least hidden">最不像我</span>
+            `;
+
+            return card;
+        }
+
+        function handleStatementClick(index) {
             const currentResponse = responses[currentBlockIndex] || {
                 block_id: currentBlockIndex,
                 most_like_index: null,
-                least_like_index: null,
-                response_time_ms: null
+                least_like_index: null
             };
 
-            // Toggle selection logic
-            if (currentResponse.most_like_index === index) {
-                // Clicking on selected "most like" - deselect it
-                currentResponse.most_like_index = null;
+            // Determine selection type based on current state
+            if (currentResponse.most_like_index === null) {
+                // No selections yet, make this "most like"
+                selectStatement(index, 'most');
+            } else if (currentResponse.least_like_index === null && currentResponse.most_like_index !== index) {
+                // "Most like" is selected, make this "least like" if different
+                selectStatement(index, 'least');
+            } else if (currentResponse.most_like_index === index) {
+                // Clicking on current "most like", deselect it
+                selectStatement(null, 'most');
             } else if (currentResponse.least_like_index === index) {
-                // Clicking on selected "least like" - deselect it
-                currentResponse.least_like_index = null;
-            } else if (currentResponse.most_like_index === null) {
-                // No "most like" selected - select this as "most like"
-                currentResponse.most_like_index = index;
-            } else if (currentResponse.least_like_index === null) {
-                // "Most like" selected but no "least like" - select as "least like"
-                // But ensure it's not the same as "most like"
-                if (index !== currentResponse.most_like_index) {
-                    currentResponse.least_like_index = index;
-                }
+                // Clicking on current "least like", deselect it
+                selectStatement(null, 'least');
             } else {
-                // Both are selected - determine which to replace based on context
-                // If clicking a third option, replace the older selection
-                // For now, we'll show a message and not change anything
+                // Both are selected, clicking on a third option
                 alert('請先取消選擇其中一個選項，再選擇新的陳述');
             }
-
-            responses[currentBlockIndex] = currentResponse;
-            updateBlockDisplay(currentResponse.most_like_index, currentResponse.least_like_index);
         }
 
-        function updateBlockDisplay(mostLikeIndex, leastLikeIndex) {
+        function selectStatement(index, type) {
+            // Initialize response if needed
+            if (!responses[currentBlockIndex]) {
+                responses[currentBlockIndex] = {
+                    block_id: currentBlockIndex,
+                    most_like_index: null,
+                    least_like_index: null
+                };
+            }
+
+            const currentResponse = responses[currentBlockIndex];
+
+            // Update response
+            if (type === 'most') {
+                // If selecting the same as "least like", prevent it
+                if (index !== null && index === currentResponse.least_like_index) {
+                    alert('此選項已被選為「最不像我」，請選擇其他選項');
+                    return;
+                }
+                currentResponse.most_like_index = index;
+            } else {
+                // If selecting the same as "most like", prevent it
+                if (index !== null && index === currentResponse.most_like_index) {
+                    alert('此選項已被選為「最像我」，請選擇其他選項');
+                    return;
+                }
+                currentResponse.least_like_index = index;
+            }
+
+            // Update display
+            updateBlockDisplay();
+            checkSelectionComplete();
+        }
+
+        function updateBlockDisplay() {
+            const response = responses[currentBlockIndex];
+            const cards = document.querySelectorAll('.statement-card');
+
             // Clear all selections
-            document.querySelectorAll('.statement-item').forEach(item => {
-                item.classList.remove('most-like', 'least-like');
+            cards.forEach(card => {
+                card.classList.remove('selected-most', 'selected-least');
+                card.querySelector('.badge-most').classList.add('hidden');
+                card.querySelector('.badge-least').classList.add('hidden');
             });
 
             // Apply selections
-            if (mostLikeIndex !== null) {
-                document.getElementById(`stmt-${mostLikeIndex}`).classList.add('most-like');
+            if (response) {
+                if (response.most_like_index !== null) {
+                    const mostCard = cards[response.most_like_index];
+                    mostCard.classList.add('selected-most');
+                    mostCard.querySelector('.badge-most').classList.remove('hidden');
+
+                    const text = mostCard.querySelector('.statement-text').textContent;
+                    document.getElementById('mostLikeSelection').textContent =
+                        text.substring(0, 30) + (text.length > 30 ? '...' : '');
+                } else {
+                    document.getElementById('mostLikeSelection').textContent = '未選擇';
+                }
+
+                if (response.least_like_index !== null) {
+                    const leastCard = cards[response.least_like_index];
+                    leastCard.classList.add('selected-least');
+                    leastCard.querySelector('.badge-least').classList.remove('hidden');
+
+                    const text = leastCard.querySelector('.statement-text').textContent;
+                    document.getElementById('leastLikeSelection').textContent =
+                        text.substring(0, 30) + (text.length > 30 ? '...' : '');
+                } else {
+                    document.getElementById('leastLikeSelection').textContent = '未選擇';
+                }
             }
-            if (leastLikeIndex !== null) {
-                document.getElementById(`stmt-${leastLikeIndex}`).classList.add('least-like');
-            }
+        }
+
+        function clearSelections() {
+            document.getElementById('mostLikeSelection').textContent = '未選擇';
+            document.getElementById('leastLikeSelection').textContent = '未選擇';
+        }
+
+        function checkSelectionComplete() {
+            const response = responses[currentBlockIndex];
+            const isComplete = response &&
+                response.most_like_index !== null &&
+                response.least_like_index !== null;
+
+            document.getElementById('nextBtn').disabled = !isComplete;
         }
 
         function previousBlock() {
@@ -650,6 +964,12 @@
             try {
                 showLoading(true);
 
+                // Hide test components
+                document.getElementById('questionCard').classList.add('hidden');
+                document.getElementById('selectionStatus').classList.add('hidden');
+                document.getElementById('actionButtons').classList.add('hidden');
+                document.getElementById('progressHeader').classList.add('hidden');
+
                 const completionTime = (Date.now() - startTime) / 1000;
 
                 const submitData = {
@@ -664,22 +984,24 @@
                     body: JSON.stringify(submitData)
                 });
 
-                if (!response.ok) throw new Error('Failed to submit responses');
+                if (!response.ok) throw new Error('提交失敗');
 
                 stopTimer();
                 showResults(completionTime);
 
             } catch (error) {
                 alert('提交失敗: ' + error.message);
+                // Show test components again
+                document.getElementById('questionCard').classList.remove('hidden');
+                document.getElementById('selectionStatus').classList.remove('hidden');
+                document.getElementById('actionButtons').classList.remove('hidden');
+                document.getElementById('progressHeader').classList.remove('hidden');
             } finally {
                 showLoading(false);
             }
         }
 
         function showResults(completionTime) {
-            document.getElementById('testSection').style.display = 'none';
-            document.getElementById('resultsSection').style.display = 'block';
-
             const minutes = Math.floor(completionTime / 60);
             const seconds = Math.floor(completionTime % 60);
 
@@ -697,6 +1019,8 @@
                     <div class="stat-label">參與者編號</div>
                 </div>
             `;
+
+            document.getElementById('resultsSection').classList.remove('hidden');
         }
 
         async function viewStats() {
@@ -737,7 +1061,11 @@
         }
 
         function showLoading(show) {
-            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+            if (show) {
+                document.getElementById('loadingState').classList.add('active');
+            } else {
+                document.getElementById('loadingState').classList.remove('active');
+            }
         }
     </script>
 </body>
