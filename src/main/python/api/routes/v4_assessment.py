@@ -15,6 +15,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel, Field
 
 from core.v4.block_designer import QuartetBlockDesigner
+from core.v4.balanced_block_designer import create_objective_assessment_blocks
 from core.v4.irt_scorer import ThurstonianIRTScorer
 from core.v4.normative_scoring import NormativeScorer
 from core.v4.irt_calibration import ThurstonianIRTCalibrator
@@ -136,23 +137,23 @@ async def get_assessment_blocks(request: BlockRequest = BlockRequest()):
         # Generate session ID if not provided
         session_id = request.session_id or str(uuid.uuid4())
 
-        # Initialize block designer if needed
-        global block_designer
-        if block_designer is None:
-            # Convert statements to Statement objects expected by block designer
-            statements_list = []
-            for stmt in get_all_statements():
-                statements_list.append(FCStatement(
-                    statement_id=stmt.statement_id,
-                    text=stmt.text,
-                    dimension=stmt.dimension,
-                    factor_loading=stmt.factor_loading,
-                    social_desirability=stmt.social_desirability
-                ))
-            block_designer = QuartetBlockDesigner(statements_list)
+        # Use objective balanced block design for complete T1-T12 coverage
+        # Convert statements to Statement objects
+        statements_list = []
+        for stmt in get_all_statements():
+            statements_list.append(FCStatement(
+                statement_id=stmt.statement_id,
+                text=stmt.text,
+                dimension=stmt.dimension,
+                factor_loading=stmt.factor_loading,
+                social_desirability=stmt.social_desirability
+            ))
 
-        # Design blocks
-        quartet_blocks = block_designer.create_blocks(method='balanced')
+        # Create objective balanced blocks
+        quartet_blocks = create_objective_assessment_blocks(
+            statements_list,
+            target_blocks=request.block_count
+        )
 
         # Limit to requested number of blocks
         quartet_blocks = quartet_blocks[:request.block_count]
@@ -570,6 +571,92 @@ async def get_results(session_id: str):
                     # Generate strength DNA visualization
                     strength_dna = create_fancy_dna_visualization(norm_scores)
                     basic_results["strength_dna"] = strength_dna
+
+                    # Generate GPT-5 deep analysis and personalized summary
+                    try:
+                        from services.gpt_analysis_service import get_gpt_analysis_service
+
+                        gpt_service = get_gpt_analysis_service()
+
+                        # Check if analysis already exists
+                        existing_analysis = None
+                        try:
+                            cursor = conn.execute("""
+                                SELECT unique_combination, contextual_excellence, development_insights,
+                                       actionable_recommendations, leadership_style, collaboration_approach,
+                                       growth_trajectory, confidence_score
+                                FROM gpt_analysis_results
+                                WHERE session_id = ?
+                            """, (session_id,))
+                            result = cursor.fetchone()
+                            if result:
+                                existing_analysis = {
+                                    'unique_combination': result[0],
+                                    'contextual_excellence': result[1],
+                                    'development_insights': result[2],
+                                    'actionable_recommendations': json.loads(result[3]),
+                                    'leadership_style': result[4],
+                                    'collaboration_approach': result[5],
+                                    'growth_trajectory': result[6],
+                                    'confidence_score': result[7]
+                                }
+                        except Exception as db_error:
+                            logger.warning(f"Failed to check existing GPT analysis: {db_error}")
+
+                        if existing_analysis:
+                            # Use existing analysis
+                            basic_results["gpt_analysis"] = existing_analysis
+                            logger.info(f"Using existing GPT analysis for session {session_id}")
+                        else:
+                            # Generate new analysis
+                            logger.info(f"Generating new GPT analysis for session {session_id}")
+                            analysis = gpt_service.analyze_talent_profile(
+                                talent_classification=basic_results["talent_classification"],
+                                norm_scores=norm_scores,
+                                career_prototype=basic_results["career_prototype"],
+                                session_id=session_id
+                            )
+
+                            # Save to database
+                            gpt_service.save_analysis_result(analysis, db_manager)
+
+                            # Add to response
+                            basic_results["gpt_analysis"] = {
+                                'unique_combination': analysis.unique_combination,
+                                'contextual_excellence': analysis.contextual_excellence,
+                                'development_insights': analysis.development_insights,
+                                'actionable_recommendations': analysis.actionable_recommendations,
+                                'leadership_style': analysis.leadership_style,
+                                'collaboration_approach': analysis.collaboration_approach,
+                                'growth_trajectory': analysis.growth_trajectory,
+                                'confidence_score': analysis.confidence_score
+                            }
+
+                    except Exception as gpt_error:
+                        logger.warning(f"GPT analysis failed for session {session_id}: {gpt_error}")
+                        # Provide fallback personalized summary
+                        dominant_talents = basic_results["talent_classification"]["classified_talents"].get("dominant", [])
+                        if len(dominant_talents) >= 2:
+                            top_two = [t["dimension"] for t in dominant_talents[:2]]
+                            fallback_summary = f"您的主導天賦聚焦於『{', '.join(top_two)}』，展現出獨特的優勢組合。這種組合讓您在特定情境下能發揮卓越表現。"
+                        else:
+                            fallback_summary = "您展現出獨特的才幹組合，在適當情境下能發揮卓越表現。"
+
+                        basic_results["gpt_analysis"] = {
+                            'unique_combination': fallback_summary,
+                            'contextual_excellence': "建議探索能發揮您主導才幹的工作環境和角色。",
+                            'development_insights': "持續強化主導才幹，並適度發展支援才幹以提升整體表現。",
+                            'actionable_recommendations': [
+                                "建立基於主導才幹的個人品牌",
+                                "尋找匹配才幹的工作機會",
+                                "培養跨領域協作能力",
+                                "制定個人發展計劃"
+                            ],
+                            'leadership_style': "基於您的才幹特色的領導方式",
+                            'collaboration_approach': "發揮專業優勢的團隊協作",
+                            'growth_trajectory': "朝向專業領導方向發展",
+                            'confidence_score': 0.7
+                        }
 
             except Exception as dna_error:
                 logger.warning(f"Norm scores/DNA generation failed for session {session_id}: {dna_error}")
