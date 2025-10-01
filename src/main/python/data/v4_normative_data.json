@@ -1,0 +1,283 @@
+{
+  "format_version": "4.0",
+  "created_date": "2025-10-01",
+  "sample_description": "Pilot normative sample for v4.0 Thurstonian IRT",
+  "total_sample_size": 500,
+  "note": "Temporary normative data for development testing",
+
+  "dimensions": {
+    "Achiever": {
+      "dimension": "Achiever",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.1,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Activator": {
+      "dimension": "Activator",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": -0.1,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Adaptability": {
+      "dimension": "Adaptability",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Analytical": {
+      "dimension": "Analytical",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Arranger": {
+      "dimension": "Arranger",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Belief": {
+      "dimension": "Belief",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Command": {
+      "dimension": "Command",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Communication": {
+      "dimension": "Communication",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Competition": {
+      "dimension": "Competition",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Connectedness": {
+      "dimension": "Connectedness",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Consistency": {
+      "dimension": "Consistency",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Context": {
+      "dimension": "Context",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    },
+    "Deliberative": {
+      "dimension": "Deliberative",
+      "mean": 0.0,
+      "sd": 1.5,
+      "sample_size": 500,
+      "skewness": 0.0,
+      "kurtosis": 0.0,
+      "min_value": -4.0,
+      "max_value": 4.0,
+      "percentiles": {
+        "1": -3.5,
+        "5": -2.5,
+        "10": -1.9,
+        "25": -1.0,
+        "50": 0.0,
+        "75": 1.0,
+        "90": 1.9,
+        "95": 2.5,
+        "99": 3.5
+      }
+    }
+  }
+}
