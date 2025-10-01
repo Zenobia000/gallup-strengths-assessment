@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallup 優勢測驗系統</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --success-color: #10b981;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .version-info {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .version-tag {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Gallup 優勢測驗系統</h1>
+        <p class="subtitle">
+            透過科學化的心理測量，發掘您的獨特優勢<br>
+            為職涯發展提供專業洞察與建議
+        </p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">科學測評</div>
+                <div class="feature-desc">基於 Big Five 人格理論</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">精準分析</div>
+                <div class="feature-desc">12 維度優勢深度解析</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💼</div>
+                <div class="feature-title">職涯建議</div>
+                <div class="feature-desc">個人化發展路徑推薦</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="assessment.html" class="btn btn-primary">
+                開始評測 (v3.0 穩定版) →
+            </a>
+            <a href="v4_pilot_test.html" class="btn btn-secondary">
+                體驗 v4.0 先導測試
+                <span class="version-tag">NEW</span>
+            </a>
+        </div>
+
+        <div class="version-info">
+            <strong>系統版本：</strong> v3.0 (穩定版) | v4.0 (測試中)<br>
+            <strong>更新時間：</strong> 2025-10-01<br>
+            <strong>技術支援：</strong> Thurstonian IRT 心理測量模型
+        </div>
+    </div>
+</body>
+</html>

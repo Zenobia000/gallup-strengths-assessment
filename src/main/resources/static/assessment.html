@@ -254,6 +254,32 @@
             border-color: var(--least-like);
         }
 
+        /* Statement badges for intuitive selection */
+        .statement-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-most {
+            background: var(--most-like);
+            color: white;
+        }
+
+        .badge-least {
+            background: var(--least-like);
+            color: white;
+        }
+
+        .statement-badge.hidden {
+            display: none;
+        }
+
         /* Selection Status */
         .selection-status {
             background: white;
@@ -689,35 +715,39 @@
                 grid.appendChild(card);
             });
 
+            // Initialize response for this question if not exists
+            if (!responses[currentQuestion]) {
+                responses[currentQuestion] = {
+                    most_like_index: null,
+                    least_like_index: null
+                };
+            }
+
             // Restore previous selections if any
-            if (responses[currentQuestion]) {
-                const savedResponse = responses[currentQuestion];
-                const cards = document.querySelectorAll('.statement-card');
+            const savedResponse = responses[currentQuestion];
+            const cards = document.querySelectorAll('.statement-card');
 
-                // Restore "most like" selection
-                if (savedResponse.most_like_index !== undefined) {
-                    const mostCard = cards[savedResponse.most_like_index];
-                    if (mostCard) {
-                        const mostBtn = mostCard.querySelector('.btn-most');
-                        mostBtn.classList.add('selected');
-                        mostCard.classList.add('selected-most');
-                        const statement = mostCard.querySelector('.statement-text').textContent;
-                        document.getElementById('mostLikeSelection').textContent =
-                            statement.substring(0, 20) + '...';
-                    }
+            // Restore "most like" selection
+            if (savedResponse.most_like_index !== null && savedResponse.most_like_index !== undefined) {
+                const mostCard = cards[savedResponse.most_like_index];
+                if (mostCard) {
+                    mostCard.classList.add('selected-most');
+                    mostCard.querySelector('.badge-most').classList.remove('hidden');
+                    const statement = mostCard.querySelector('.statement-text').textContent;
+                    document.getElementById('mostLikeSelection').textContent =
+                        statement.substring(0, 30) + '...';
                 }
+            }
 
-                // Restore "least like" selection
-                if (savedResponse.least_like_index !== undefined) {
-                    const leastCard = cards[savedResponse.least_like_index];
-                    if (leastCard) {
-                        const leastBtn = leastCard.querySelector('.btn-least');
-                        leastBtn.classList.add('selected');
-                        leastCard.classList.add('selected-least');
-                        const statement = leastCard.querySelector('.statement-text').textContent;
-                        document.getElementById('leastLikeSelection').textContent =
-                            statement.substring(0, 20) + '...';
-                    }
+            // Restore "least like" selection
+            if (savedResponse.least_like_index !== null && savedResponse.least_like_index !== undefined) {
+                const leastCard = cards[savedResponse.least_like_index];
+                if (leastCard) {
+                    leastCard.classList.add('selected-least');
+                    leastCard.querySelector('.badge-least').classList.remove('hidden');
+                    const statement = leastCard.querySelector('.statement-text').textContent;
+                    document.getElementById('leastLikeSelection').textContent =
+                        statement.substring(0, 30) + '...';
                 }
             }
 
@@ -731,24 +761,88 @@
             const card = document.createElement('div');
             card.className = 'statement-card';
             card.dataset.statementId = statement.id;
+            card.dataset.index = index;
+
+            // Make the entire card clickable
+            card.onclick = () => handleStatementClick(index, statement);
 
             card.innerHTML = `
                 <div class="statement-letter">${String.fromCharCode(65 + index)}</div>
                 <div class="statement-text">${statement.text}</div>
-                <div class="statement-actions">
-                    <button class="choice-btn btn-most" onclick="selectChoice('${statement.id}', 'most', this)">
-                        最像我
-                    </button>
-                    <button class="choice-btn btn-least" onclick="selectChoice('${statement.id}', 'least', this)">
-                        最不像我
-                    </button>
-                </div>
+                <span class="statement-badge badge-most hidden">最像我</span>
+                <span class="statement-badge badge-least hidden">最不像我</span>
             `;
 
             return card;
         }
 
-        // Handle Selection
+        // Handle Statement Click - New intuitive interface
+        function handleStatementClick(index, statement) {
+            const currentResponse = responses[currentQuestion] || {
+                most_like_index: null,
+                least_like_index: null
+            };
+
+            const card = document.querySelectorAll('.statement-card')[index];
+
+            // If already selected as most, toggle it off
+            if (currentResponse.most_like_index === index) {
+                currentResponse.most_like_index = null;
+                card.classList.remove('selected-most');
+                card.querySelector('.badge-most').classList.add('hidden');
+                document.getElementById('mostLikeSelection').textContent = '未選擇';
+            }
+            // If already selected as least, toggle it off
+            else if (currentResponse.least_like_index === index) {
+                currentResponse.least_like_index = null;
+                card.classList.remove('selected-least');
+                card.querySelector('.badge-least').classList.add('hidden');
+                document.getElementById('leastLikeSelection').textContent = '未選擇';
+            }
+            // If not selected, select as most (if most is empty) or least
+            else if (currentResponse.most_like_index === null) {
+                // Clear any previous most selection
+                document.querySelectorAll('.statement-card').forEach((c, i) => {
+                    if (i === currentResponse.most_like_index) {
+                        c.classList.remove('selected-most');
+                        c.querySelector('.badge-most').classList.add('hidden');
+                    }
+                });
+
+                currentResponse.most_like_index = index;
+                card.classList.add('selected-most');
+                card.querySelector('.badge-most').classList.remove('hidden');
+                document.getElementById('mostLikeSelection').textContent =
+                    statement.text.substring(0, 30) + '...';
+            }
+            else if (currentResponse.least_like_index === null) {
+                // Clear any previous least selection
+                document.querySelectorAll('.statement-card').forEach((c, i) => {
+                    if (i === currentResponse.least_like_index) {
+                        c.classList.remove('selected-least');
+                        c.querySelector('.badge-least').classList.add('hidden');
+                    }
+                });
+
+                currentResponse.least_like_index = index;
+                card.classList.add('selected-least');
+                card.querySelector('.badge-least').classList.remove('hidden');
+                document.getElementById('leastLikeSelection').textContent =
+                    statement.text.substring(0, 30) + '...';
+            }
+            else {
+                // Both are selected, show hint
+                alert('請先取消其中一個選擇，再選擇新的選項');
+            }
+
+            // Update response
+            responses[currentQuestion] = currentResponse;
+
+            // Check if selection is complete
+            checkSelectionComplete();
+        }
+
+        // Handle Selection (Old method - keep for compatibility)
         function selectChoice(statementId, type, button) {
             // Check if this statement is already selected for the opposite type
             const card = button.closest('.statement-card');
@@ -801,8 +895,9 @@
 
         // Check Selection Complete
         function checkSelectionComplete() {
-            const hasMost = document.querySelector('.btn-most.selected');
-            const hasLeast = document.querySelector('.btn-least.selected');
+            const currentResponse = responses[currentQuestion] || {};
+            const hasMost = currentResponse.most_like_index !== null && currentResponse.most_like_index !== undefined;
+            const hasLeast = currentResponse.least_like_index !== null && currentResponse.least_like_index !== undefined;
 
             document.getElementById('nextBtn').disabled = !(hasMost && hasLeast);
         }
@@ -814,6 +909,9 @@
             });
             document.querySelectorAll('.statement-card').forEach(card => {
                 card.classList.remove('selected-most', 'selected-least');
+                // Hide badges
+                const badges = card.querySelectorAll('.statement-badge');
+                badges.forEach(badge => badge.classList.add('hidden'));
             });
             document.getElementById('mostLikeSelection').textContent = '未選擇';
             document.getElementById('leastLikeSelection').textContent = '未選擇';
@@ -821,32 +919,19 @@
 
         // Navigate Questions
         function nextQuestion() {
-            // Save current response
-            const mostLikeBtn = document.querySelector('.btn-most.selected');
-            const leastLikeBtn = document.querySelector('.btn-least.selected');
+            // Check if current response is complete
+            const currentResponse = responses[currentQuestion] || {};
 
-            if (!mostLikeBtn || !leastLikeBtn) {
+            if (currentResponse.most_like_index === null || currentResponse.most_like_index === undefined ||
+                currentResponse.least_like_index === null || currentResponse.least_like_index === undefined) {
                 alert('請選擇最像和最不像的選項');
                 return;
             }
 
-            const mostLikeCard = mostLikeBtn.closest('.statement-card');
-            const leastLikeCard = leastLikeBtn.closest('.statement-card');
-
-            // Find the index of selected statements
-            const cards = Array.from(document.querySelectorAll('.statement-card'));
-            const mostLikeIndex = cards.indexOf(mostLikeCard);
-            const leastLikeIndex = cards.indexOf(leastLikeCard);
-
-            // Update response with final data
-            if (!responses[currentQuestion]) {
-                responses[currentQuestion] = {};
-            }
+            // Update response with timing data
             responses[currentQuestion] = {
-                ...responses[currentQuestion],
+                ...currentResponse,
                 block_id: currentQuestion,
-                most_like_index: mostLikeIndex,
-                least_like_index: leastLikeIndex,
                 response_time_ms: Date.now() - (startTime?.getTime() || Date.now())
             };
 

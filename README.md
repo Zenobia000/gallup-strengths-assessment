@@ -152,19 +152,35 @@ python3 -m http.server 3000
 
 ### 🌐 系統訪問地址
 
-#### 前端界面 (使用者介面)
+#### 前端服務器 (Port 3000)
 - **主頁**: http://localhost:3000
-- **測驗界面**: http://localhost:3000/pages/assessment.html
-- **結果展示**: http://localhost:3000/pages/results.html
+- **v3.0 測驗界面**: http://localhost:3000/assessment.html
+- **v4.0 先導測試**: http://localhost:3000/v4_pilot_test.html
+- **結果展示**: http://localhost:3000/results.html
 
-#### 後端 API (開發/測試)
+#### 後端 API 服務 (Port 8004)
+- **FastAPI 應用根目錄**: http://localhost:8004/
+- **v3.0 測驗頁面**: http://localhost:8004/assessment
+- **v4.0 先導測試頁面**: http://localhost:8004/v4-pilot
 - **健康檢查**: http://localhost:8004/api/v1/health
 - **API 文檔**: http://localhost:8004/api/v1/docs
-- **測驗問題**: http://localhost:8004/api/v1/questions
+- **OpenAPI Schema**: http://localhost:8004/api/v1/openapi.json
 
-#### 🛠️ 除錯工具 (Debug Tools)
-- **清除會話工具**: http://localhost:3000/clear_session.html
-- **提交測試工具**: http://localhost:3000/test_submit.html
+#### API 端點總覽
+- **v3.0 評估系統**
+  - `GET /api/v1/questions` - 獲取測驗題目
+  - `POST /api/v1/consent` - 記錄用戶同意
+  - `POST /api/v1/sessions/start` - 開始測驗會話
+  - `POST /api/v1/scoring/submit` - 提交答案計分
+  - `GET /api/v1/results/{session_id}` - 獲取測驗結果
+
+- **v4.0 Thurstonian IRT 系統**
+  - `GET /api/v4/blocks` - 獲取迫選題組
+  - `POST /api/v4/sessions` - 創建 v4 會話
+  - `POST /api/v4/submit` - 提交 v4 答案
+  - `POST /api/v4/data-collection/participants/register` - 註冊參與者
+  - `POST /api/v4/data-collection/sessions/start` - 開始資料收集
+  - `GET /api/v4/data-collection/stats` - 獲取收集統計
 
 ### 📝 使用操作說明
 

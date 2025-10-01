@@ -595,51 +595,21 @@
 
             if (sessionId) {
                 try {
-                    // Try both possible endpoints
-                    let response = await fetch(`/api/v1/scoring/results/${sessionId}`);
-
-                    if (!response.ok) {
-                        // Try alternative endpoint
-                        response = await fetch(`http://localhost:8004/api/v1/scoring/results/${sessionId}`);
-                    }
-
+                    const response = await fetch(`/api/v1/scoring/results/${sessionId}`);
                     if (response.ok) {
                         const data = await response.json();
-                        console.log('Loaded results:', data);
-
                         // Update strengthData with actual API data
-                        if (data.strengths_profile) {
-                            try {
-                                const profileData = JSON.parse(data.strengths_profile);
-                                updateStrengthDataFromProfile(profileData);
-                            } catch (e) {
-                                console.warn('Could not parse strengths_profile:', e);
-                            }
+                        if (data.strength_scores) {
+                            Object.keys(data.strength_scores).forEach(key => {
+                                if (strengthData[key]) {
+                                    strengthData[key].score = data.strength_scores[key];
+                                }
+                            });
                         }
-
-                        // Update from standardized scores if available
-                        if (data.standardized_scores) {
-                            try {
-                                const scoresData = JSON.parse(data.standardized_scores);
-                                updateStrengthDataFromScores(scoresData);
-                            } catch (e) {
-                                console.warn('Could not parse standardized_scores:', e);
-                            }
-                        }
-
-                        // Add session info to the page
-                        addSessionInfo(data, sessionId);
-                    } else {
-                        console.warn(`Session ${sessionId} not found, using demo data`);
-                        addDemoWarning(sessionId);
                     }
                 } catch (error) {
                     console.error('Error loading results:', error);
-                    addErrorMessage(sessionId);
                 }
-            } else {
-                console.log('No session ID provided, showing demo data');
-                addDemoInfo();
             }
 
             // Hide loading and show results
@@ -648,86 +618,6 @@
             // Initialize visualizations
             createDNAHelix();
             populateCategories();
-        }
-
-        function updateStrengthDataFromProfile(profileData) {
-            // Update strength data based on profile structure
-            if (Array.isArray(profileData)) {
-                profileData.forEach((item, index) => {
-                    const key = `T${index + 1}`;
-                    if (strengthData[key] && item.score !== undefined) {
-                        strengthData[key].score = Math.round(item.score);
-                        if (item.name) strengthData[key].name = item.name;
-                        if (item.description) strengthData[key].desc = item.description;
-                    }
-                });
-            }
-        }
-
-        function updateStrengthDataFromScores(scoresData) {
-            // Map standardized scores to strength data
-            Object.entries(scoresData).forEach(([key, score]) => {
-                if (strengthData[key]) {
-                    strengthData[key].score = Math.round(score);
-                }
-            });
-        }
-
-        function addSessionInfo(data, sessionId) {
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'session-metadata';
-            infoDiv.innerHTML = `
-                <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h3 style="margin: 0 0 12px 0; color: #1f2937;">📋 測評資訊</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-size: 14px; color: #6b7280;">
-                        <div><strong>Session ID:</strong> ${sessionId}</div>
-                        <div><strong>測評時間:</strong> ${data.created_at ? new Date(data.created_at).toLocaleString('zh-TW') : '未知'}</div>
-                        <div><strong>信心等級:</strong> ${data.confidence_level ?
-                            (data.confidence_level === 'high' ? '高' : data.confidence_level === 'medium' ? '中' : '低') : '未知'}</div>
-                        <div><strong>評分版本:</strong> ${data.scoring_version || 'v1.0'}</div>
-                    </div>
-                </div>
-            `;
-            document.querySelector('.container').insertBefore(infoDiv, document.querySelector('.dna-visualization'));
-        }
-
-        function addDemoWarning(sessionId) {
-            const warningDiv = document.createElement('div');
-            warningDiv.innerHTML = `
-                <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #92400e;">
-                        ⚠️ 找不到 Session ID: <code>${sessionId}</code> 的測評結果，正在顯示示範資料。
-                        <a href="assessment.html" style="color: #2563eb; text-decoration: underline;">點此重新測評</a>
-                    </p>
-                </div>
-            `;
-            document.querySelector('.container').insertBefore(warningDiv, document.querySelector('.dna-visualization'));
-        }
-
-        function addDemoInfo() {
-            const infoDiv = document.createElement('div');
-            infoDiv.innerHTML = `
-                <div style="background: #dbeafe; border: 1px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #1e40af;">
-                        💡 這是示範報告。要查看您的個人化結果，請先
-                        <a href="assessment.html" style="color: #2563eb; text-decoration: underline;">完成測評</a>
-                    </p>
-                </div>
-            `;
-            document.querySelector('.container').insertBefore(infoDiv, document.querySelector('.dna-visualization'));
-        }
-
-        function addErrorMessage(sessionId) {
-            const errorDiv = document.createElement('div');
-            errorDiv.innerHTML = `
-                <div style="background: #fee2e2; border: 1px solid #ef4444; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #991b1b;">
-                        ❌ 載入 Session ${sessionId} 時發生錯誤。正在顯示示範資料。
-                        <a href="assessment.html" style="color: #2563eb; text-decoration: underline;">重新測評</a>
-                    </p>
-                </div>
-            `;
-            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.dna-visualization'));
         }
 
         function downloadReport() {

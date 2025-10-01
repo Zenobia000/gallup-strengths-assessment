@@ -60,7 +60,7 @@ curl --request POST \
 ### 2.2 基本 URL (Base URL)
 ```
 Production:  https://gallup-strengths.example.com/api/v1
-Development: http://localhost:8002/api/v1
+Development: http://localhost:8004/api/v1
 Staging:     http://localhost:8003/api/v1
 ```
 
