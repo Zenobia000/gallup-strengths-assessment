@@ -281,9 +281,10 @@ async def submit_assessment(request: SubmitRequest):
             theta_scores = theta_estimate.theta
             duration = time.time() - start_time
 
-            # Track performance and cache result
+            # Track performance and cache result (don't cache dict format)
             optimizer.track_computation_time(duration)
-            optimizer.cache_theta_estimation(formatted_responses, blocks_data, theta_scores)
+            # Note: theta_scores is now a dict, cache disabled for now
+            # optimizer.cache_theta_estimation(formatted_responses, blocks_data, theta_scores)
 
         # Convert to normative scores with caching
         @cached_computation('norm_scores', ttl=7200)
