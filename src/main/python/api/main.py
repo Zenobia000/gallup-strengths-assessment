@@ -33,7 +33,7 @@ from models.schemas import (
 # TODO: Refactor AssessmentService to use ScoringEngine (Task: future)
 # from services.assessment import AssessmentService
 from utils.database import get_db_connection
-from api.routes import consent, sessions, scoring, recommendations
+from api.routes import consent, reports_v4_only, v4_assessment, v4_data_collection
 from api.middleware.error_handler import register_error_handlers
 
 
@@ -217,23 +217,13 @@ async def health_check() -> HealthResponse:
 
 # Include route modules - Clean separation of concerns
 app.include_router(consent.router, prefix="/api/v1", tags=["Consent"])
-app.include_router(sessions.router, prefix="/api/v1", tags=["Sessions"])
-app.include_router(scoring.router, tags=["Scoring"])
-app.include_router(recommendations.router, tags=["Recommendations"])
 
-# Report generation routes
-from api.routes import reports
-app.include_router(reports.router, prefix="/api/v1", tags=["Reports"])
-
-# Cache administration routes
-from api.routes import cache_admin
-app.include_router(cache_admin.router, prefix="/api/v1", tags=["Cache"])
+# Report generation routes (V4 only)
+app.include_router(reports_v4_only.router, prefix="/api/v1", tags=["Reports"])
 
 # V4.0 Thurstonian IRT routes
-from api.routes import v4_assessment, v4_data_collection, analysis
 app.include_router(v4_assessment.router, tags=["V4 Assessment"])
 app.include_router(v4_data_collection.router, tags=["V4 Data Collection"])
-app.include_router(analysis.router, prefix="/api/v1/analysis", tags=["Analysis"])
 
 # Mount static files for frontend
 import os

@@ -407,7 +407,7 @@ async def submit_assessment(request: SubmitRequest):
 
         return ScoreResponse(
             session_id=request.session_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(),  # Use local time instead of UTC
             dimension_scores=dimension_scores,
             top_strengths=profile['top_strengths'],
             development_areas=profile['development_areas'],
@@ -445,7 +445,7 @@ async def get_results(session_id: str):
             # Get basic results
             basic_results = {
                 "session_id": session_id,
-                "completed_at": result[4],
+                "completed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),  # Use current time
                 "theta_scores": json.loads(result[1]),
                 "norm_scores": json.loads(result[2]),
                 "profile": json.loads(result[3])
