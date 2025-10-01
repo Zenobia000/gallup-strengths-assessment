@@ -21,7 +21,7 @@ from datetime import datetime
 from api.routes.v4_assessment import router as v4_assessment_router
 from api.routes.consent import router as consent_router
 from api.routes.reports_v4_only import router as reports_router
-from api.routes.cache_admin import router as cache_router
+# Cache admin removed to eliminate dependencies
 from api.error_handlers import setup_error_handlers
 from core.constants import get_system_config
 
@@ -59,7 +59,7 @@ app.include_router(v4_assessment_router)
 # 註冊共用服務路由
 app.include_router(consent_router)
 app.include_router(reports_router)
-app.include_router(cache_router)
+# Cache admin router removed
 
 # 靜態檔案服務
 static_path = Path(__file__).parent / "resources" / "static"

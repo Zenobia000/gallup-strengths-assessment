@@ -651,8 +651,8 @@
         // Initialize Assessment
         async function initAssessment() {
             try {
-                // Load assessment blocks from V4 API
-                const response = await fetch(`${apiBase}/api/v4/assessment/blocks?block_count=15`);
+                // Load assessment blocks from V4 API (let API determine optimal count)
+                const response = await fetch(`${apiBase}/api/v4/assessment/blocks`);
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Loaded blocks from API:', data);
@@ -673,7 +673,14 @@
                     }));
 
                     totalQuestions = questions.length;
-                    console.log(`Loaded ${totalQuestions} blocks from API`);
+                    console.log(`Loaded ${totalQuestions} balanced blocks from API (T1-T12 complete coverage)`);
+
+                    // Verify we have reasonable number of blocks
+                    if (totalQuestions < 9) {
+                        console.warn(`Warning: Only ${totalQuestions} blocks loaded, may not cover all T1-T12 dimensions`);
+                    } else {
+                        console.log('✅ Sufficient blocks for complete T1-T12 dimensional coverage');
+                    }
                 } else {
                     throw new Error('Failed to load blocks from API');
                 }

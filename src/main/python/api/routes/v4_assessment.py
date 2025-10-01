@@ -149,14 +149,26 @@ async def get_assessment_blocks(request: BlockRequest = BlockRequest()):
                 social_desirability=stmt.social_desirability
             ))
 
-        # Create objective balanced blocks
+        # Create objective balanced blocks with randomization
+        # Always use optimal block count for complete T1-T12 coverage
         quartet_blocks = create_objective_assessment_blocks(
             statements_list,
-            target_blocks=request.block_count
+            target_blocks=None  # Let designer determine optimal count
         )
 
-        # Limit to requested number of blocks
-        quartet_blocks = quartet_blocks[:request.block_count]
+        # Add randomization to prevent identical experiences
+        import random
+        import time
+        random.seed(int(time.time() * 1000) % 10000)  # Time-based seed for variation
+
+        # Shuffle block order for different user experience
+        random.shuffle(quartet_blocks)
+
+        # Shuffle statements within each block
+        for block in quartet_blocks:
+            random.shuffle(block.statements)
+
+        print(f"Generated {len(quartet_blocks)} balanced blocks with randomization")
 
         # Format blocks for response and for storage
         blocks = []
