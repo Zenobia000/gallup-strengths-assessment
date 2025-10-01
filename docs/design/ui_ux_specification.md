@@ -1,8 +1,8 @@
 # 優勢評測系統 UI/UX 設計規範
 
-**版本**: 4.0
-**更新日期**: 2025-09-30
-**狀態**: 深度整合認知心理學與說服力設計
+**版本**: 4.1
+**更新日期**: 2025-10-01
+**狀態**: 實現完整動態結果系統與V4.0整合
 
 ## 1. 品牌定位與使命
 
@@ -45,13 +45,15 @@
 ### 3.2 頁面導航架構
 
 #### 主要頁面
-1. **landing.html** - 轉換導向首頁
-2. **assessment-intro.html** - 評測說明頁【新增】
-3. **assessment.html** - 評測執行頁
-4. **results.html** - 基礎結果頁
-5. **report-detail.html** - 深度報告頁【新增】
-6. **action-plan.html** - 行動方案頁【新增】
-7. **profile.html** - 個人檔案頁【新增】
+1. **index.html** - 主要入口點（V3.0/V4.0選擇）
+2. **landing.html** - 轉換導向首頁
+3. **assessment-intro.html** - 評測說明頁
+4. **assessment.html** - V3.0評測執行頁（點選式介面）
+5. **v4_pilot_test.html** - V4.0測試頁（Thurstonian IRT）
+6. **results.html** - 動態結果頁（DNA視覺化）
+7. **report-detail.html** - 深度報告頁
+8. **action-plan.html** - 行動方案頁
+9. **profile.html** - 個人檔案頁
 
 #### 導航邏輯
 - **前進路徑**: 線性引導，每步都有明確下一步
@@ -167,36 +169,76 @@ function handleBack() {
 }
 ```
 
-### 4.4 基礎結果頁（Results）
+### 4.4 動態結果頁（Results）
 
 #### 設計要點
-- **峰值體驗**: 動畫展示前5大優勢
-- **數據可視化**: 雷達圖 + 條形圖組合
-- **層次信息**: 總覽 → 優勢 → 細節 → 行動
-- **社交分享**: 一鍵生成優勢卡片
+- **DNA視覺化**: 雙螺旋結構展示12維度優勢
+- **動態載入**: 基於session ID載入個人化結果
+- **三層分類**: 主導優勢 (8-10分) / 支援優勢 (6-8分) / 待發展 (<6分)
+- **錯誤處理**: 完善的fallback機制和demo模式
+
+#### 技術實現
+```javascript
+// 動態結果載入
+async function loadResults() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session');
+
+    if (sessionId) {
+        try {
+            const response = await fetch(`/api/v1/scoring/results/${sessionId}`);
+            if (response.ok) {
+                const data = await response.json();
+                updateStrengthDataFromProfile(data);
+                return;
+            }
+        } catch (error) {
+            addErrorMessage(sessionId);
+        }
+    }
+
+    // Fallback to demo data
+    showDemoResults();
+}
+
+// DNA雙螺旋視覺化
+function createDNAVisualization(strengths) {
+    const dnaContainer = document.querySelector('.dna-container');
+    strengths.forEach((strength, index) => {
+        const strengthElement = createStrengthBubble(strength, index);
+        dnaContainer.appendChild(strengthElement);
+    });
+}
+```
 
 #### 內容結構
 ```html
-<!-- 優勢揭曉動畫 -->
-<section class="strength-reveal">
-  - 逐一展示動畫
-  - 優勢標籤雲
-  - 一句話總結
+<!-- Session Loading -->
+<section class="session-info">
+  - 會話ID顯示
+  - 測試時間
+  - 置信度指標
 </section>
 
-<!-- 詳細分析 -->
-<section class="detailed-analysis">
-  - 12維度雷達圖
-  - Top 5 優勢深度解析
-  - 發展建議（具體可行）
+<!-- DNA視覺化 -->
+<section class="dna-visualization">
+  - 雙螺旋結構
+  - 12維度氣泡圖
+  - 動態動畫效果
 </section>
 
-<!-- 後續行動 -->
-<section class="next-steps">
-  <button>下載完整報告</button>
-  <button>獲取行動方案</button>
-  <button>分享我的優勢</button>
-  <button>重新測評</button>
+<!-- 優勢分析 -->
+<section class="strength-analysis">
+  - 主導優勢（紅色標記）
+  - 支援優勢（金色標記）
+  - 待發展領域（灰色標記）
+</section>
+
+<!-- 分享與行動 -->
+<section class="next-actions">
+  <button>生成PDF報告</button>
+  <button>分享優勢圖</button>
+  <button>開始行動計劃</button>
 </section>
 ```
 
@@ -557,71 +599,102 @@ class ProgressTracker {
 
 ### 11.1 頁面完整性檢查
 
-- [ ] **landing.html** - 首頁實現
-  - [ ] 信任標誌顯示
-  - [ ] CTA 按鈕醒目
-  - [ ] 價值主張清晰
-  - [ ] 響應式適配
+- [x] **index.html** - 主要入口點
+  - [x] V3.0/V4.0選擇介面
+  - [x] 統一導航入口
+  - [x] 版本說明清晰
 
-- [ ] **assessment-intro.html** - 評測說明頁【待開發】
-  - [ ] 流程說明清楚
-  - [ ] 期待設定恰當
-  - [ ] 開始按鈕明確
+- [x] **landing.html** - 首頁實現
+  - [x] 信任標誌顯示
+  - [x] CTA 按鈕醒目
+  - [x] 價值主張清晰
+  - [x] 響應式適配
 
-- [ ] **assessment.html** - 評測頁優化
-  - [ ] 進度保存功能
-  - [ ] 返回提醒機制
-  - [ ] 自動下一題
+- [x] **assessment-intro.html** - 評測說明頁
+  - [x] 流程說明清楚
+  - [x] 期待設定恰當
+  - [x] 開始按鈕明確
 
-- [ ] **results.html** - 結果頁增強
-  - [ ] 動畫效果流暢
-  - [ ] 數據視覺化
-  - [ ] 後續引導清晰
+- [x] **assessment.html** - V3.0評測頁
+  - [x] 點選式介面（與V4.0統一）
+  - [x] 進度保存功能
+  - [x] 返回提醒機制
+  - [x] 自動下一題
 
-- [ ] **report-detail.html** - 深度報告【待開發】
-  - [ ] 內容個性化
-  - [ ] 建議具體化
-  - [ ] 下載功能
+- [x] **v4_pilot_test.html** - V4.0測試頁
+  - [x] Thurstonian IRT評測
+  - [x] 防重複選擇邏輯
+  - [x] 環境適配（雙埠支援）
+  - [x] 與assessment.html統一設計
 
-- [ ] **action-plan.html** - 行動方案【待開發】
-  - [ ] 計劃可執行
-  - [ ] 資源連結有效
-  - [ ] 進度追蹤
+- [x] **results.html** - 動態結果頁
+  - [x] DNA雙螺旋視覺化
+  - [x] 動態session載入
+  - [x] 三層優勢分類
+  - [x] 錯誤處理與fallback
+  - [x] 個人化數據展示
 
-- [ ] **profile.html** - 個人檔案【待開發】
-  - [ ] 歷史記錄
-  - [ ] 進步追蹤
-  - [ ] 分享功能
+- [x] **report-detail.html** - 深度報告
+  - [x] 基礎頁面架構
+  - [ ] 內容個性化（待優化）
+  - [ ] 建議具體化（待優化）
+  - [ ] 下載功能（待實現）
+
+- [x] **action-plan.html** - 行動方案
+  - [x] 基礎頁面架構
+  - [ ] 計劃個性化（待實現）
+  - [ ] 資源連結整合（待實現）
+  - [ ] 進度追蹤（待實現）
+
+- [x] **profile.html** - 個人檔案
+  - [x] 基礎頁面架構
+  - [ ] 歷史記錄整合（待實現）
+  - [ ] 進步追蹤（待實現）
+  - [ ] 分享功能（待實現）
 
 ### 11.2 用戶流程驗證
 
-- [ ] 新用戶完整流程順暢
-- [ ] 返回用戶恢復機制完善
-- [ ] 錯誤處理友好
-- [ ] 載入狀態明確
-- [ ] 離開確認提醒
+- [x] 新用戶完整流程順暢
+- [x] 返回用戶恢復機制完善
+- [x] 錯誤處理友好
+- [x] 載入狀態明確
+- [x] 離開確認提醒
 
 ## 12. 總結
 
-本規範（v4.0）深度整合了認知心理學原理、格式塔設計原則、AIDA模型和Cialdini說服力原則，解決了以下關鍵問題：
+本規範（v4.1）在v4.0基礎上完成了動態結果系統實現，深度整合認知心理學原理、格式塔設計原則、AIDA模型和Cialdini說服力原則，解決了以下關鍵問題：
 
-### 已解決問題
-1. ✅ **頁面功能缺失** - 新增5個關鍵頁面完善用戶旅程
-2. ✅ **內容空泛問題** - 建立深度個性化內容生成系統
-3. ✅ **導航斷層** - 設計完整的進度追蹤與返回機制
-4. ✅ **認知負荷** - 應用Hick's Law簡化決策流程
-5. ✅ **轉換優化** - AIDA模型貫穿全流程
+### V4.1版本新增功能
+1. ✅ **動態結果系統** - 完全重寫results.html，基於session ID載入個人化數據
+2. ✅ **DNA視覺化** - 實現雙螺旋結構的12維度優勢展示
+3. ✅ **V4.0 IRT整合** - Thurstonian IRT評測與V3.0系統並行運行
+4. ✅ **統一介面設計** - V3.0與V4.0評測頁面採用一致的點選式介面
+5. ✅ **環境適配** - 雙埠支援（3000靜態 / 8004 API）確保部署彈性
+6. ✅ **錯誤處理完善** - 全面的fallback機制和使用者友好錯誤提示
 
-### 核心改進
-- **系統化**: 從單點優化到全流程設計
-- **科學化**: 每個決策都有心理學依據
-- **個性化**: 從通用建議到定制化方案
-- **可執行**: 從概念到具體實施細節
+### 已解決技術問題
+1. ✅ **IRT計分問題** - 修復DIMENSION_MAPPING，確保不同答案產生不同結果
+2. ✅ **UI邏輯錯誤** - 防止同選項重複選擇為「最像」和「最不像」
+3. ✅ **API路由問題** - 修復端點404錯誤，確保JSON回應格式
+4. ✅ **靜態結果問題** - 從硬編碼靜態內容轉為動態session載入
+5. ✅ **導航不一致** - 統一所有評測按鈕路由到正確頁面
 
-### 下一步行動
-1. 實施新增頁面開發
-2. 整合深度內容系統
-3. 部署進度追蹤機制
-4. A/B測試優化轉換
+### 核心技術架構改進
+- **雙版本並行**: V3.0傳統評測 + V4.0 IRT前沿研究
+- **動態個性化**: 從靜態展示轉為session驅動的個人化體驗
+- **視覺創新**: DNA雙螺旋替代傳統圖表，提升峰值體驗
+- **容錯設計**: 多層fallback確保任何情況下都有合適展示
 
-透過這次全面升級，系統將真正實現「發現優勢 → 理解價值 → 採取行動」的完整閉環。
+### 系統完整性狀態
+- **核心流程**: 完全實現並測試通過
+- **前端介面**: 9個主要頁面全部到位
+- **後端API**: 雙API架構支撐V3.0/V4.0評測
+- **數據視覺化**: DNA結構創新呈現優勢組合
+
+### 下一階段重點
+1. 深化報告個性化內容生成
+2. 實現PDF下載和分享功能
+3. 建立用戶歷史記錄追蹤
+4. 優化loading效能和使用者體驗
+
+透過v4.1版本的完整實現，系統已經建立了從「科學評測 → 動態結果 → 個性化建議」的完整價值鏈，為後續的商業化和規模化奠定了堅實基礎。
