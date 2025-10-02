@@ -13,7 +13,7 @@ import json
 
 from services.v4_data_collector import get_data_collector
 
-router = APIRouter(prefix="/api/v4/data-collection")
+router = APIRouter(prefix="/data/collection")
 
 
 # Request/Response Models

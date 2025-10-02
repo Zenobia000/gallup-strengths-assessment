@@ -84,18 +84,18 @@ class Config {
     const currentOrigin = window.location.origin;
 
     // If we're on a specific port, try common API ports
-    const apiPorts = [8002, 8000, 5000, 3001];
+    const apiPorts = [8004, 8002, 8000, 5000, 3001];
 
     // Extract current port
     const currentPort = window.location.port;
 
     // If current port is a known API port, use it
     if (apiPorts.includes(parseInt(currentPort))) {
-      return `${currentOrigin}/api/v1`;
+      return `${currentOrigin}/api`;
     }
 
-    // Default to port 8002 for FastAPI
-    return `${window.location.protocol}//${window.location.hostname}:8002/api/v1`;
+    // Default to port 8004 for FastAPI
+    return `${window.location.protocol}//${window.location.hostname}:8004/api`;
   }
 
   /**
@@ -104,7 +104,7 @@ class Config {
    */
   _getProdApiUrl() {
     // In production, API should be on same origin
-    return `${window.location.origin}/api/v1`;
+    return `${window.location.origin}/api`;
   }
 
   /**

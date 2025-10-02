@@ -42,9 +42,9 @@ app = FastAPI(
     title="Gallup Strengths Assessment API",
     description="心理測量與決策支援系統 - 將公領域人格量表轉化為可執行的決策建議",
     version="1.0.0",
-    docs_url="/api/v1/docs",
-    openapi_url="/api/v1/openapi.json",
-    redoc_url="/api/v1/redoc"
+    docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
+    redoc_url="/api/redoc"
 )
 
 # Configure CORS for development - following MVP pragmatism
@@ -74,7 +74,7 @@ async def add_request_metadata(request: Request, call_next):
     # Add metadata headers for traceability
     response.headers["X-Request-ID"] = request.state.request_id
     response.headers["X-Timestamp"] = request.state.timestamp.isoformat()
-    response.headers["X-API-Version"] = "v1.0.0"
+    response.headers["X-API-Version"] = "1.0.0"
 
     return response
 
@@ -84,7 +84,7 @@ register_error_handlers(app)
 
 
 # Enhanced Questions Endpoint - Database Driven with Situational Support
-@app.get("/api/v1/questions", tags=["Assessment"])
+@app.get("/api/assessment/questions", tags=["Assessment"])
 async def get_questions(include_situational: bool = True):
     """
     Get assessment questions from database.
@@ -179,7 +179,7 @@ async def get_questions(include_situational: bool = True):
         )
 
 # Health Check Endpoint - Simple and focused
-@app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
+@app.get("/api/system/health", response_model=HealthResponse, tags=["System"])
 async def health_check() -> HealthResponse:
     """
     System health check endpoint.
@@ -215,15 +215,11 @@ async def health_check() -> HealthResponse:
         )
 
 
-# Include route modules - Clean separation of concerns
-app.include_router(consent.router, prefix="/api/v1", tags=["Consent"])
-
-# Report generation routes (V4 only)
-app.include_router(reports_v4_only.router, prefix="/api/v1", tags=["Reports"])
-
-# V4.0 Thurstonian IRT routes
-app.include_router(v4_assessment.router, tags=["V4 Assessment"])
-app.include_router(v4_data_collection.router, tags=["V4 Data Collection"])
+# Include route modules - Functional grouping
+app.include_router(consent.router, prefix="/api", tags=["Privacy"])
+app.include_router(reports_v4_only.router, prefix="/api", tags=["Reports"])
+app.include_router(v4_assessment.router, prefix="/api", tags=["Assessment"])
+app.include_router(v4_data_collection.router, prefix="/api", tags=["Data Collection"])
 
 # Mount static files for frontend
 import os
@@ -248,7 +244,7 @@ async def startup_event():
 
         print("FastAPI application started successfully")
         print(f"Psychometric assessment system ready")
-        print(f"API documentation: http://localhost:8004/api/v1/docs")
+        print(f"API documentation: http://localhost:8004/api/docs")
 
     except Exception as e:
         print(f"Startup failed: {e}")
@@ -291,8 +287,8 @@ async def root():
     """Redirect root to API documentation."""
     return JSONResponse({
         "message": "Gallup Strengths Assessment API",
-        "documentation": "/api/v1/docs",
-        "health_check": "/api/v1/health",
+        "documentation": "/api/docs",
+        "health_check": "/api/system/health",
         "assessment": "/assessment"
     })
 

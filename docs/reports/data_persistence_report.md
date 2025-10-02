@@ -50,14 +50,14 @@
 ## 🛠️ 資料留存機制
 
 ### 自動留存點
-1. **會話建立時**（GET /api/v4/assessment/blocks）
+1. **會話建立時**（GET /api/assessment/blocks）
    - 自動存儲 session_id 和 blocks_data 到 v4_sessions
 
-2. **評測提交時**（POST /api/v4/assessment/submit）
+2. **評測提交時**（POST /api/assessment/submit）
    - 存儲完整回應到 v4_assessment_results
    - 包含原始回應、IRT 分數、常模分數
 
-3. **校準執行時**（POST /api/v4/calibration/run）
+3. **校準執行時**（POST /api/data/collection/calibration/run）
    - 存儲校準後的參數到 v4_parameters
    - 用於優化 IRT 模型
 

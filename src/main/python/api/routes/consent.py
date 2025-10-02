@@ -26,7 +26,7 @@ from utils.database import get_database_manager
 from core.config import get_settings
 
 
-router = APIRouter()
+router = APIRouter(prefix="/privacy")
 
 
 def get_client_ip(request: Request) -> str:

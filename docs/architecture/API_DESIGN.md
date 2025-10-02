@@ -3,7 +3,7 @@
 ---
 
 **文件版本 (Document Version):** `v1.0.0`
-**最後更新 (Last Updated):** `2025-09-25`
+**最後更新 (Last Updated):** `2025-10-02`
 **主要作者/設計師 (Lead Author/Designer):** `TaskMaster Hub + Claude Code`
 **審核者 (Reviewers):** `Sunny (Project Lead), 心理測量專家待定`
 **狀態 (Status):** `草稿 (Draft) - Phase 2 API 設計`
@@ -36,11 +36,11 @@
 ```bash
 # 系統健康檢查
 curl --request GET \
-  --url http://localhost:8002/api/v1/health
+  --url http://localhost:8004/api/system/health
 
 # 開始測驗流程 - 提交同意書
 curl --request POST \
-  --url http://localhost:8002/api/v1/consent \
+  --url http://localhost:8004/api/privacy/consent \
   --header 'Content-Type: application/json' \
   --data '{"agreed": true, "user_agent": "browser/1.0", "consent_version": "v1.0"}'
 ```
@@ -59,9 +59,9 @@ curl --request POST \
 
 ### 2.2 基本 URL (Base URL)
 ```
-Production:  https://gallup-strengths.example.com/api/v1
-Development: http://localhost:8004/api/v1
-Staging:     http://localhost:8003/api/v1
+Production:  https://gallup-strengths.example.com/api
+Development: http://localhost:8004/api
+Staging:     http://localhost:8003/api
 ```
 
 ### 2.3 請求與回應格式
@@ -151,7 +151,7 @@ Authorization: Bearer <session_token>
 
 ### 6.1 同意管理 (Consent Management)
 
-#### POST /consent
+#### POST /privacy/consent
 記錄用戶對隱私條款的同意
 
 **請求**:
@@ -178,7 +178,7 @@ Authorization: Bearer <session_token>
 
 ### 6.2 測驗會話管理 (Assessment Sessions)
 
-#### POST /sessions/start
+#### POST /assessment/start
 開始新的測驗會話
 
 **請求**:
@@ -204,7 +204,7 @@ Authorization: Bearer <session_token>
 }
 ```
 
-#### GET /sessions/{session_id}/items
+#### GET /assessment/sessions/{session_id}/items
 獲取測驗題目
 
 **回應**:
@@ -231,7 +231,7 @@ Authorization: Bearer <session_token>
 }
 ```
 
-#### POST /sessions/{session_id}/submit
+#### POST /assessment/sessions/{session_id}/submit
 提交測驗回答
 
 **請求**:
@@ -266,14 +266,14 @@ Authorization: Bearer <session_token>
       "openness": 78,
       "honesty_humility": 67
     },
-    "next_step": "/sessions/sess_abc123/results"
+    "next_step": "/assessment/sessions/sess_abc123/results"
   }
 }
 ```
 
 ### 6.3 結果分析 (Results Analysis)
 
-#### GET /sessions/{session_id}/results
+#### GET /assessment/sessions/{session_id}/results
 獲取優勢面向分析結果
 
 **回應**:
@@ -325,7 +325,7 @@ Authorization: Bearer <session_token>
 
 ### 6.4 決策建議 (Decision Support)
 
-#### POST /sessions/{session_id}/recommendations
+#### POST /assessment/sessions/{session_id}/recommendations
 生成職缺推薦和改善建議
 
 **請求**:
@@ -384,7 +384,7 @@ Authorization: Bearer <session_token>
 
 ### 6.5 報告生成 (Report Generation)
 
-#### GET /sessions/{session_id}/reports/pdf
+#### GET /reports/sessions/{session_id}/pdf
 生成並下載 PDF 報告
 
 **查詢參數**:
@@ -401,7 +401,7 @@ Content-Length: 245760
 [PDF Binary Data]
 ```
 
-#### POST /sessions/{session_id}/share
+#### POST /reports/sessions/{session_id}/share
 生成一次性分享連結
 
 **請求**:
@@ -533,7 +533,7 @@ Content-Length: 245760
 ## 9. API 版本控制與生命週期
 
 ### 9.1 版本控制策略
-- **URL 版本控制**: `/api/v1/`, `/api/v2/`
+- **功能性API結構**: `/api/system/*`, `/api/assessment/*`, `/api/reports/*`, `/api/privacy/*`, `/api/data/*`
 - **語意化版本**: `v1.0.0` (major.minor.patch)
 - **向後相容性**: 次版本更新保證相容
 

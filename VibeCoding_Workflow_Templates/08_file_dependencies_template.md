@@ -112,7 +112,7 @@ graph TD
 
 | 層級/模組 | 主要職責 | 程式碼示例 (路徑) |
 | :--- | :--- | :--- |
-| **介面層 (Presentation)** | 處理 HTTP 請求、API 端點定義、數據驗證、序列化。 | `src/app/api/v1/` |
+| **介面層 (Presentation)** | 處理 HTTP 請求、API 端點定義、數據驗證、序列化。 | `src/app/api/` |
 | **應用層 (Application)** | 編排業務流程、協調領域對象和基礎設施服務。 | `src/app/services/` |
 | **領域層 (Domain)** | 包含核心業務邏輯、實體、值對象和倉儲介面。 | `src/app/domain/` |
 | **基礎設施層 (Infrastructure)** | 實現數據庫訪問、與外部服務通信、消息隊列等。 | `src/app/repositories/`, `src/app/clients/` |

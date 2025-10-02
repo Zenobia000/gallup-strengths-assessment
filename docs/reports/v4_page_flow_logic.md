@@ -42,10 +42,10 @@
 ### 2. Assessment Page (assessment.html)
 **功能**: 標準評測流程頁面
 **API 調用**:
-- **初始化**: `GET http://localhost:8004/api/v4/assessment/blocks?block_count=15`
+- **初始化**: `GET http://localhost:8004/api/assessment/blocks?block_count=15`
   - 獲取15個四選二區塊
   - 獲取 session_id
-- **提交**: `POST http://localhost:8004/api/v4/assessment/submit`
+- **提交**: `POST http://localhost:8004/api/assessment/submit`
   ```json
   {
     "session_id": "xxx",
@@ -75,7 +75,7 @@
 **功能**: 展示評測結果
 **數據獲取**:
 - 從 URL 參數獲取 session_id
-- 調用 `GET http://localhost:8004/api/v4/assessment/results/{session_id}`
+- 調用 `GET http://localhost:8004/api/assessment/results/{session_id}`
 **展示內容**:
 - 12維度雷達圖
 - 前5大優勢
@@ -86,10 +86,10 @@
 
 | 端點 | 方法 | 用途 |
 |------|------|------|
-| `/api/v4/health` | GET | 系統健康檢查 |
-| `/api/v4/assessment/blocks` | GET | 獲取評測區塊 |
-| `/api/v4/assessment/submit` | POST | 提交評測答案 |
-| `/api/v4/assessment/results/{session_id}` | GET | 獲取評測結果 |
+| `/api/system/health` | GET | 系統健康檢查 |
+| `/api/assessment/blocks` | GET | 獲取評測區塊 |
+| `/api/assessment/submit` | POST | 提交評測答案 |
+| `/api/assessment/results/{session_id}` | GET | 獲取評測結果 |
 
 ## 常見問題與解決方案
 
@@ -98,10 +98,10 @@
 **解決**:
 ```javascript
 // 錯誤
-fetch('/api/v4/assessment/blocks')
+fetch('/api/assessment/blocks')
 
 // 正確
-fetch('http://localhost:8004/api/v4/assessment/blocks')
+fetch('http://localhost:8004/api/assessment/blocks')
 ```
 
 ### 問題2: CORS 錯誤
@@ -150,4 +150,4 @@ fetch('http://localhost:8004/api/v4/assessment/blocks')
 
 ---
 
-*更新時間: 2025-09-30 23:10*
+*更新時間: 2025-10-02*

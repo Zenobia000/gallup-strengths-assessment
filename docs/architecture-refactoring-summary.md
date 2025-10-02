@@ -44,9 +44,9 @@
 
 **效果**:
 ```
-✅ V4 (當前): /api/v4/assessment/*
-✅ V1 (維護): /api/v1/sessions/*, /api/v1/scoring/*
-✅ 相容性: /results/* → /api/v4/assessment/results/*
+✅ 功能性API (當前): /api/assessment/*, /api/system/*, /api/reports/*
+✅ 傳統維護: /api/privacy/*, /api/data/collection/*
+✅ 相容性: /results/* → /api/assessment/results/*
 ```
 
 ### 2. **統一計分引擎**

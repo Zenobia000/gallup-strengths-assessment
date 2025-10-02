@@ -57,20 +57,20 @@
 
 ### API 端點配置
 ```
-開發環境: http://localhost:8004/api/v1
-測試環境: http://localhost:8003/api/v1
+開發環境: http://localhost:8004/api
+測試環境: http://localhost:8003/api
 前端服務: http://localhost:8080
 ```
 
 ### 已實現的 API 端點
-- `POST /api/v1/consent` - 隱私同意記錄
-- `GET /api/v1/health` - 系統健康檢查
-- `POST /api/v1/sessions` - 會話管理
-- `GET /api/v1/questions` - 題目載入
-- `POST /api/v1/scoring/{session_id}` - 計分處理
-- `GET /api/v1/results/{session_id}` - 結果查詢
-- `GET /api/v1/reports/{session_id}` - PDF 報告
-- `POST /api/v1/cache/clear` - 快取管理 (新增)
+- `POST /api/privacy/consent` - 隱私同意記錄
+- `GET /api/system/health` - 系統健康檢查
+- `POST /api/assessment/sessions` - 會話管理
+- `GET /api/assessment/questions` - 題目載入
+- `POST /api/assessment/scoring/{session_id}` - 計分處理
+- `GET /api/assessment/results/{session_id}` - 結果查詢
+- `GET /api/reports/{session_id}` - PDF 報告
+- `POST /api/data/collection/cache/clear` - 快取管理 (新增)
 
 ### 前端頁面
 - `/pages/consent.html` - 隱私同意頁面

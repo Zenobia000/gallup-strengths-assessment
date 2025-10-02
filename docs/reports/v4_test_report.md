@@ -1,6 +1,6 @@
 # V4.0 Thurstonian IRT System - Test Report
 
-**Date**: 2025-09-30
+**Date**: 2025-10-02
 **Version**: 4.0.0
 **Status**: ✅ Testing Complete
 
@@ -13,7 +13,7 @@ The V4.0 Thurstonian IRT-based assessment system has been successfully implement
 ### 1. API Testing ✅
 
 #### Health Check Endpoint
-- **Endpoint**: `GET /api/v4/health`
+- **Endpoint**: `GET /api/system/health`
 - **Status**: ✅ Passing
 - **Response**: System health status with component readiness
 ```json
@@ -31,7 +31,7 @@ The V4.0 Thurstonian IRT-based assessment system has been successfully implement
 ```
 
 #### Assessment Blocks Endpoint
-- **Endpoint**: `GET /api/v4/assessment/blocks`
+- **Endpoint**: `GET /api/assessment/blocks`
 - **Status**: ✅ Passing
 - **Function**: Generates quartet blocks for forced-choice assessment
 - **Key Features**:
@@ -41,7 +41,7 @@ The V4.0 Thurstonian IRT-based assessment system has been successfully implement
   - Social desirability matching
 
 #### Submit Responses Endpoint
-- **Endpoint**: `POST /api/v4/assessment/submit`
+- **Endpoint**: `POST /api/assessment/submit`
 - **Status**: ✅ Fixed and operational
 - **Function**: Processes responses and calculates IRT scores
 - **Key Features**:
@@ -159,10 +159,10 @@ The V4.0 Thurstonian IRT-based assessment system has been successfully implement
 python3 src/test/unit/v4/test_api_integration.py
 
 # Test health endpoint
-curl http://localhost:8004/api/v4/health
+curl http://localhost:8004/api/system/health
 
 # Test blocks endpoint
-curl -X GET "http://localhost:8004/api/v4/assessment/blocks?block_count=5"
+curl -X GET "http://localhost:8004/api/assessment/blocks?block_count=5"
 
 # Access frontend
 open http://localhost:3000/landing.html
@@ -182,5 +182,5 @@ The V4.0 Thurstonian IRT system is fully functional and ready for deployment. Al
 
 ---
 
-*Generated: 2025-09-30 22:55*
+*Generated: 2025-10-02*
 *Tester: Claude Code Assistant*

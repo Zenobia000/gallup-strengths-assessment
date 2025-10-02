@@ -42,7 +42,7 @@
 | 服務名稱 | 端口 | 用途 | 狀態 | 訪問地址 |
 |:---------|:-----|:-----|:-----|:---------|
 | **前端服務** | 3000 | 靜態文件服務器 | ✅ 運行中 | http://localhost:3000 |
-| **API 主服務** | 8004 | FastAPI 主要 API 端點 | ✅ 運行中 | http://localhost:8004/api/v1 |
+| **API 主服務** | 8004 | FastAPI 主要 API 端點 | ✅ 運行中 | http://localhost:8004/api |
 
 ### 開發環境預留端口
 
@@ -91,7 +91,7 @@ PYTHONPATH=. python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8004 --reload
 
 echo "✅ 服務啟動完成"
 echo "📱 前端: http://localhost:3000"
-echo "🔌 API: http://localhost:8004/api/v1/docs"
+echo "🔌 API: http://localhost:8004/docs"
 ```
 
 ## API 端點規範
@@ -100,15 +100,13 @@ echo "🔌 API: http://localhost:8004/api/v1/docs"
 
 | 端點 | 方法 | 功能 | 版本 |
 |:-----|:-----|:-----|:-----|
-| `/api/v1/health` | GET | 健康檢查 | v1.0 |
-| `/api/v1/questions` | GET | 獲取題目 | v1.0 |
-| `/api/v1/consent` | POST | 用戶同意 | v1.0 |
-| `/api/v1/sessions/start` | POST | 開始測評 | v1.0 |
-| `/api/v1/sessions/{id}/submit` | POST | 提交答案 | v1.0 |
-| `/api/v1/scoring/calculate` | POST | 計算分數 | v2.0 |
-| `/api/v1/reports/generate` | POST | 生成報告 | v2.0 |
-| `/api/v4/assessment/start` | POST | V4 測評啟動 | v4.0 |
-| `/api/v4/assessment/submit` | POST | V4 提交評測 | v4.0 |
+| `/api/system/health` | GET | 健康檢查 | 現行 |
+| `/api/assessment/questions` | GET | 獲取題目 | 現行 |
+| `/api/privacy/consent` | POST | 用戶同意 | 現行 |
+| `/api/assessment/start` | POST | 開始測評 | 現行 |
+| `/api/assessment/submit` | POST | 提交答案 | 現行 |
+| `/api/assessment/scoring/calculate` | POST | 計算分數 | 現行 |
+| `/api/reports/generate` | POST | 生成報告 | 現行 |
 
 ## 前端路由規範
 
@@ -126,10 +124,10 @@ echo "🔌 API: http://localhost:8004/api/v1/docs"
 用戶訪問流程:
 1. 用戶訪問 http://localhost:3000/landing.html
 2. 點擊 "開始測評"
-3. 前端調用 POST /api/v1/sessions/start
+3. 前端調用 POST /api/assessment/start
 4. 跳轉到 /v4_assessment.html
 5. 用戶完成測評
-6. 前端調用 POST /api/v4/assessment/submit
+6. 前端調用 POST /api/assessment/submit
 7. 後端處理並返回結果
 8. 跳轉到 /results.html 展示結果
 ```
@@ -151,7 +149,7 @@ ENVIRONMENT=production
 
 ```bash
 # 檢查服務狀態
-curl http://localhost:8004/api/v1/health
+curl http://localhost:8004/api/system/health
 curl http://localhost:3000/landing.html -I
 ```
 

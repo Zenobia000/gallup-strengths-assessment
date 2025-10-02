@@ -480,27 +480,27 @@ async def add_security_headers(request: Request, call_next):
 
 #### Assessment API
 ```
-GET    /api/v1/health                    # System health check
-POST   /api/v1/sessions                  # Create new session
-GET    /api/v1/scoring/questions         # Get assessment questions
-POST   /api/v1/scoring/submit            # Submit assessment responses
-GET    /api/v1/sessions/{id}/results     # Retrieve assessment results
-POST   /api/v1/reports/generate/session  # Generate PDF report
+GET    /api/system/health                # System health check
+POST   /api/assessment/sessions          # Create new session
+GET    /api/assessment/questions         # Get assessment questions
+POST   /api/assessment/submit            # Submit assessment responses
+GET    /api/assessment/sessions/{id}/results  # Retrieve assessment results
+POST   /api/reports/generate/session     # Generate PDF report
 ```
 
 #### Cache Management API
 ```
-GET    /api/v1/cache/stats              # Cache statistics
-GET    /api/v1/cache/health             # Cache health check
-POST   /api/v1/cache/warm               # Warm cache with common data
-DELETE /api/v1/cache/clear              # Clear cache data
+GET    /api/data/collection/cache/stats  # Cache statistics
+GET    /api/data/collection/cache/health # Cache health check
+POST   /api/data/collection/cache/warm   # Warm cache with common data
+DELETE /api/data/collection/cache/clear  # Clear cache data
 ```
 
 ### Request/Response Examples
 
 #### Start Assessment
 ```http
-POST /api/v1/sessions
+POST /api/assessment/sessions
 Content-Type: application/json
 
 {
@@ -518,7 +518,7 @@ Response:
 
 #### Submit Assessment
 ```http
-POST /api/v1/scoring/submit
+POST /api/assessment/submit
 Content-Type: application/json
 
 {
@@ -611,7 +611,7 @@ grep -i "database" /var/log/strengths-app.log | grep -i error
 echo "=== Daily Health Check - $(date) ==="
 
 # Check application status
-curl -s http://localhost:8004/api/v1/health | jq .
+curl -s http://localhost:8004/api/system/health | jq .
 
 # Check database status
 psql strengths_db -c "SELECT COUNT(*) FROM users;"

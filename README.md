@@ -120,7 +120,7 @@ pip install -r requirements.txt
 # 2. 啟動後端 API (V4)
 cd src/main/python
 PYTHONPATH=. python main.py
-# API: http://localhost:8002
+# API: http://localhost:8004
 
 # 3. 啟動前端服務 (另一終端)
 cd src/main/resources/static
@@ -136,23 +136,31 @@ python -m http.server 3000
 - **結果頁面**: http://localhost:3000/results.html?session={id}
 
 #### 開發端
-- **API 文檔**: http://localhost:8002/docs
-- **系統狀態**: http://localhost:8002/api/health
-- **系統資訊**: http://localhost:8002/api/system/info
+- **API 文檔**: http://localhost:8004/api/docs
+- **系統狀態**: http://localhost:8004/api/system/health
+- **系統資訊**: http://localhost:8004/api/system/info
 
-### 📊 **V4.0 API 端點**
+### 📊 **功能導向 API 端點**
 ```
-V4 核心端點:
-├── GET  /api/v4/assessment/blocks     # 獲取平衡題組
-├── POST /api/v4/assessment/submit     # 提交評測回答
-├── GET  /api/v4/assessment/results/{id} # 獲取完整結果
-├── GET  /api/v4/health               # 系統健康檢查
-└── POST /api/v4/calibration/run      # IRT 參數校準
+系統相關:
+├── GET  /api/system/health              # 系統健康檢查
+└── GET  /api/system/info                # 系統資訊
 
-共用端點:
-├── POST /consent                     # 隱私同意管理
-├── GET  /reports/{id}/download       # 報告下載
-└── GET  /api/system/info            # 系統資訊
+隱私相關:
+└── POST /api/privacy/consent            # 隱私同意管理
+
+評測相關:
+├── GET  /api/assessment/blocks          # 獲取平衡題組
+├── POST /api/assessment/submit          # 提交評測回答
+├── GET  /api/assessment/results/{id}    # 獲取完整結果
+└── GET  /api/assessment/questions       # 獲取評測題目
+
+報告相關:
+├── POST /api/reports/generate/{id}      # 生成報告
+└── GET  /api/reports/download/{id}      # 報告下載
+
+數據收集:
+└── POST /api/data/collection/*          # 數據收集相關
 ```
 
 ---
@@ -172,8 +180,8 @@ python -m pytest src/test/integration/test_v4_archetype_integration.py -v
 ### 系統驗證
 ```bash
 # 檢查核心功能
-curl -s http://localhost:8002/api/v4/assessment/blocks | jq '.total_blocks'
-curl -s http://localhost:8002/api/health | jq '.status'
+curl -s http://localhost:8004/api/assessment/blocks | jq '.total_blocks'
+curl -s http://localhost:8004/api/system/health | jq '.status'
 
 # 評測流程測試
 # 1. 訪問 http://localhost:3000/assessment.html
@@ -227,8 +235,8 @@ curl -s http://localhost:8002/api/health | jq '.status'
 - `CLAUDE.md` - 開發協作規則
 
 ### API 文檔
-- **自動生成**: http://localhost:8002/docs
-- **OpenAPI**: http://localhost:8002/openapi.json
+- **自動生成**: http://localhost:8004/docs
+- **OpenAPI**: http://localhost:8004/openapi.json
 
 ---
 

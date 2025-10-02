@@ -16,7 +16,7 @@ import logging
 from core.data_access.unified_repository import get_score_repository
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/reports", tags=["Reports V4"])
+router = APIRouter(prefix="/reports", tags=["Reports"])
 
 
 @router.post("/generate/{session_id}")

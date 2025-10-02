@@ -310,7 +310,7 @@ graph TD
   ## 3. 必要 API 契約
   | 方法 | 路徑 | 說明 | 請求 | 回應 | 錯誤碼 |
   | :--- | :--- | :--- | :--- | :--- | :--- |
-  | POST | /api/v1/... | ...  | ...  | ...  | 4xx/5xx |
+  | POST | /api/assessment/... | ...  | ...  | ...  | 4xx/5xx |
 
   ## 4. 資料表 Schema
   ```sql
@@ -320,7 +320,7 @@ graph TD
   ## 5. 前端範圍與路由
   | 頁面/路由 | 依賴 API | 核心組件 |
   | :--- | :--- | :--- |
-  | /login | `POST /api/v1/auth` | `LoginForm` |
+  | /login | `POST /api/privacy/auth` | `LoginForm` |
 
   ## 6. 風險與手動替代方案
   | 風險分類 | 描述 | 替代/回退方案 |

@@ -31,7 +31,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-router = APIRouter(prefix="/api/v4")
+router = APIRouter(prefix="/assessment")
 
 
 # Request/Response Models

@@ -62,7 +62,7 @@ class APIConstants:
     V4_PREFIX = "/api/v4"
 
     # 預設埠號
-    DEFAULT_API_PORT = 8002
+    DEFAULT_API_PORT = 8004
     DEFAULT_FRONTEND_PORT = 3000
 
     # 超時配置
