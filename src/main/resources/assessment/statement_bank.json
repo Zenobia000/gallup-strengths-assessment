@@ -1,0 +1,831 @@
+{
+  "statement_bank_metadata": {
+    "version": "1.0",
+    "created_date": "2025-10-02",
+    "author": "Claude Code AI",
+    "description": "12個才幹維度的語句庫，每個維度10個語句，共120個語句",
+    "statement_format": "第一人稱、行為可觀察、正向、中性場景",
+    "naming_convention": "S_T{talent}_{01-10}"
+  },
+
+  "talent_definitions": {
+    "T1": {
+      "name": "結構化執行",
+      "domain": "EXECUTING",
+      "description": "將目標拆解成步驟，建立流程和追蹤機制"
+    },
+    "T2": {
+      "name": "品質與完備",
+      "domain": "EXECUTING",
+      "description": "注重細節，追求第一次就把事情做對"
+    },
+    "T3": {
+      "name": "探索與創新",
+      "domain": "STRATEGIC_THINKING",
+      "description": "嘗試新方法，從失敗中學習，連結不同概念"
+    },
+    "T4": {
+      "name": "分析與洞察",
+      "domain": "STRATEGIC_THINKING",
+      "description": "界定問題，用數據檢驗假設，辨識因果關係"
+    },
+    "T5": {
+      "name": "影響與倡議",
+      "domain": "INFLUENCING",
+      "description": "說服他人，表達觀點，推動變革"
+    },
+    "T6": {
+      "name": "協作與共好",
+      "domain": "RELATIONSHIP_BUILDING",
+      "description": "建立團隊合作，分享資源，促進和諧"
+    },
+    "T7": {
+      "name": "客戶導向",
+      "domain": "INFLUENCING",
+      "description": "理解客戶需求，創造價值，建立長期關係"
+    },
+    "T8": {
+      "name": "學習與成長",
+      "domain": "STRATEGIC_THINKING",
+      "description": "持續學習，反思改進，培養他人"
+    },
+    "T9": {
+      "name": "紀律與信任",
+      "domain": "RELATIONSHIP_BUILDING",
+      "description": "守約守時，維持穩定，建立可靠形象"
+    },
+    "T10": {
+      "name": "壓力調節",
+      "domain": "RELATIONSHIP_BUILDING",
+      "description": "在壓力下保持冷靜，穩定團隊情緒"
+    },
+    "T11": {
+      "name": "衝突整合",
+      "domain": "INFLUENCING",
+      "description": "處理分歧，尋求共識，促進決策"
+    },
+    "T12": {
+      "name": "責任與當責",
+      "domain": "EXECUTING",
+      "description": "承擔責任，主動回報，確保交付"
+    }
+  },
+
+  "statement_bank": {
+    "T1_結構化執行": [
+      {
+        "id": "S_T1_01",
+        "text": "我會把大型目標拆成週任務",
+        "complexity": "medium",
+        "behavioral_focus": "planning"
+      },
+      {
+        "id": "S_T1_02",
+        "text": "我習慣以看板追蹤進度",
+        "complexity": "medium",
+        "behavioral_focus": "tracking"
+      },
+      {
+        "id": "S_T1_03",
+        "text": "我設定明確交付與日期",
+        "complexity": "low",
+        "behavioral_focus": "goal_setting"
+      },
+      {
+        "id": "S_T1_04",
+        "text": "我先定義完成定義(DoD)",
+        "complexity": "high",
+        "behavioral_focus": "standards"
+      },
+      {
+        "id": "S_T1_05",
+        "text": "我用里程碑管理風險",
+        "complexity": "high",
+        "behavioral_focus": "risk_management"
+      },
+      {
+        "id": "S_T1_06",
+        "text": "我把依賴關係畫出來",
+        "complexity": "high",
+        "behavioral_focus": "dependency_mapping"
+      },
+      {
+        "id": "S_T1_07",
+        "text": "我每日檢視阻礙並清除",
+        "complexity": "medium",
+        "behavioral_focus": "problem_solving"
+      },
+      {
+        "id": "S_T1_08",
+        "text": "我用模板複用流程",
+        "complexity": "medium",
+        "behavioral_focus": "standardization"
+      },
+      {
+        "id": "S_T1_09",
+        "text": "我將需求轉成任務顆粒",
+        "complexity": "high",
+        "behavioral_focus": "decomposition"
+      },
+      {
+        "id": "S_T1_10",
+        "text": "我在週會前備妥更新",
+        "complexity": "low",
+        "behavioral_focus": "communication"
+      }
+    ],
+
+    "T2_品質與完備": [
+      {
+        "id": "S_T2_01",
+        "text": "我為關鍵流程設檢核表",
+        "complexity": "medium",
+        "behavioral_focus": "quality_control"
+      },
+      {
+        "id": "S_T2_02",
+        "text": "我在提交前做雙人覆核",
+        "complexity": "medium",
+        "behavioral_focus": "verification"
+      },
+      {
+        "id": "S_T2_03",
+        "text": "我偏好可重現的結果",
+        "complexity": "medium",
+        "behavioral_focus": "consistency"
+      },
+      {
+        "id": "S_T2_04",
+        "text": "我預先定義驗收準則",
+        "complexity": "high",
+        "behavioral_focus": "criteria_setting"
+      },
+      {
+        "id": "S_T2_05",
+        "text": "我會找根因而非頭痛醫頭",
+        "complexity": "high",
+        "behavioral_focus": "root_cause_analysis"
+      },
+      {
+        "id": "S_T2_06",
+        "text": "我用數據驗證修正效果",
+        "complexity": "high",
+        "behavioral_focus": "data_validation"
+      },
+      {
+        "id": "S_T2_07",
+        "text": "我重視邊界與例外情境",
+        "complexity": "high",
+        "behavioral_focus": "edge_case_handling"
+      },
+      {
+        "id": "S_T2_08",
+        "text": "我維護變更紀錄",
+        "complexity": "medium",
+        "behavioral_focus": "documentation"
+      },
+      {
+        "id": "S_T2_09",
+        "text": "我把缺陷轉成預防機制",
+        "complexity": "high",
+        "behavioral_focus": "prevention"
+      },
+      {
+        "id": "S_T2_10",
+        "text": "我追求一次到位",
+        "complexity": "low",
+        "behavioral_focus": "efficiency"
+      }
+    ],
+
+    "T3_探索與創新": [
+      {
+        "id": "S_T3_01",
+        "text": "我喜歡試驗新方法",
+        "complexity": "low",
+        "behavioral_focus": "experimentation"
+      },
+      {
+        "id": "S_T3_02",
+        "text": "我會製作原型驗證",
+        "complexity": "medium",
+        "behavioral_focus": "prototyping"
+      },
+      {
+        "id": "S_T3_03",
+        "text": "我從他域借鏡解法",
+        "complexity": "high",
+        "behavioral_focus": "cross_domain_learning"
+      },
+      {
+        "id": "S_T3_04",
+        "text": "我把失敗當學習",
+        "complexity": "medium",
+        "behavioral_focus": "failure_learning"
+      },
+      {
+        "id": "S_T3_05",
+        "text": "我建議替代路徑",
+        "complexity": "medium",
+        "behavioral_focus": "alternative_thinking"
+      },
+      {
+        "id": "S_T3_06",
+        "text": "我常提出「為何不」",
+        "complexity": "low",
+        "behavioral_focus": "questioning"
+      },
+      {
+        "id": "S_T3_07",
+        "text": "我連結看似無關的點",
+        "complexity": "high",
+        "behavioral_focus": "pattern_recognition"
+      },
+      {
+        "id": "S_T3_08",
+        "text": "我以小成本試水溫",
+        "complexity": "medium",
+        "behavioral_focus": "risk_mitigation"
+      },
+      {
+        "id": "S_T3_09",
+        "text": "我為未來預留選項",
+        "complexity": "high",
+        "behavioral_focus": "optionality"
+      },
+      {
+        "id": "S_T3_10",
+        "text": "我鼓勵團隊嘗試",
+        "complexity": "medium",
+        "behavioral_focus": "team_innovation"
+      }
+    ],
+
+    "T4_分析與洞察": [
+      {
+        "id": "S_T4_01",
+        "text": "我先界定問題與指標",
+        "complexity": "high",
+        "behavioral_focus": "problem_definition"
+      },
+      {
+        "id": "S_T4_02",
+        "text": "我用數據檢驗直覺",
+        "complexity": "medium",
+        "behavioral_focus": "data_validation"
+      },
+      {
+        "id": "S_T4_03",
+        "text": "我建立假設再驗證",
+        "complexity": "high",
+        "behavioral_focus": "hypothesis_testing"
+      },
+      {
+        "id": "S_T4_04",
+        "text": "我辨識因果而非相關",
+        "complexity": "high",
+        "behavioral_focus": "causal_analysis"
+      },
+      {
+        "id": "S_T4_05",
+        "text": "我用可視化溝通洞察",
+        "complexity": "medium",
+        "behavioral_focus": "visualization"
+      },
+      {
+        "id": "S_T4_06",
+        "text": "我做敏感度分析",
+        "complexity": "high",
+        "behavioral_focus": "sensitivity_analysis"
+      },
+      {
+        "id": "S_T4_07",
+        "text": "我評估機會成本",
+        "complexity": "medium",
+        "behavioral_focus": "opportunity_cost"
+      },
+      {
+        "id": "S_T4_08",
+        "text": "我計算風險與報酬",
+        "complexity": "medium",
+        "behavioral_focus": "risk_assessment"
+      },
+      {
+        "id": "S_T4_09",
+        "text": "我拆解成可測試單元",
+        "complexity": "high",
+        "behavioral_focus": "decomposition"
+      },
+      {
+        "id": "S_T4_10",
+        "text": "我追溯差異來源",
+        "complexity": "high",
+        "behavioral_focus": "variance_analysis"
+      }
+    ],
+
+    "T5_影響與倡議": [
+      {
+        "id": "S_T5_01",
+        "text": "我能用故事說明價值",
+        "complexity": "medium",
+        "behavioral_focus": "storytelling"
+      },
+      {
+        "id": "S_T5_02",
+        "text": "我會因人調整說服策略",
+        "complexity": "high",
+        "behavioral_focus": "adaptive_persuasion"
+      },
+      {
+        "id": "S_T5_03",
+        "text": "我善用數據支持主張",
+        "complexity": "medium",
+        "behavioral_focus": "evidence_based"
+      },
+      {
+        "id": "S_T5_04",
+        "text": "我在會議中主動定義議題",
+        "complexity": "medium",
+        "behavioral_focus": "agenda_setting"
+      },
+      {
+        "id": "S_T5_05",
+        "text": "我設計容易被轉述的金句",
+        "complexity": "high",
+        "behavioral_focus": "message_crafting"
+      },
+      {
+        "id": "S_T5_06",
+        "text": "我能把複雜概念講清楚",
+        "complexity": "medium",
+        "behavioral_focus": "simplification"
+      },
+      {
+        "id": "S_T5_07",
+        "text": "我在關鍵時刻敢於表態",
+        "complexity": "medium",
+        "behavioral_focus": "decisive_communication"
+      },
+      {
+        "id": "S_T5_08",
+        "text": "我重視反對意見的處理",
+        "complexity": "high",
+        "behavioral_focus": "objection_handling"
+      },
+      {
+        "id": "S_T5_09",
+        "text": "我以試辦降低阻力",
+        "complexity": "high",
+        "behavioral_focus": "change_management"
+      },
+      {
+        "id": "S_T5_10",
+        "text": "我會爭取資源推動方案",
+        "complexity": "medium",
+        "behavioral_focus": "resource_acquisition"
+      }
+    ],
+
+    "T6_協作與共好": [
+      {
+        "id": "S_T6_01",
+        "text": "我用 RACI 釐清責任",
+        "complexity": "medium",
+        "behavioral_focus": "role_clarification"
+      },
+      {
+        "id": "S_T6_02",
+        "text": "我會正向回饋他人成果",
+        "complexity": "low",
+        "behavioral_focus": "positive_feedback"
+      },
+      {
+        "id": "S_T6_03",
+        "text": "我主動建立跨部門管道",
+        "complexity": "medium",
+        "behavioral_focus": "network_building"
+      },
+      {
+        "id": "S_T6_04",
+        "text": "我分享資訊而非囤積",
+        "complexity": "medium",
+        "behavioral_focus": "information_sharing"
+      },
+      {
+        "id": "S_T6_05",
+        "text": "我安排規律同步會議",
+        "complexity": "low",
+        "behavioral_focus": "regular_communication"
+      },
+      {
+        "id": "S_T6_06",
+        "text": "我促進知識共用",
+        "complexity": "medium",
+        "behavioral_focus": "knowledge_sharing"
+      },
+      {
+        "id": "S_T6_07",
+        "text": "我會替隊友擋子彈",
+        "complexity": "medium",
+        "behavioral_focus": "team_protection"
+      },
+      {
+        "id": "S_T6_08",
+        "text": "我協調資源避免重工",
+        "complexity": "medium",
+        "behavioral_focus": "resource_coordination"
+      },
+      {
+        "id": "S_T6_09",
+        "text": "我重視團隊儀式感",
+        "complexity": "low",
+        "behavioral_focus": "team_culture"
+      },
+      {
+        "id": "S_T6_10",
+        "text": "我在需要時請求支援",
+        "complexity": "medium",
+        "behavioral_focus": "help_seeking"
+      }
+    ],
+
+    "T7_客戶導向": [
+      {
+        "id": "S_T7_01",
+        "text": "我以客戶語言定義價值",
+        "complexity": "medium",
+        "behavioral_focus": "value_definition"
+      },
+      {
+        "id": "S_T7_02",
+        "text": "我能抓到客戶真實痛點",
+        "complexity": "high",
+        "behavioral_focus": "pain_point_identification"
+      },
+      {
+        "id": "S_T7_03",
+        "text": "我優先處理高影響案例",
+        "complexity": "medium",
+        "behavioral_focus": "prioritization"
+      },
+      {
+        "id": "S_T7_04",
+        "text": "我把回饋轉成路線圖",
+        "complexity": "high",
+        "behavioral_focus": "feedback_integration"
+      },
+      {
+        "id": "S_T7_05",
+        "text": "我設計可自助的體驗",
+        "complexity": "high",
+        "behavioral_focus": "self_service_design"
+      },
+      {
+        "id": "S_T7_06",
+        "text": "我用旅程圖找摩擦點",
+        "complexity": "high",
+        "behavioral_focus": "journey_mapping"
+      },
+      {
+        "id": "S_T7_07",
+        "text": "我關注留存而非一次交易",
+        "complexity": "medium",
+        "behavioral_focus": "retention_focus"
+      },
+      {
+        "id": "S_T7_08",
+        "text": "我以 SLA 對齊期待",
+        "complexity": "medium",
+        "behavioral_focus": "expectation_management"
+      },
+      {
+        "id": "S_T7_09",
+        "text": "我衡量 NPS/CSAT 的變化",
+        "complexity": "medium",
+        "behavioral_focus": "satisfaction_measurement"
+      },
+      {
+        "id": "S_T7_10",
+        "text": "我與客戶共創解法",
+        "complexity": "high",
+        "behavioral_focus": "co_creation"
+      }
+    ],
+
+    "T8_學習與成長": [
+      {
+        "id": "S_T8_01",
+        "text": "我設定學習目標",
+        "complexity": "low",
+        "behavioral_focus": "goal_setting"
+      },
+      {
+        "id": "S_T8_02",
+        "text": "我建立知識筆記",
+        "complexity": "low",
+        "behavioral_focus": "knowledge_capture"
+      },
+      {
+        "id": "S_T8_03",
+        "text": "我定期複盤得失",
+        "complexity": "medium",
+        "behavioral_focus": "reflection"
+      },
+      {
+        "id": "S_T8_04",
+        "text": "我主動尋師問道",
+        "complexity": "medium",
+        "behavioral_focus": "mentorship_seeking"
+      },
+      {
+        "id": "S_T8_05",
+        "text": "我把所學教給他人",
+        "complexity": "medium",
+        "behavioral_focus": "knowledge_transfer"
+      },
+      {
+        "id": "S_T8_06",
+        "text": "我每季更新技能地圖",
+        "complexity": "medium",
+        "behavioral_focus": "skill_mapping"
+      },
+      {
+        "id": "S_T8_07",
+        "text": "我把練習排進週計畫",
+        "complexity": "medium",
+        "behavioral_focus": "deliberate_practice"
+      },
+      {
+        "id": "S_T8_08",
+        "text": "我用刻意練習提升",
+        "complexity": "high",
+        "behavioral_focus": "skill_development"
+      },
+      {
+        "id": "S_T8_09",
+        "text": "我追蹤學習成效",
+        "complexity": "medium",
+        "behavioral_focus": "progress_tracking"
+      },
+      {
+        "id": "S_T8_10",
+        "text": "我保持好奇與開放心態",
+        "complexity": "low",
+        "behavioral_focus": "openness"
+      }
+    ],
+
+    "T9_紀律與信任": [
+      {
+        "id": "S_T9_01",
+        "text": "我準時與守約",
+        "complexity": "low",
+        "behavioral_focus": "punctuality"
+      },
+      {
+        "id": "S_T9_02",
+        "text": "我把承諾寫進行事曆",
+        "complexity": "low",
+        "behavioral_focus": "commitment_tracking"
+      },
+      {
+        "id": "S_T9_03",
+        "text": "我維持流程穩定性",
+        "complexity": "medium",
+        "behavioral_focus": "process_stability"
+      },
+      {
+        "id": "S_T9_04",
+        "text": "我遵循合規與稽核",
+        "complexity": "medium",
+        "behavioral_focus": "compliance"
+      },
+      {
+        "id": "S_T9_05",
+        "text": "我保護機密與隱私",
+        "complexity": "medium",
+        "behavioral_focus": "confidentiality"
+      },
+      {
+        "id": "S_T9_06",
+        "text": "我固定節奏發佈版本",
+        "complexity": "medium",
+        "behavioral_focus": "regular_delivery"
+      },
+      {
+        "id": "S_T9_07",
+        "text": "我記錄決策依據",
+        "complexity": "medium",
+        "behavioral_focus": "documentation"
+      },
+      {
+        "id": "S_T9_08",
+        "text": "我按規範提交文件",
+        "complexity": "low",
+        "behavioral_focus": "procedural_compliance"
+      },
+      {
+        "id": "S_T9_09",
+        "text": "我避免臨時改口",
+        "complexity": "medium",
+        "behavioral_focus": "consistency"
+      },
+      {
+        "id": "S_T9_10",
+        "text": "我讓他人可以放心依賴",
+        "complexity": "medium",
+        "behavioral_focus": "reliability"
+      }
+    ],
+
+    "T10_壓力調節": [
+      {
+        "id": "S_T10_01",
+        "text": "我在壓力下保持冷靜",
+        "complexity": "medium",
+        "behavioral_focus": "stress_management"
+      },
+      {
+        "id": "S_T10_02",
+        "text": "我用呼吸與時間隔離",
+        "complexity": "low",
+        "behavioral_focus": "emotional_regulation"
+      },
+      {
+        "id": "S_T10_03",
+        "text": "我能在混亂中抓重點",
+        "complexity": "high",
+        "behavioral_focus": "priority_focus"
+      },
+      {
+        "id": "S_T10_04",
+        "text": "我把焦慮轉為行動",
+        "complexity": "medium",
+        "behavioral_focus": "anxiety_channeling"
+      },
+      {
+        "id": "S_T10_05",
+        "text": "我避免情緒化回應",
+        "complexity": "medium",
+        "behavioral_focus": "emotional_control"
+      },
+      {
+        "id": "S_T10_06",
+        "text": "我會尋求外部視角",
+        "complexity": "medium",
+        "behavioral_focus": "perspective_seeking"
+      },
+      {
+        "id": "S_T10_07",
+        "text": "我安排恢復與休息窗",
+        "complexity": "medium",
+        "behavioral_focus": "recovery_planning"
+      },
+      {
+        "id": "S_T10_08",
+        "text": "我在衝突中保持禮貌",
+        "complexity": "medium",
+        "behavioral_focus": "conflict_composure"
+      },
+      {
+        "id": "S_T10_09",
+        "text": "我辨識能控與不能控",
+        "complexity": "high",
+        "behavioral_focus": "control_discernment"
+      },
+      {
+        "id": "S_T10_10",
+        "text": "我在危機中穩住團隊",
+        "complexity": "high",
+        "behavioral_focus": "team_stabilization"
+      }
+    ],
+
+    "T11_衝突整合": [
+      {
+        "id": "S_T11_01",
+        "text": "我能區分立場與利益",
+        "complexity": "high",
+        "behavioral_focus": "position_interest_analysis"
+      },
+      {
+        "id": "S_T11_02",
+        "text": "我會提出雙贏選項",
+        "complexity": "medium",
+        "behavioral_focus": "win_win_solutions"
+      },
+      {
+        "id": "S_T11_03",
+        "text": "我重述他方觀點以求共識",
+        "complexity": "medium",
+        "behavioral_focus": "active_listening"
+      },
+      {
+        "id": "S_T11_04",
+        "text": "我把歧見轉成假設驗證",
+        "complexity": "high",
+        "behavioral_focus": "disagreement_resolution"
+      },
+      {
+        "id": "S_T11_05",
+        "text": "我設計決策規則避免內耗",
+        "complexity": "high",
+        "behavioral_focus": "decision_framework"
+      },
+      {
+        "id": "S_T11_06",
+        "text": "我管理會議時間與發言",
+        "complexity": "medium",
+        "behavioral_focus": "meeting_facilitation"
+      },
+      {
+        "id": "S_T11_07",
+        "text": "我在僵局時尋求第三路",
+        "complexity": "high",
+        "behavioral_focus": "creative_alternatives"
+      },
+      {
+        "id": "S_T11_08",
+        "text": "我善後並追蹤共識落地",
+        "complexity": "medium",
+        "behavioral_focus": "follow_through"
+      },
+      {
+        "id": "S_T11_09",
+        "text": "我紀錄分歧與解法",
+        "complexity": "medium",
+        "behavioral_focus": "conflict_documentation"
+      },
+      {
+        "id": "S_T11_10",
+        "text": "我尊重少數意見並納入風險",
+        "complexity": "high",
+        "behavioral_focus": "minority_consideration"
+      }
+    ],
+
+    "T12_責任與當責": [
+      {
+        "id": "S_T12_01",
+        "text": "我會對結果負責到底",
+        "complexity": "medium",
+        "behavioral_focus": "result_ownership"
+      },
+      {
+        "id": "S_T12_02",
+        "text": "我主動回報進度與風險",
+        "complexity": "medium",
+        "behavioral_focus": "proactive_communication"
+      },
+      {
+        "id": "S_T12_03",
+        "text": "我承諾後會排除萬難完成",
+        "complexity": "medium",
+        "behavioral_focus": "commitment_fulfillment"
+      },
+      {
+        "id": "S_T12_04",
+        "text": "我願意承擔決策後果",
+        "complexity": "medium",
+        "behavioral_focus": "decision_accountability"
+      },
+      {
+        "id": "S_T12_05",
+        "text": "我清楚我的交付邊界",
+        "complexity": "medium",
+        "behavioral_focus": "boundary_awareness"
+      },
+      {
+        "id": "S_T12_06",
+        "text": "我在延誤時先提出補救計畫",
+        "complexity": "high",
+        "behavioral_focus": "contingency_planning"
+      },
+      {
+        "id": "S_T12_07",
+        "text": "我遇到問題首先自我檢討",
+        "complexity": "medium",
+        "behavioral_focus": "self_reflection"
+      },
+      {
+        "id": "S_T12_08",
+        "text": "我把承諾寫下來並追蹤",
+        "complexity": "low",
+        "behavioral_focus": "commitment_tracking"
+      },
+      {
+        "id": "S_T12_09",
+        "text": "我會要求明確授權",
+        "complexity": "medium",
+        "behavioral_focus": "authority_clarification"
+      },
+      {
+        "id": "S_T12_10",
+        "text": "我讓利害關係人看得到成果",
+        "complexity": "medium",
+        "behavioral_focus": "transparency"
+      }
+    ]
+  }
+}

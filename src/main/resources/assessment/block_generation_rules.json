@@ -1,0 +1,217 @@
+{
+  "block_generation_metadata": {
+    "version": "1.0",
+    "created_date": "2025-10-02",
+    "author": "Claude Code AI",
+    "description": "Rule-based 出題系統規則，基於平衡不完全區塊設計 (BIBD)",
+    "theoretical_basis": "Balanced Incomplete Block Design (BIBD) + ILP Optimization"
+  },
+
+  "design_parameters": {
+    "total_blocks": 30,
+    "statements_per_block": 4,
+    "total_talents": 12,
+    "total_domains": 4,
+    "appearances_per_talent": 10,
+    "talents_per_domain": 3,
+    "target_pairwise_occurrence": 2.73,
+    "domain_balance_requirement": "每個區塊至少包含3個不同領域"
+  },
+
+  "optimization_objectives": {
+    "primary": {
+      "name": "talent_pairwise_balance",
+      "description": "最小化才幹配對共現次數的變異數",
+      "formula": "minimize Var(λ_ij) where λ_ij = 才幹i和j在同一區塊出現次數",
+      "target_value": 2.73,
+      "tolerance": 0.5
+    },
+
+    "secondary": {
+      "name": "domain_interdomain_balance",
+      "description": "最小化領域間共現次數的變異數",
+      "formula": "minimize Var(δ_kl) where δ_kl = 領域k和l在同一區塊出現次數",
+      "constraints": ["每個區塊至少3個不同領域", "避免單一領域獨占"]
+    },
+
+    "tertiary": {
+      "name": "statement_difficulty_balance",
+      "description": "平衡語句複雜度分布",
+      "constraints": ["每個區塊包含不同複雜度語句", "避免全高難度或全低難度區塊"]
+    }
+  },
+
+  "generation_algorithms": {
+    "method_1_systematic_rotation": {
+      "name": "輪轉生成法",
+      "description": "基於數學輪轉規則的系統化生成",
+      "algorithm": "(block_index + offset_pattern) mod 12",
+      "offset_patterns": [0, 3, 6, 9],
+      "advantages": ["簡單實作", "完美平衡性", "可預測性"],
+      "disadvantages": ["可能產生模式", "缺乏隨機性"],
+      "use_case": "基礎版本和快速原型"
+    },
+
+    "method_2_ilp_optimization": {
+      "name": "整數線性規劃法",
+      "description": "使用ILP求解器找到最優解",
+      "objective_function": "minimize Σ(λ_ij - λ_target)² + penalty_terms",
+      "constraints": [
+        "每個才幹出現次數 = 10",
+        "每個區塊4個語句",
+        "每個區塊至少3個不同領域",
+        "語句不重複使用"
+      ],
+      "solver": "CPLEX 或 Gurobi",
+      "advantages": ["全域最優解", "可自定義約束", "理論最佳"],
+      "disadvantages": ["計算複雜", "需要專業軟體"],
+      "use_case": "生產環境和研究版本"
+    },
+
+    "method_3_heuristic_search": {
+      "name": "啟發式搜索法",
+      "description": "模擬退火或遺傳演算法近似求解",
+      "algorithm": "Simulated Annealing with domain constraints",
+      "temperature_schedule": "exponential_decay",
+      "acceptance_probability": "exp(-ΔE/T)",
+      "advantages": ["實作彈性", "可處理複雜約束", "接近最優解"],
+      "disadvantages": ["非保證最優", "需要調參"],
+      "use_case": "平衡版本，兼顧效果和實作成本"
+    }
+  },
+
+  "domain_mapping": {
+    "EXECUTING": {
+      "talents": ["T1", "T2", "T12"],
+      "color": "purple",
+      "min_statements_per_block": 1,
+      "max_statements_per_block": 2
+    },
+    "INFLUENCING": {
+      "talents": ["T5", "T7", "T11"],
+      "color": "orange",
+      "min_statements_per_block": 1,
+      "max_statements_per_block": 2
+    },
+    "RELATIONSHIP_BUILDING": {
+      "talents": ["T6", "T9", "T10"],
+      "color": "blue",
+      "min_statements_per_block": 1,
+      "max_statements_per_block": 2
+    },
+    "STRATEGIC_THINKING": {
+      "talents": ["T3", "T4", "T8"],
+      "color": "green",
+      "min_statements_per_block": 1,
+      "max_statements_per_block": 2
+    }
+  },
+
+  "validation_rules": {
+    "block_level": {
+      "domain_diversity": "每個區塊必須包含至少3個不同領域",
+      "talent_uniqueness": "每個區塊內才幹不重複",
+      "complexity_balance": "每個區塊包含不同複雜度語句",
+      "social_desirability_balance": "避免極端偏向某一端"
+    },
+
+    "questionnaire_level": {
+      "talent_frequency": "每個才幹出現次數 = 10 ± 0",
+      "pairwise_occurrence": "才幹配對共現次數 = 2.73 ± 0.5",
+      "domain_balance": "四個領域出現次數相對平衡",
+      "statement_usage": "每個語句使用次數 = 1"
+    },
+
+    "psychometric_quality": {
+      "discrimination_index": "每個語句鑑別度 > 0.30",
+      "factor_loading": "每個語句因子載荷 > 0.40",
+      "reliability": "內部一致性 α > 0.70",
+      "validity": "結構效度適配指標達標"
+    }
+  },
+
+  "implementation_template": {
+    "input_parameters": {
+      "statement_bank": "語句庫JSON檔案",
+      "target_blocks": 30,
+      "optimization_method": "systematic_rotation | ilp | heuristic",
+      "constraints": "領域平衡、複雜度平衡等額外約束",
+      "random_seed": "可重現性種子值"
+    },
+
+    "output_format": {
+      "questionnaire_id": "問卷版本標識",
+      "generation_timestamp": "生成時間戳",
+      "blocks": [
+        {
+          "block_id": "Q01",
+          "statements": [
+            {
+              "statement_id": "S_T1_01",
+              "talent": "T1",
+              "domain": "EXECUTING",
+              "text": "我會把大型目標拆成週任務",
+              "complexity": "medium"
+            }
+          ],
+          "validation": {
+            "domain_count": 4,
+            "talent_uniqueness": true,
+            "complexity_distribution": "balanced"
+          }
+        }
+      ],
+      "summary_statistics": {
+        "talent_frequency": {},
+        "pairwise_occurrence_matrix": {},
+        "domain_balance_metrics": {},
+        "overall_quality_score": 0.85
+      }
+    },
+
+    "quality_report": {
+      "design_objectives_met": true,
+      "constraint_violations": [],
+      "optimization_score": 0.92,
+      "recommendations": []
+    }
+  },
+
+  "example_systematic_generation": {
+    "description": "基於輪轉規則的前10個區塊範例",
+    "rotation_pattern": "(block_index - 1 + offset) mod 12",
+    "offsets": [0, 3, 6, 9],
+    "blocks": [
+      {
+        "block_id": "Q01",
+        "talents": ["T1", "T4", "T7", "T10"],
+        "domains": ["EXECUTING", "STRATEGIC_THINKING", "INFLUENCING", "RELATIONSHIP_BUILDING"],
+        "statements": ["S_T1_01", "S_T4_01", "S_T7_01", "S_T10_01"]
+      },
+      {
+        "block_id": "Q02",
+        "talents": ["T2", "T5", "T8", "T11"],
+        "domains": ["EXECUTING", "INFLUENCING", "STRATEGIC_THINKING", "INFLUENCING"],
+        "statements": ["S_T2_01", "S_T5_01", "S_T8_01", "S_T11_01"]
+      },
+      {
+        "block_id": "Q03",
+        "talents": ["T3", "T6", "T9", "T12"],
+        "domains": ["STRATEGIC_THINKING", "RELATIONSHIP_BUILDING", "RELATIONSHIP_BUILDING", "EXECUTING"],
+        "statements": ["S_T3_01", "S_T6_01", "S_T9_01", "S_T12_01"]
+      },
+      {
+        "block_id": "Q04",
+        "talents": ["T4", "T7", "T10", "T1"],
+        "domains": ["STRATEGIC_THINKING", "INFLUENCING", "RELATIONSHIP_BUILDING", "EXECUTING"],
+        "statements": ["S_T4_02", "S_T7_02", "S_T10_02", "S_T1_02"]
+      },
+      {
+        "block_id": "Q05",
+        "talents": ["T5", "T8", "T11", "T2"],
+        "domains": ["INFLUENCING", "STRATEGIC_THINKING", "INFLUENCING", "EXECUTING"],
+        "statements": ["S_T5_02", "S_T8_02", "S_T11_02", "S_T2_02"]
+      }
+    ]
+  }
+}

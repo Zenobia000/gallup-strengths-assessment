@@ -1,0 +1,307 @@
+{
+  "methodology_metadata": {
+    "version": "1.0",
+    "created_date": "2025-10-02",
+    "author": "Claude Code AI",
+    "description": "評測基準和方法論，基於 Hierarchical Thurstonian IRT 模型",
+    "theoretical_foundation": [
+      "Thurstonian Item Response Theory (TIRT)",
+      "Hierarchical Multi-dimensional IRT (H-MIRT)",
+      "Keirsey 四大氣質理論",
+      "Gallup CliftonStrengths 四域架構"
+    ]
+  },
+
+  "assessment_framework": {
+    "structure": {
+      "total_blocks": 30,
+      "statements_per_block": 4,
+      "response_format": "forced_choice_quartet",
+      "selection_method": "most_like_least_like",
+      "total_statements": 120,
+      "talent_facets": 12,
+      "talent_domains": 4,
+      "appearances_per_talent": 10
+    },
+
+    "measurement_levels": {
+      "facet_level": {
+        "description": "12個具體才幹特質 (θ)",
+        "measurement_type": "Thurstonian IRT",
+        "output": "normative_percentile_scores"
+      },
+      "domain_level": {
+        "description": "4個才幹領域 (η)",
+        "measurement_type": "Hierarchical factor model",
+        "output": "domain_percentile_scores"
+      },
+      "balance_level": {
+        "description": "領域均衡指標",
+        "measurement_type": "Statistical balance metrics",
+        "output": "DBI_entropy_gini_coefficients"
+      }
+    }
+  },
+
+  "quality_benchmarks": {
+    "psychometric_standards": {
+      "reliability": {
+        "cronbach_alpha": {
+          "minimum": 0.70,
+          "target": 0.85,
+          "description": "內部一致性信度"
+        },
+        "test_retest": {
+          "minimum": 0.75,
+          "target": 0.85,
+          "timeframe": "2-4週",
+          "description": "重測信度"
+        }
+      },
+
+      "validity": {
+        "construct_validity": {
+          "factor_loading": {
+            "minimum": 0.40,
+            "target": 0.70,
+            "description": "因子載荷強度"
+          },
+          "model_fit": {
+            "cfi": { "minimum": 0.90, "target": 0.95 },
+            "tli": { "minimum": 0.90, "target": 0.95 },
+            "rmsea": { "maximum": 0.08, "target": 0.06 },
+            "description": "結構效度適配指標"
+          }
+        },
+
+        "criterion_validity": {
+          "job_performance": {
+            "correlation": { "minimum": 0.25, "target": 0.40 },
+            "description": "與工作績效的關聯"
+          },
+          "career_satisfaction": {
+            "correlation": { "minimum": 0.30, "target": 0.50 },
+            "description": "與職涯滿意度的關聯"
+          }
+        }
+      },
+
+      "fairness": {
+        "differential_item_functioning": {
+          "max_effect_size": 0.20,
+          "description": "不同群體間的項目功能差異"
+        },
+        "measurement_invariance": {
+          "requirement": "strong_invariance",
+          "description": "跨群體測量不變性"
+        }
+      }
+    },
+
+    "technical_performance": {
+      "response_time": {
+        "per_block": { "target": "30-60秒", "maximum": "120秒" },
+        "total_assessment": { "target": "15-30分鐘", "maximum": "60分鐘" }
+      },
+
+      "completion_rate": {
+        "target": 0.90,
+        "minimum": 0.80,
+        "description": "評測完成率"
+      },
+
+      "data_quality": {
+        "response_variance": {
+          "minimum": 0.15,
+          "description": "回應變異性，避免隨機填答"
+        },
+        "extreme_response_rate": {
+          "maximum": 0.20,
+          "description": "極端反應偏誤控制"
+        }
+      }
+    }
+  },
+
+  "scoring_methodology": {
+    "hierarchical_irt": {
+      "facet_estimation": {
+        "method": "Maximum Likelihood Estimation (MLE)",
+        "algorithm": "Newton-Raphson",
+        "convergence_criteria": 1e-6,
+        "max_iterations": 1000
+      },
+
+      "domain_estimation": {
+        "method": "Empirical Bayes",
+        "hierarchical_structure": "4_domains_x_3_talents",
+        "loading_matrix": "Lambda_12x4"
+      },
+
+      "normative_conversion": {
+        "reference_population": "Working professionals (18-65歲)",
+        "sample_size": { "minimum": 1000, "target": 2000 },
+        "percentile_calculation": "empirical_distribution",
+        "smoothing": "kernel_density_estimation"
+      }
+    },
+
+    "balance_metrics": {
+      "domain_balance_index": {
+        "formula": "DBI = 1 - (Var(p) / Var_max)",
+        "range": [0, 1],
+        "interpretation": "0=極不均衡, 1=完全均衡"
+      },
+
+      "relative_entropy": {
+        "formula": "H_rel = -Σ(p_i * log(p_i)) / log(4)",
+        "range": [0, 1],
+        "interpretation": "0=集中分布, 1=均勻分布"
+      },
+
+      "gini_coefficient": {
+        "formula": "G = Σ|p_i - p_j| / (2n * Σp_i)",
+        "range": [0, 1],
+        "interpretation": "0=完全平等, 1=極度不平等"
+      }
+    }
+  },
+
+  "interpretation_framework": {
+    "talent_tiers": {
+      "dominant_talents": {
+        "percentile_range": [80, 100],
+        "description": "主導才幹，具有顯著優勢",
+        "count": "Top 3-4個才幹",
+        "interpretation": "發揮潛能的核心領域"
+      },
+
+      "supporting_talents": {
+        "percentile_range": [50, 79],
+        "description": "支撐才幹，可發展運用",
+        "count": "中等水平才幹",
+        "interpretation": "可透過練習強化的領域"
+      },
+
+      "lesser_talents": {
+        "percentile_range": [0, 49],
+        "description": "較弱才幹，建議透過合作補強",
+        "count": "相對較弱才幹",
+        "interpretation": "透過系統、流程或夥伴合作的領域"
+      }
+    },
+
+    "domain_profiles": {
+      "executing": {
+        "talents": ["T1", "T2", "T12"],
+        "description": "執行力：將想法轉化為現實",
+        "key_behaviors": ["結構化執行", "品質與完備", "責任與當責"]
+      },
+
+      "influencing": {
+        "talents": ["T5", "T7", "T11"],
+        "description": "影響力：說服他人並推動改變",
+        "key_behaviors": ["影響與倡議", "客戶導向", "衝突整合"]
+      },
+
+      "relationship_building": {
+        "talents": ["T6", "T9", "T10"],
+        "description": "關係建立：凝聚團隊並建立信任",
+        "key_behaviors": ["協作與共好", "紀律與信任", "壓力調節"]
+      },
+
+      "strategic_thinking": {
+        "talents": ["T3", "T4", "T8"],
+        "description": "戰略思維：分析信息並做出決策",
+        "key_behaviors": ["探索與創新", "分析與洞察", "學習與成長"]
+      }
+    },
+
+    "balance_interpretation": {
+      "balanced_profile": {
+        "dbi": { "min": 0.70 },
+        "entropy": { "min": 0.70 },
+        "description": "均衡型：四域發展相對平衡"
+      },
+
+      "specialized_profile": {
+        "dbi": { "max": 0.50 },
+        "entropy": { "max": 0.50 },
+        "description": "專精型：在特定領域具有顯著優勢"
+      },
+
+      "complementary_profile": {
+        "dbi": { "range": [0.50, 0.70] },
+        "entropy": { "range": [0.50, 0.70] },
+        "description": "互補型：主次領域分明，適合團隊合作"
+      }
+    }
+  },
+
+  "validation_protocols": {
+    "content_validity": {
+      "expert_review": {
+        "experts": "心理測量學家、組織行為專家、HR實務專家",
+        "criteria": "理論適切性、內容代表性、文化適應性",
+        "agreement_threshold": 0.80
+      },
+
+      "pilot_testing": {
+        "sample_size": { "minimum": 200, "target": 500 },
+        "demographics": "多元背景工作者",
+        "feedback_collection": "量化問卷 + 深度訪談"
+      }
+    },
+
+    "construct_validity": {
+      "factor_analysis": {
+        "exploratory": "確認潛在因子結構",
+        "confirmatory": "驗證理論模型適配",
+        "cross_validation": "獨立樣本驗證"
+      },
+
+      "convergent_divergent": {
+        "convergent_measures": ["Big Five", "MBTI", "Strengths Profile"],
+        "divergent_measures": ["認知能力", "情緒智力"],
+        "expected_correlations": "中等至高度正相關 (r=0.40-0.70)"
+      }
+    },
+
+    "criterion_validity": {
+      "concurrent_validity": {
+        "job_performance": "360度評估、績效考核",
+        "leadership_effectiveness": "領導力評量",
+        "team_dynamics": "團隊合作評估"
+      },
+
+      "predictive_validity": {
+        "career_advancement": "晉升率、薪資成長",
+        "job_satisfaction": "工作滿意度量表",
+        "turnover_intention": "離職傾向預測"
+      }
+    }
+  },
+
+  "continuous_improvement": {
+    "monitoring_metrics": {
+      "response_patterns": "異常反應偵測",
+      "item_performance": "項目難度與鑑別度追蹤",
+      "demographic_bias": "群體差異監控",
+      "predictive_accuracy": "效標預測準確度"
+    },
+
+    "calibration_updates": {
+      "frequency": "每年重新校準",
+      "sample_requirements": "新增樣本 ≥ 500人",
+      "model_refinement": "參數更新與模型優化",
+      "norm_updates": "常模更新與擴充"
+    },
+
+    "research_agenda": {
+      "cross_cultural": "跨文化適應性研究",
+      "longitudinal": "縱貫性發展追蹤",
+      "intervention": "才幹發展介入效果",
+      "team_dynamics": "團隊組合最佳化"
+    }
+  }
+}
