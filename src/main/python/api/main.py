@@ -200,17 +200,14 @@ async def startup_event():
     Follows fail-fast principle.
     """
     try:
-        # Initialize database engine and validate schema
-        from database.engine import get_database_engine
-        engine = get_database_engine()
-        health = engine.health_check()
-
-        if health["status"] != "healthy":
-            raise Exception(f"Database not healthy: {health}")
+        # Initialize file storage (skipping database for now)
+        from core.file_storage import get_file_storage
+        storage = get_file_storage()
 
         print("FastAPI application started successfully")
-        print(f"V4 SQLAlchemy database ready - {health['table_count']} tables")
-        print(f"API documentation: http://localhost:8004/api/docs")
+        print("V4 File storage version ready")
+        print(f"API documentation: http://localhost:8005/api/docs")
+        print("File storage initialized")
 
     except Exception as e:
         print(f"Startup failed: {e}")

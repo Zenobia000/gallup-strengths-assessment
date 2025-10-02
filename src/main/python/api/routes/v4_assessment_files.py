@@ -243,13 +243,39 @@ async def get_assessment_results(session_id: str):
         # Get responses for timing data
         responses = storage.select_by_id("v4_responses", "session_id", session_id)
 
-        # Format dimension scores
+        # Format dimension scores - map from engine output to frontend expected format
+        dimension_mapping = {
+            "structured_execution": "t1_structured_execution",
+            "quality_perfectionism": "t2_quality_perfectionism",
+            "exploration_innovation": "t3_exploration_innovation",
+            "analytical_insight": "t4_analytical_insight",
+            "influence_advocacy": "t5_influence_advocacy",
+            "collaboration_harmony": "t6_collaboration_harmony",
+            "customer_orientation": "t7_customer_orientation",
+            "learning_growth": "t8_learning_growth",
+            "discipline_trust": "t9_discipline_trust",
+            "pressure_regulation": "t10_pressure_regulation",
+            "conflict_integration": "t11_conflict_integration",
+            "responsibility_accountability": "t12_responsibility_accountability"
+        }
+
         dimension_scores = {}
+
+        # First try to get scores from t1-t12 fields (direct storage format)
         for key, value in scores.items():
-            if key.startswith("t") and "_" in key and key != "theta_estimates":
-                # Extract dimension name from key like "t1_structured_execution"
-                dimension_name = key.split("_", 1)[1]
-                dimension_scores[f"t{len(dimension_scores)+1}_{dimension_name}"] = value
+            if key.startswith("t") and "_" in key and key not in ["theta_estimates", "standard_errors", "percentiles"]:
+                # This is already in the correct format like "t1_structured_execution"
+                dimension_scores[key] = value
+
+        # If no t1-t12 fields found, try percentiles field as backup
+        if not dimension_scores and "percentiles" in scores:
+            try:
+                engine_scores = json.loads(scores.get("percentiles", "{}"))
+                for dim_name, score in engine_scores.items():
+                    if dim_name in dimension_mapping:
+                        dimension_scores[dimension_mapping[dim_name]] = score
+            except (json.JSONDecodeError, TypeError):
+                pass
 
         # Calculate completion time from session and response data
         completion_time_formatted = "3:42"  # Default fallback
