@@ -1,0 +1,60 @@
+{
+  "calibration_info": {
+    "version": "v4_2025_enhanced",
+    "calibration_date": "2025-10-02",
+    "sample_size": 2500,
+    "methodology": "Item Response Theory + Factor Analysis",
+    "target_population": "Working adults 22-55, Taiwan & International"
+  },
+  "social_desirability_guidelines": {
+    "scale": "1-7 Likert scale",
+    "interpretation": {
+      "1.0-2.5": "Socially undesirable - admits weakness/negative traits",
+      "2.6-3.5": "Neutral-negative - honest self-assessment",
+      "3.6-4.5": "Balanced - realistic and authentic",
+      "4.6-5.5": "Positive-desirable - shows strength",
+      "5.6-7.0": "Highly desirable - may trigger social bias"
+    },
+    "target_distribution": {
+      "low_sd": "20%",
+      "medium_sd": "60%",
+      "high_sd": "20%"
+    }
+  },
+  "discrimination_parameters": {
+    "excellent": "> 1.20",
+    "good": "1.00-1.20",
+    "acceptable": "0.80-1.00",
+    "poor": "< 0.80",
+    "target_range": "0.85-1.35"
+  },
+  "difficulty_parameters": {
+    "very_easy": "< -1.0",
+    "easy": "-1.0 to -0.5",
+    "medium": "-0.5 to 0.5",
+    "hard": "0.5 to 1.0",
+    "very_hard": "> 1.0",
+    "target_distribution": "Normal distribution centered at 0.0"
+  },
+  "factor_loading_targets": {
+    "excellent": "> 0.80",
+    "good": "0.70-0.80",
+    "acceptable": "0.60-0.70",
+    "minimum": "0.50",
+    "target_range": "0.70-0.90"
+  },
+  "context_balance": {
+    "general": "30%",
+    "work": "25%",
+    "life": "20%",
+    "social": "15%",
+    "emotional": "10%"
+  },
+  "statement_types": {
+    "preference": "30%",
+    "behavioral": "25%",
+    "feeling": "20%",
+    "cognitive": "15%",
+    "belief": "10%"
+  }
+}

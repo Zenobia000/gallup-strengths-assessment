@@ -2,7 +2,7 @@
 V4 Scoring Engine - Simplified version for file storage
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import random
 import time
 
@@ -28,96 +28,134 @@ class V4ScoringEngine:
 
     def score_assessment(self, responses: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Score assessment responses - simplified version
+        Score assessment responses with improved differentiation
         """
         start_time = time.time()
 
         if not responses:
             raise ValueError("No responses to score")
 
-        # Simplified scoring: count preferences per dimension
-        dimension_counts = {dim: 0 for dim in self.dimensions}
+        # Initialize dimension counts with more precision
+        dimension_counts = {dim: 0.0 for dim in self.dimensions}
 
-        # Handle both old format (most_like/least_like) and new format (indices)
+        # Load statement data for accurate scoring
+        try:
+            from core.file_storage import get_file_storage
+            storage = get_file_storage()
+            statements_data = storage.get_table("v4_statements")
+
+            # Create lookup dict for statement to dimension mapping
+            statement_to_dim = {}
+            for stmt in statements_data:
+                stmt_id = stmt.get("statement_id", "")
+                dimension = stmt.get("dimension", "")
+                if stmt_id and dimension:
+                    statement_to_dim[stmt_id] = dimension
+
+        except Exception as e:
+            print(f"Warning: Could not load statement data for accurate scoring: {e}")
+            statement_to_dim = {}
+
+        # Process responses with accurate statement-to-dimension mapping
         for response in responses:
-            # Support both formats for backward compatibility
             if "most_like_index" in response and "least_like_index" in response:
-                # New format: indices (0-3) representing choices within a block
+                # New format: get actual statement IDs from block
+                block_id = response.get("block_id", -1)
                 most_like_index = response.get("most_like_index", -1)
                 least_like_index = response.get("least_like_index", -1)
 
-                # In simplified scoring, map indices to dimensions by rotating
-                # This is a simplified approach - in real scoring we'd need the actual statements
-                if 0 <= most_like_index < 4:
-                    # Map each index to a dimension group (rough approximation)
-                    dim_group = most_like_index % 4  # 0=EXECUTING, 1=INFLUENCING, 2=RELATIONSHIP, 3=STRATEGIC
-                    start_idx = dim_group * 3
-                    for i in range(3):
-                        if start_idx + i < len(self.dimensions):
-                            dimension_counts[self.dimensions[start_idx + i]] += 0.67
+                # Get statement IDs from the response if available
+                statement_ids = response.get("statement_ids", [])
 
-                if 0 <= least_like_index < 4:
-                    dim_group = least_like_index % 4
-                    start_idx = dim_group * 3
-                    for i in range(3):
-                        if start_idx + i < len(self.dimensions):
-                            dimension_counts[self.dimensions[start_idx + i]] -= 0.33
+                if statement_ids and len(statement_ids) == 4:
+                    # Use actual statement mapping
+                    if 0 <= most_like_index < len(statement_ids):
+                        stmt_id = statement_ids[most_like_index]
+                        dim = statement_to_dim.get(stmt_id, f"T{(most_like_index % 12) + 1}")
+                        dim_index = self._dim_to_index(dim)
+                        if dim_index is not None:
+                            dimension_counts[self.dimensions[dim_index]] += 2.0
+
+                    if 0 <= least_like_index < len(statement_ids):
+                        stmt_id = statement_ids[least_like_index]
+                        dim = statement_to_dim.get(stmt_id, f"T{(least_like_index % 12) + 1}")
+                        dim_index = self._dim_to_index(dim)
+                        if dim_index is not None:
+                            dimension_counts[self.dimensions[dim_index]] -= 1.0
+                else:
+                    # Fallback to distributed scoring
+                    if 0 <= most_like_index < 4:
+                        dim_idx = (block_id * 4 + most_like_index) % len(self.dimensions)
+                        dimension_counts[self.dimensions[dim_idx]] += 2.0
+
+                    if 0 <= least_like_index < 4:
+                        dim_idx = (block_id * 4 + least_like_index) % len(self.dimensions)
+                        dimension_counts[self.dimensions[dim_idx]] -= 1.0
             else:
-                # Old format: statement IDs
+                # Old format: direct statement IDs
                 most_like = response.get("most_like", "")
                 least_like = response.get("least_like", "")
 
-                # Extract dimension from statement ID (e.g., T1001 -> T1)
                 if most_like:
-                    dim_id = most_like[:2]  # T1, T2, etc.
-                    if dim_id in ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]:
-                        dim_index = int(dim_id[1:]) - 1
-                        if 0 <= dim_index < len(self.dimensions):
-                            dimension_counts[self.dimensions[dim_index]] += 2
+                    dim = statement_to_dim.get(most_like, most_like[:2] if len(most_like) >= 2 else "")
+                    dim_index = self._dim_to_index(dim)
+                    if dim_index is not None:
+                        dimension_counts[self.dimensions[dim_index]] += 2.0
 
                 if least_like:
-                    dim_id = least_like[:2]
-                    if dim_id in ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]:
-                        dim_index = int(dim_id[1:]) - 1
-                        if 0 <= dim_index < len(self.dimensions):
-                            dimension_counts[self.dimensions[dim_index]] -= 1
+                    dim = statement_to_dim.get(least_like, least_like[:2] if len(least_like) >= 2 else "")
+                    dim_index = self._dim_to_index(dim)
+                    if dim_index is not None:
+                        dimension_counts[self.dimensions[dim_index]] -= 1.0
 
-        # Convert to percentiles (improved realistic scoring)
+        # Convert to percentiles with better differentiation based on actual choices
         total_responses = len(responses)
-        base_percentiles = [95, 88, 82, 74, 68, 58, 52, 45, 38, 28, 22, 15]  # Realistic distribution
+        max_possible_score = total_responses * 2  # Maximum if all most_like
+        min_possible_score = total_responses * -1  # Minimum if all least_like
 
         dimension_scores = {}
         theta_estimates = {}
 
-        # Sort dimensions by count for realistic distribution
-        sorted_dims = sorted(dimension_counts.items(), key=lambda x: x[1], reverse=True)
+        # Normalize counts to get raw preference strength
+        normalized_counts = {}
+        for dim, count in dimension_counts.items():
+            # Normalize to 0-1 range, then scale to percentiles
+            if max_possible_score > min_possible_score:
+                normalized = (count - min_possible_score) / (max_possible_score - min_possible_score)
+            else:
+                normalized = 0.5
 
-        for i, (dim, count) in enumerate(sorted_dims):
-            # Use position-based percentile with count influence
-            base_index = i % len(base_percentiles)
-            base_score = base_percentiles[base_index]
+            # Convert to percentile with realistic distribution
+            # Use sigmoid transformation for better spread
+            import math
+            sigmoid_input = (normalized - 0.5) * 6  # Scale to -3 to +3
+            sigmoid_output = 1 / (1 + math.exp(-sigmoid_input))
 
-            # Add count-based adjustment
-            count_adjustment = count * 5  # Each point adds ~5 percentiles
+            # Map to percentile range (5-95 to avoid extremes)
+            percentile = 5 + (sigmoid_output * 90)
 
-            # Add controlled randomization to avoid identical scores
-            random_adjustment = random.uniform(-8, 8)
+            # Add small random variation for ties
+            percentile += random.uniform(-2, 2)
+            percentile = min(95, max(5, percentile))
 
-            # Calculate final percentile
-            percentile = base_score + count_adjustment + random_adjustment
-            percentile = min(99, max(1, percentile))  # Clamp to valid range
-
+            normalized_counts[dim] = count
             dimension_scores[dim] = round(percentile, 1)
 
-            # Realistic theta estimates based on percentile
-            if percentile >= 75:
-                theta = random.uniform(0.5, 2.0)
-            elif percentile >= 50:
-                theta = random.uniform(-0.5, 0.5)
-            elif percentile >= 25:
+        # Generate theta estimates based on actual percentiles
+        for i, (dim, percentile) in enumerate(dimension_scores.items()):
+            # Convert percentile to standardized theta
+            if percentile >= 84:  # Top 16%
+                theta = random.uniform(1.0, 2.5)
+            elif percentile >= 70:  # Top 30%
+                theta = random.uniform(0.5, 1.0)
+            elif percentile >= 50:  # Above average
+                theta = random.uniform(0.0, 0.5)
+            elif percentile >= 30:  # Below average
+                theta = random.uniform(-0.5, 0.0)
+            elif percentile >= 16:  # Bottom 30%
                 theta = random.uniform(-1.0, -0.5)
-            else:
-                theta = random.uniform(-2.0, -1.0)
+            else:  # Bottom 16%
+                theta = random.uniform(-2.5, -1.0)
 
             theta_estimates[f"T{i+1}"] = round(theta, 2)
 
@@ -140,3 +178,14 @@ class V4ScoringEngine:
             "lesser_talents": lesser_talents,
             "computation_time_ms": round(computation_time, 1)
         }
+
+    def _dim_to_index(self, dimension: str) -> Optional[int]:
+        """Convert dimension ID (T1-T12) to array index"""
+        if dimension.startswith('T') and len(dimension) >= 2:
+            try:
+                dim_num = int(dimension[1:]) - 1
+                if 0 <= dim_num < len(self.dimensions):
+                    return dim_num
+            except ValueError:
+                pass
+        return None

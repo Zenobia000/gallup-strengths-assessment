@@ -17,7 +17,7 @@ from dataclasses import dataclass, asdict
 @dataclass
 class StorageConfig:
     """Configuration for file storage system"""
-    base_path: str = "/home/os-sunnie.gd.weng/python_workstation/side-project/strength-system/data/file_storage"
+    base_path: str = "/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage"
     backup_enabled: bool = True
     auto_save: bool = True
     format_preference: str = "json"  # "json" or "csv"

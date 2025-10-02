@@ -28,7 +28,10 @@
       "Read(//proc/280121/**)",
       "Bash(kill:*)",
       "mcp__playwright__browser_navigate",
-      "Bash(sqlite3:*)"
+      "Bash(sqlite3:*)",
+      "Bash(PYTHONPATH=/mnt/d/python_workspace/github/gallup-strengths-assessment/src/main/python python3 -m uvicorn api.main_files:app --host 0.0.0.0 --port 8005 --reload)",
+      "Bash(python3:*)",
+      "Bash(open http://localhost:8005/static/landing.html)"
     ],
     "deny": [],
     "ask": []

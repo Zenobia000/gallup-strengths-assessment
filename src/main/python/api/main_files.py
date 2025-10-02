@@ -237,6 +237,17 @@ async def assessment_html_page():
         raise HTTPException(status_code=404, detail="Assessment HTML page not found")
 
 
+@app.get("/assessment-intro.html", include_in_schema=False)
+async def assessment_intro_page():
+    """Serve the assessment intro page directly."""
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    assessment_intro_file = os.path.join(static_dir, "assessment-intro.html")
+    if os.path.exists(assessment_intro_file):
+        return FileResponse(assessment_intro_file)
+    else:
+        raise HTTPException(status_code=404, detail="Assessment intro page not found")
+
+
 # Root endpoint - Redirect to main entry
 @app.get("/", include_in_schema=False)
 async def root():
