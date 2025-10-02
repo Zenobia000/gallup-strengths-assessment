@@ -1015,7 +1015,7 @@
 
     <script>
         // API Configuration
-        const apiBase = window.location.port === '8005' ? '' : 'http://localhost:8005';
+        const apiBase = window.location.port === '8005' ? '' : `http://${window.location.hostname}:8005`;
 
         // Talent definitions with detailed info
         const TALENT_DEFINITIONS = {

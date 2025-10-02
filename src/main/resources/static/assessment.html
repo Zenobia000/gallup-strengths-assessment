@@ -10,7 +10,7 @@
 <body>
   <header class="global-header">
     <div class="layout">
-      <div class="brand">Strength DNA Lab</div>
+      <a href="landing.html" class="brand">Strength DNA Lab</a>
       <nav>
         <ul class="nav-list">
           <li><a class="nav-link" href="landing.html">首頁</a></li>
@@ -29,7 +29,7 @@
           <div class="progress-info">
             <div class="progress-title">優勢天賦評測</div>
             <div class="progress-stats">
-              <span id="questionCounter">問題 1 / 20</span>
+              <span id="questionCounter">問題 1 / 30</span>
               <span id="timeRemaining">預計剩餘 5 分鐘</span>
             </div>
           </div>
@@ -127,14 +127,16 @@
   </footer>
 
   <script>
-    const apiBase = window.location.port === '8005' ? '' : 'http://localhost:8005';
+    const apiBase = window.location.port === '8005' ? '' : `http://${window.location.hostname}:8005`;
 
     let currentQuestion = 0;
-    let totalQuestions = 20;
+    let totalQuestions = 30;
     let responses = [];
     let sessionId = null;
     let startTime = null;
     let questions = [];
+    let timerInterval = null;
+    let estimatedEndTime = null;
 
     const sampleQuestions = [
       {
@@ -181,7 +183,7 @@
         } else {
           sessionId = generateSessionId();
           questions = sampleQuestions;
-          totalQuestions = sampleQuestions.length;
+          totalQuestions = 30; // 保持30題即使在離線模式
         }
       }
     }
@@ -433,20 +435,53 @@
       }
     }
 
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+
+      const avgTimePerQuestion = 25;
+      const remainingQuestions = totalQuestions - currentQuestion;
+      const estimatedRemainingMs = remainingQuestions * avgTimePerQuestion * 1000;
+      estimatedEndTime = Date.now() + estimatedRemainingMs;
+
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer(); // 立即更新一次
+    }
+
+    function updateTimer() {
+      if (!estimatedEndTime) return;
+
+      const now = Date.now();
+      const remainingMs = Math.max(0, estimatedEndTime - now);
+      const remainingSeconds = Math.floor(remainingMs / 1000);
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+
+      document.getElementById('timeRemaining').textContent =
+        `預計剩餘 ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+      if (remainingMs <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById('timeRemaining').textContent = '時間到！';
+      }
+    }
+
     function updateProgress() {
       const progress = ((currentQuestion + 1) / totalQuestions) * 100;
       document.getElementById('progressFill').style.width = `${progress}%`;
       document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
       document.getElementById('questionCounter').textContent = `問題 ${currentQuestion + 1} / ${totalQuestions}`;
 
-      const avgTimePerQuestion = 15;
-      const remainingQuestions = totalQuestions - currentQuestion;
-      const remainingSeconds = remainingQuestions * avgTimePerQuestion;
-      const remainingMinutes = Math.ceil(remainingSeconds / 60);
-      document.getElementById('timeRemaining').textContent = `預計剩餘 ${remainingMinutes} 分鐘`;
+      // 重新計算並啟動計時器
+      startTimer();
     }
 
     async function submitAssessment() {
+      // 清理計時器
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
       document.getElementById('questionCard').style.display = 'none';
       document.getElementById('selectionStatus').style.display = 'none';
       document.getElementById('actionButtons').style.display = 'none';

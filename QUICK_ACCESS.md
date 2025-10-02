@@ -1,23 +1,32 @@
 # 🚀 優勢評測系統 - 快速訪問指南
 
-## 📍 **正確的訪問地址（文件存儲版本 - 端口 8005）**
+## 📍 **正確的訪問地址（動態評測系統 - 端口 8005）**
 
-### 🌐 **前端頁面訪問**
+### 🌐 **完整評測流程**
 ```
 主入口頁面: http://localhost:8005/static/index.html
 營銷首頁:   http://localhost:8005/static/landing.html
 評測準備:   http://localhost:8005/static/assessment-intro.html
-開始評測:   http://localhost:8005/static/assessment.html
-結果頁面:   http://localhost:8005/static/results.html
-詳細報告:   http://localhost:8005/static/report-detail.html
+動態評測:   http://localhost:8005/static/assessment.html (🔄 30題組動態生成)
+專業報告:   http://localhost:8005/static/results.html?session={id} (🧬 DNA視覺化)
+深度分析:   http://localhost:8005/static/report-detail.html?session={id}
 ```
 
-### 🔧 **API 端點訪問**
+### 🔧 **API 服務端點**
 ```
 API 文檔:    http://localhost:8005/api/docs
 系統健康:    http://localhost:8005/api/system/health
-評測題組:    http://localhost:8005/api/assessment/blocks
+動態題組:    http://localhost:8005/api/assessment/blocks (⚡ 即時生成)
+評測結果:    http://localhost:8005/api/assessment/results/{session_id}
+提交評測:    http://localhost:8005/api/assessment/submit
 ```
+
+### ✨ **系統特色 (V4.0 完整動態版)**
+- **🎯 動態出題**: 基於120語句庫的平衡區塊設計
+- **🧬 DNA視覺化**: SVG雙螺旋結構展示優勢分布
+- **📊 三層分級**: 主導(>75%) / 支援(25-75%) / 待管理(<25%)
+- **💼 職業原型**: 基於主導領域的動態職業建議
+- **🔬 科學基礎**: Thurstonian IRT + 常模百分位系統
 
 ### 🛠️ **如果端口被轉發到其他地址**
 
@@ -41,13 +50,26 @@ curl -s http://localhost:8005/api/system/health
 curl -s -I http://localhost:8005/static/index.html
 ```
 
-### 🎯 **推薦訪問流程**
-1. **入口頁面**: http://localhost:8005/static/index.html
-2. **點擊「核心營銷首頁」** → Landing Page
-3. **點擊「開始專業評測」** → Assessment Intro
-4. **確認準備事項後開始評測** → Assessment
-5. **完成評測查看結果** → Results → Report Detail
+### 🎯 **推薦訪問流程（完整動態體驗）**
+1. **主入口**: http://localhost:8005/static/index.html
+2. **營銷首頁**: http://localhost:8005/static/landing.html
+3. **評測準備**: http://localhost:8005/static/assessment-intro.html
+4. **動態評測**: http://localhost:8005/static/assessment.html (🔄 即時生成30題組)
+5. **專業報告**: http://localhost:8005/static/results.html (🧬 DNA視覺化 + 職業原型)
+6. **深度分析**: http://localhost:8005/static/report-detail.html (📊 個人化詳細報告)
+
+### 🎮 **快速測試**
+```bash
+# 測試動態題組生成
+curl -s http://localhost:8005/api/assessment/blocks | head -c 300
+
+# 測試API健康狀態
+curl -s http://localhost:8005/api/system/health
+
+# 測試評測結果 (使用現有session)
+curl -s http://localhost:8005/api/assessment/results/v4_51891bd0dfab | head -c 300
+```
 
 ---
 
-**技術支援**: 文件存儲版本 V4.0-FileStorage | API 端點: localhost:8005
+**系統狀態**: 動態評測系統 V4.0 | 🧬 DNA視覺化 | 📊 McKinsey專業報告 | API 端點: localhost:8005

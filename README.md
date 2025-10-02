@@ -41,9 +41,9 @@
 
 #### 📊 **Thurstonian IRT 評測系統**
 - **評測方式**: 四選二強制選擇 (Quartet Blocks)
-- **題組設計**: 9題組完美平衡，T1-T12 完整覆蓋
-- **隨機化**: 每次評測動態生成不同題組
-- **計分模型**: Thurstonian IRT + 常模轉換
+- **題組設計**: 30題組動態生成，T1-T12 完整覆蓋，基於120語句庫
+- **平衡算法**: 系統化輪轉規則 + 領域平衡約束
+- **計分模型**: Thurstonian IRT + 常模轉換 + 三層分級系統
 
 #### 🎯 **完整 T1-T12 才幹評估**
 ```
@@ -68,11 +68,12 @@
 - **配置外部化**: 環境變數支援，部署靈活
 
 ### 📈 **V4.0 系統指標**
-- **評測效率**: 9題組 vs 原15題組 (-40%時間)
-- **維度覆蓋**: 100% T1-T12 完整覆蓋
-- **平衡性**: 完美平衡 (每維度恰好3次曝光)
-- **隨機化**: 每次生成不同題組，避免記憶效應
-- **架構品質**: 簡潔、專注、易維護
+- **評測效率**: 動態生成30題組，平均每題20-30秒，總時間10-15分鐘
+- **維度覆蓋**: 100% T1-T12 完整覆蓋，每個維度恰好出現10次
+- **平衡性**: 系統化輪轉規則 (block_index + offset) mod 12，確保四域均衡
+- **動態特性**: 即時API串接，個人化報告生成，DNA視覺化
+- **架構品質**: 專業McKinsey風格UI，支持遠端開發訪問
+- **技術架構**: 基於talent-domain-mapping.md設計，完全符合Thurstonian IRT標準
 
 ---
 
@@ -151,11 +152,24 @@ python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8004 --reload
 ### 🌐 **系統訪問入口**
 
 #### 文件存儲版本 (端口 8005) ⭐
-- **著陸頁**: http://localhost:8005/landing.html
-- **評測頁面**: http://localhost:8005/assessment.html
-- **結果頁面**: http://localhost:8005/results.html?session={id}
+**本地開發:**
+- **主入口**: http://localhost:8005/static/index.html
+- **著陸頁**: http://localhost:8005/static/landing.html
+- **評測準備**: http://localhost:8005/static/assessment-intro.html
+- **評測執行**: http://localhost:8005/static/assessment.html (30題動態出題)
+- **結果展示**: http://localhost:8005/static/results.html?session={id} (專業報告)
+- **詳細分析**: http://localhost:8005/static/report-detail.html?session={id}
 - **API 文檔**: http://localhost:8005/api/docs
 - **系統狀態**: http://localhost:8005/api/system/health
+
+**遠端開發 (替換為你的服務器IP):**
+- **主入口**: http://10.137.80.58:8005/static/index.html
+- **著陸頁**: http://10.137.80.58:8005/static/landing.html
+- **評測準備**: http://10.137.80.58:8005/static/assessment-intro.html
+- **評測執行**: http://10.137.80.58:8005/static/assessment.html (30題動態出題)
+- **結果展示**: http://10.137.80.58:8005/static/results.html?session={id}
+- **API 文檔**: http://10.137.80.58:8005/api/docs
+- **系統狀態**: http://10.137.80.58:8005/api/system/health
 
 #### 數據庫版本 (端口 8004)
 - **API 文檔**: http://localhost:8004/api/docs
@@ -296,11 +310,12 @@ python3 -m uvicorn api.main_files:app --port 8005 --reload
 ## 📈 **成功指標與品質保證**
 
 ### V4.0 達成指標
-- ✅ **完整性**: T1-T12 維度 100% 覆蓋
-- ✅ **平衡性**: 每維度 3次曝光，完美平衡
+- ✅ **完整性**: T1-T12 維度 100% 覆蓋，30題完整評測
+- ✅ **平衡性**: 每維度恰好10次曝光，系統化輪轉平衡
 - ✅ **動態性**: 職業原型基於真實分數分析
 - ✅ **客觀性**: 隨機化題組，避免記憶效應
-- ✅ **穩定性**: 純淨架構，無技術債
+- ✅ **穩定性**: 純淨架構，支持遠端開發
+- ✅ **用戶體驗**: McKinsey風格UI，分:秒計時顯示
 
 ### V5.0 目標指標
 - 🎯 **科學性**: H-MIRT 模型，心理測量學標準
