@@ -1,0 +1,65 @@
+[
+  {
+    "session_id": "v4_1b415d73d0ec",
+    "response_data": "[{\"most_like_index\": 0, \"least_like_index\": 2, \"block_id\": 0, \"response_time_ms\": 2738}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 1, \"response_time_ms\": 4193}, {\"most_like_index\": 2, \"least_like_index\": 3, \"block_id\": 2, \"response_time_ms\": 6380}, {\"most_like_index\": 2, \"least_like_index\": 0, \"block_id\": 3, \"response_time_ms\": 7952}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 4, \"response_time_ms\": 11908}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 5, \"response_time_ms\": 14000}, {\"most_like_index\": 3, \"least_like_index\": 2, \"block_id\": 6, \"response_time_ms\": 15188}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 7, \"response_time_ms\": 16281}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 8, \"response_time_ms\": 17414}, {\"most_like_index\": 1, \"least_like_index\": 3, \"block_id\": 9, \"response_time_ms\": 18680}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 10, \"response_time_ms\": 19827}]",
+    "total_responses": 11,
+    "submission_time": "2025-10-02T15:10:00.299074",
+    "id": 1,
+    "created_at": "2025-10-02T15:10:00.299244",
+    "updated_at": "2025-10-02T15:10:00.299252"
+  },
+  {
+    "session_id": "v4_153177ccdcbc",
+    "response_data": "[{\"block_id\": 0, \"most_like_statement_id\": \"T10002\", \"least_like_statement_id\": \"T5004\"}, {\"block_id\": 1, \"most_like_statement_id\": \"T3005\", \"least_like_statement_id\": \"T6005\"}, {\"block_id\": 2, \"most_like_statement_id\": \"T1002\", \"least_like_statement_id\": \"T9007\"}, {\"block_id\": 3, \"most_like_statement_id\": \"T3004\", \"least_like_statement_id\": \"T1007\"}, {\"block_id\": 4, \"most_like_statement_id\": \"T8004\", \"least_like_statement_id\": \"T12010\"}, {\"block_id\": 5, \"most_like_statement_id\": \"T11004\", \"least_like_statement_id\": \"T9010\"}, {\"block_id\": 6, \"most_like_statement_id\": \"T2004\", \"least_like_statement_id\": \"T10005\"}, {\"block_id\": 7, \"most_like_statement_id\": \"T8002\", \"least_like_statement_id\": \"T3002\"}, {\"block_id\": 8, \"most_like_statement_id\": \"T4001\", \"least_like_statement_id\": \"T5009\"}, {\"block_id\": 9, \"most_like_statement_id\": \"T7002\", \"least_like_statement_id\": \"T4002\"}, {\"block_id\": 10, \"most_like_statement_id\": \"T8001\", \"least_like_statement_id\": \"T12007\"}]",
+    "total_responses": 11,
+    "submission_time": "2025-10-02T15:14:25.738257",
+    "id": 2,
+    "created_at": "2025-10-02T15:14:25.738268",
+    "updated_at": "2025-10-02T15:14:25.738270"
+  },
+  {
+    "session_id": "v4_52b474c6eb0b",
+    "response_data": "[{\"block_id\": 0, \"most_like_statement_id\": \"T1004\", \"least_like_statement_id\": \"T4010\"}, {\"block_id\": 1, \"most_like_statement_id\": \"T3005\", \"least_like_statement_id\": \"T6005\"}]",
+    "total_responses": 2,
+    "submission_time": "2025-10-02T15:32:46.725524",
+    "id": 3,
+    "created_at": "2025-10-02T15:32:46.725534",
+    "updated_at": "2025-10-02T15:32:46.725536"
+  },
+  {
+    "session_id": "v4_7231fbc82477",
+    "response_data": "[{\"block_id\": 0, \"most_like_statement_id\": \"T1006\", \"least_like_statement_id\": \"T2004\"}, {\"block_id\": 1, \"most_like_statement_id\": \"T2002\", \"least_like_statement_id\": \"T1007\"}, {\"block_id\": 2, \"most_like_statement_id\": \"T1004\", \"least_like_statement_id\": \"T10003\"}, {\"block_id\": 3, \"most_like_statement_id\": \"T12001\", \"least_like_statement_id\": \"T11004\"}, {\"block_id\": 4, \"most_like_statement_id\": \"T4006\", \"least_like_statement_id\": \"T6002\"}, {\"block_id\": 5, \"most_like_statement_id\": \"T9009\", \"least_like_statement_id\": \"T2001\"}, {\"block_id\": 6, \"most_like_statement_id\": \"T4010\", \"least_like_statement_id\": \"T11001\"}, {\"block_id\": 7, \"most_like_statement_id\": \"T5002\", \"least_like_statement_id\": \"T4002\"}, {\"block_id\": 8, \"most_like_statement_id\": \"T4001\", \"least_like_statement_id\": \"T1008\"}, {\"block_id\": 9, \"most_like_statement_id\": \"T9005\", \"least_like_statement_id\": \"T10002\"}, {\"block_id\": 10, \"most_like_statement_id\": \"T11003\", \"least_like_statement_id\": \"T12006\"}]",
+    "total_responses": 11,
+    "submission_time": "2025-10-02T15:33:46.757983",
+    "id": 4,
+    "created_at": "2025-10-02T15:33:46.757998",
+    "updated_at": "2025-10-02T15:33:46.758000"
+  },
+  {
+    "session_id": "v4_e4ad83f7f3fa",
+    "response_data": "[{\"most_like_index\": 1, \"least_like_index\": 3, \"block_id\": 0, \"response_time_ms\": 4799}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 1, \"response_time_ms\": 6310}, {\"most_like_index\": 3, \"least_like_index\": 1, \"block_id\": 2, \"response_time_ms\": 7804}, {\"most_like_index\": 0, \"least_like_index\": 2, \"block_id\": 3, \"response_time_ms\": 9449}, {\"most_like_index\": 3, \"least_like_index\": 1, \"block_id\": 4, \"response_time_ms\": 11014}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 5, \"response_time_ms\": 12501}, {\"most_like_index\": 2, \"least_like_index\": 3, \"block_id\": 6, \"response_time_ms\": 15962}, {\"most_like_index\": 0, \"least_like_index\": 1, \"block_id\": 7, \"response_time_ms\": 17652}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 8, \"response_time_ms\": 19044}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 9, \"response_time_ms\": 21248}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 10, \"response_time_ms\": 23851}]",
+    "total_responses": 11,
+    "submission_time": "2025-10-02T15:35:43.113026",
+    "id": 5,
+    "created_at": "2025-10-02T15:35:43.113038",
+    "updated_at": "2025-10-02T15:35:43.113040"
+  },
+  {
+    "session_id": "v4_80486afcdda5",
+    "response_data": "[{\"most_like_index\": 0, \"least_like_index\": 1, \"block_id\": 0, \"response_time_ms\": 2172}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 1, \"response_time_ms\": 3328}, {\"most_like_index\": 2, \"least_like_index\": 3, \"block_id\": 2, \"response_time_ms\": 4926}, {\"most_like_index\": 1, \"least_like_index\": 0, \"block_id\": 3, \"response_time_ms\": 89736}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 4, \"response_time_ms\": 91466}, {\"most_like_index\": 3, \"least_like_index\": 2, \"block_id\": 5, \"response_time_ms\": 92876}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 6, \"response_time_ms\": 94613}, {\"most_like_index\": 2, \"least_like_index\": 3, \"block_id\": 7, \"response_time_ms\": 96469}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 8, \"response_time_ms\": 97771}, {\"most_like_index\": 0, \"least_like_index\": 1, \"block_id\": 9, \"response_time_ms\": 99067}, {\"most_like_index\": 2, \"least_like_index\": 3, \"block_id\": 10, \"response_time_ms\": 100680}]",
+    "total_responses": 11,
+    "submission_time": "2025-10-02T16:55:46.464442",
+    "id": 6,
+    "created_at": "2025-10-02T16:55:46.464473",
+    "updated_at": "2025-10-02T16:55:46.464480"
+  },
+  {
+    "session_id": "v4_51891bd0dfab",
+    "response_data": "[{\"most_like_index\": 0, \"least_like_index\": 1, \"block_id\": 0, \"response_time_ms\": 532096}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 1, \"response_time_ms\": 533426}, {\"most_like_index\": 3, \"least_like_index\": 2, \"block_id\": 2, \"response_time_ms\": 534794}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 3, \"response_time_ms\": 535965}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 4, \"response_time_ms\": 537846}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 5, \"response_time_ms\": 543871}, {\"most_like_index\": 3, \"least_like_index\": 1, \"block_id\": 6, \"response_time_ms\": 546531}, {\"most_like_index\": 0, \"least_like_index\": 2, \"block_id\": 7, \"response_time_ms\": 548348}, {\"most_like_index\": 2, \"least_like_index\": 1, \"block_id\": 8, \"response_time_ms\": 551794}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 9, \"response_time_ms\": 553014}, {\"most_like_index\": 1, \"least_like_index\": 2, \"block_id\": 10, \"response_time_ms\": 554673}]",
+    "total_responses": 11,
+    "submission_time": "2025-10-02T17:02:28.159054",
+    "id": 7,
+    "created_at": "2025-10-02T17:02:28.159064",
+    "updated_at": "2025-10-02T17:02:28.159066"
+  }
+]

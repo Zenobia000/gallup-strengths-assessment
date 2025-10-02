@@ -318,6 +318,63 @@ async def home_ui():
     else:
         raise HTTPException(status_code=404, detail="Home page not found")
 
+# Additional static page endpoints
+@app.get("/results.html", include_in_schema=False)
+async def results_page():
+    """Serve the results page directly."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    results_file = os.path.join(static_dir, "results.html")
+
+    if os.path.exists(results_file):
+        return FileResponse(results_file)
+    else:
+        raise HTTPException(status_code=404, detail="Results page not found")
+
+@app.get("/landing.html", include_in_schema=False)
+async def landing_page():
+    """Serve the landing page directly."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    landing_file = os.path.join(static_dir, "landing.html")
+
+    if os.path.exists(landing_file):
+        return FileResponse(landing_file)
+    else:
+        raise HTTPException(status_code=404, detail="Landing page not found")
+
+@app.get("/report-detail.html", include_in_schema=False)
+async def report_detail_page():
+    """Serve the report detail page directly."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    report_file = os.path.join(static_dir, "report-detail.html")
+
+    if os.path.exists(report_file):
+        return FileResponse(report_file)
+    else:
+        raise HTTPException(status_code=404, detail="Report detail page not found")
+
+@app.get("/assessment.html", include_in_schema=False)
+async def assessment_html_page():
+    """Serve the assessment page directly as HTML."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    assessment_file = os.path.join(static_dir, "assessment.html")
+
+    if os.path.exists(assessment_file):
+        return FileResponse(assessment_file)
+    else:
+        raise HTTPException(status_code=404, detail="Assessment HTML page not found")
+
 # Root endpoint redirect
 @app.get("/", include_in_schema=False)
 async def root():

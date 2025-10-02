@@ -711,13 +711,13 @@
                 </div>
                 <div class="report-meta">
                     <div class="meta-item">
-                        📅 生成時間：<span id="report-date">2025-09-30</span>
+                        📅 生成時間：<span id="report-date">載入中...</span>
                     </div>
                     <div class="meta-item">
-                        ⏱️ 完成時長：<span id="completion-time">4分32秒</span>
+                        ⏱️ 完成時長：<span id="completion-time">載入中...</span>
                     </div>
                     <div class="meta-item">
-                        📊 準確度：<span id="accuracy">94%</span>
+                        📊 準確度：<span id="accuracy">載入中...</span>
                     </div>
                 </div>
             </div>
@@ -727,17 +727,11 @@
         <div class="strength-overview fade-in">
             <div class="overview-content">
                 <h3 class="overview-title">您的優勢DNA</h3>
-                <div class="top-strengths">
-                    <span class="strength-badge primary">🎯 戰略思維</span>
-                    <span class="strength-badge">💡 創新能力</span>
-                    <span class="strength-badge">🤝 溝通協調</span>
-                    <span class="strength-badge">📊 分析思考</span>
-                    <span class="strength-badge">🎨 創意表達</span>
+                <div class="top-strengths" id="topStrengthsBadges">
+                    <span class="strength-badge primary">載入中...</span>
                 </div>
-                <p class="overview-summary">
-                    您是一位具有卓越戰略視野的思考者，能夠看到大局並理解複雜系統之間的關聯。
-                    您的創新能力與溝通技巧的結合，使您特別適合需要同時運用分析和創意的角色。
-                    這種獨特的優勢組合在人群中僅占 3.2%，是極為稀有且有價值的天賦組合。
+                <p class="overview-summary" id="overviewSummary">
+                    載入中...
                 </p>
             </div>
         </div>
@@ -1020,6 +1014,31 @@
     </div>
 
     <script>
+        // API Configuration
+        const apiBase = window.location.port === '8005' ? '' : 'http://localhost:8005';
+
+        // Talent definitions with detailed info
+        const TALENT_DEFINITIONS = {
+            "T1": { name: "結構化執行", domain: "EXECUTING", icon: "🎯", description: "將目標拆解成步驟，建立流程和追蹤機制" },
+            "T2": { name: "品質與完備", domain: "EXECUTING", icon: "✅", description: "注重細節，追求第一次就把事情做對" },
+            "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING", icon: "🔍", description: "嘗試新方法，從失敗中學習，連結不同概念" },
+            "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING", icon: "📊", description: "界定問題，用數據檢驗假設，辨識因果關係" },
+            "T5": { name: "影響與倡議", domain: "INFLUENCING", icon: "💪", description: "說服他人，表達觀點，推動變革" },
+            "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING", icon: "🤝", description: "建立團隊合作，分享資源，促進和諧" },
+            "T7": { name: "客戶導向", domain: "INFLUENCING", icon: "🎯", description: "理解客戶需求，創造價值，建立長期關係" },
+            "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING", icon: "📚", description: "持續學習，反思改進，培養他人" },
+            "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING", icon: "⚖️", description: "守約守時，維持穩定，建立可靠形象" },
+            "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING", icon: "🧘", description: "在壓力下保持冷靜，穩定團隊情緒" },
+            "T11": { name: "衝突整合", domain: "INFLUENCING", icon: "🎭", description: "處理分歧，尋求共識，促進決策" },
+            "T12": { name: "責任與當責", domain: "EXECUTING", icon: "💼", description: "承擔責任，主動回報，確保交付" }
+        };
+
+        // Get session ID from URL
+        function getSessionId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('session');
+        }
+
         // 頁面初始化
         document.addEventListener('DOMContentLoaded', function() {
             // 設置當前日期
@@ -1027,12 +1046,12 @@
             document.getElementById('report-date').textContent =
                 `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-            // 從 localStorage 獲取評測數據
-            const sessionId = new URLSearchParams(window.location.search).get('session') ||
-                            localStorage.getItem('currentSessionId');
-
+            // 獲取 session ID 並載入報告
+            const sessionId = getSessionId();
             if (sessionId) {
                 loadDetailedReport(sessionId);
+            } else {
+                showError('找不到評測會話 ID');
             }
 
             // 添加滾動動畫
@@ -1045,16 +1064,133 @@
         // 載入詳細報告
         async function loadDetailedReport(sessionId) {
             try {
-                // 這裡應該調用 API 獲取詳細報告
-                // const response = await fetch(`http://localhost:8004/api/assessment/detailed-report/${sessionId}`);
-                // const data = await response.json();
-                // updateReportContent(data);
-
-                // 模擬數據載入
                 console.log('Loading detailed report for session:', sessionId);
+
+                const response = await fetch(`${apiBase}/api/assessment/results/${sessionId}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Loaded detailed report data:', data);
+
+                updateReportContent(data);
+
             } catch (error) {
                 console.error('Failed to load detailed report:', error);
+                showError('載入詳細報告失敗: ' + error.message);
             }
+        }
+
+        // 更新報告內容
+        function updateReportContent(data) {
+            const sessionId = data.session_id;
+            const scores = data.scores || {};
+            const sessionInfo = data.session_info || {};
+            const scoringInfo = data.scoring_info || {};
+
+            // 更新基本資訊
+            document.getElementById('completion-time').textContent = '4分32秒';  // Mock data
+            const accuracy = Math.round((scoringInfo.overall_confidence || 0.85) * 100);
+            document.getElementById('accuracy').textContent = `${accuracy}%`;
+
+            // 解析分數並排序
+            const talentScores = [];
+            for (const [key, score] of Object.entries(scores)) {
+                if (key.startsWith('t') && key.includes('_')) {
+                    const talentMatch = key.match(/^t(\d+)_(.+)$/);
+                    if (talentMatch) {
+                        const talentId = `T${talentMatch[1]}`;
+                        const talentDef = TALENT_DEFINITIONS[talentId];
+
+                        if (talentDef) {
+                            talentScores.push({
+                                id: talentId,
+                                name: talentDef.name,
+                                domain: talentDef.domain,
+                                icon: talentDef.icon,
+                                description: talentDef.description,
+                                score: score
+                            });
+                        }
+                    }
+                }
+            }
+
+            // 按分數排序
+            talentScores.sort((a, b) => b.score - a.score);
+
+            // 更新優勢徽章
+            updateStrengthBadges(talentScores.slice(0, 5));
+
+            // 更新概述
+            updateOverviewSummary(talentScores);
+
+            // 更新詳細分析區域
+            updateDetailedAnalysis(talentScores);
+
+            console.log('Report content updated successfully');
+        }
+
+        // 更新優勢徽章
+        function updateStrengthBadges(topTalents) {
+            const container = document.getElementById('topStrengthsBadges');
+            container.innerHTML = '';
+
+            topTalents.forEach((talent, index) => {
+                const badge = document.createElement('span');
+                badge.className = `strength-badge ${index === 0 ? 'primary' : ''}`;
+                badge.textContent = `${talent.icon} ${talent.name}`;
+                container.appendChild(badge);
+            });
+        }
+
+        // 更新概述文字
+        function updateOverviewSummary(talentScores) {
+            if (talentScores.length === 0) {
+                document.getElementById('overviewSummary').textContent = '無法載入優勢分析。';
+                return;
+            }
+
+            const topTalent = talentScores[0];
+            const topDomain = topTalent.domain;
+
+            const domainDescriptions = {
+                'EXECUTING': '執行型',
+                'INFLUENCING': '影響型',
+                'RELATIONSHIP_BUILDING': '關係建立型',
+                'STRATEGIC_THINKING': '策略思維型'
+            };
+
+            const domainDescription = domainDescriptions[topDomain] || '綜合型';
+
+            const summary = `您是一位 ${domainDescription} 的優秀人才，特別擅長 ${topTalent.name}。` +
+                          `您的優勢組合使您在需要 ${topTalent.description} 的工作中表現卓越。` +
+                          `這種獨特的才幹組合使您具備了稀有且有價值的競爭優勢。`;
+
+            document.getElementById('overviewSummary').textContent = summary;
+        }
+
+        // 更新詳細分析區域
+        function updateDetailedAnalysis(talentScores) {
+            // 這裡可以更新詳細分析區域的內容
+            // 比如動態生成每個優勢的詳細解說
+            console.log('Updating detailed analysis with talent scores:', talentScores);
+        }
+
+        // 顯示錯誤
+        function showError(message) {
+            console.error('Report error:', message);
+
+            document.getElementById('report-date').textContent = 'Error';
+            document.getElementById('completion-time').textContent = 'Error';
+            document.getElementById('accuracy').textContent = 'Error';
+
+            document.getElementById('topStrengthsBadges').innerHTML = '<span class="strength-badge">載入失敗</span>';
+            document.getElementById('overviewSummary').textContent = '載入詳細報告時發生錯誤，請重新整理頁面。';
+
+            alert('無法載入詳細報告，請檢查網路連線或稍後再試。');
         }
 
         // 分享報告

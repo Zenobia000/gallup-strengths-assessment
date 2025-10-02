@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>評測執行 Preview | 優勢評測系統</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="layout">
+      <div class="brand">Strength DNA Lab</div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Index</a></li>
+          <li><a href="landing.html">Landing</a></li>
+          <li><a href="assessment-intro.html">Intro</a></li>
+          <li><a href="results.html">Results</a></li>
+          <li><a href="report-detail.html">Detail</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="section">
+      <div class="breadcrumbs">
+        <span>核心流程</span>
+        <span>/</span>
+        <span>assessment.html</span>
+      </div>
+      <h2>評測執行頁 · 單一路徑評測體驗</h2>
+      <p>此預覽展示進度條、題目卡片、選項互動狀態與側邊提示，對應設計規範。</p>
+    </section>
+
+    <div class="report-layout two-columns">
+      <section class="section" style="padding:28px;">
+        <div class="progress-bar" aria-label="進度條">
+          <div class="value" style="width:54%;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 24px;">
+          <span style="letter-spacing:0.08em; text-transform:uppercase; font-size:13px; color:var(--gray-600);">區塊 1 / 2</span>
+          <span style="font-family:var(--font-mono); color:var(--mckinsey-blue);">題目 23 / 42</span>
+        </div>
+
+        <div class="question-card">
+          <div>
+            <span class="badge" style="background:rgba(0,128,217,0.18); color:var(--mckinsey-blue);">強迫選擇題</span>
+            <h3 style="margin:16px 0 12px;">在團隊合作時，我更傾向於...</h3>
+            <p>請從下列兩個敘述中，分別挑選最像你的與最不像你的選項。</p>
+          </div>
+          <div class="options">
+            <div class="option primary">
+              <strong>主動整合不同觀點，推動共識。</strong>
+              <p style="margin-top:8px; color:var(--gray-600);">代表傾向：影響力領域</p>
+            </div>
+            <div class="option">
+              <strong>專注於務實細節，確保流程落地。</strong>
+              <p style="margin-top:8px; color:var(--gray-600);">代表傾向：執行力領域</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a class="button primary" href="#">最像我</a>
+            <a class="button secondary" href="#">最不像我</a>
+          </div>
+        </div>
+      </section>
+
+      <aside class="section context" style="padding:28px;">
+        <h3 style="margin-top:0;">作答提示</h3>
+        <ul style="padding-left:18px;">
+          <li>依第一直覺回答，避免分析過久。</li>
+          <li>若兩個選項都像你，先選最像再選最不像。</li>
+          <li>系統會於 800ms 後自動跳到下一題。</li>
+        </ul>
+        <div class="highlight">
+          <strong>離開提醒：</strong>若關閉視窗，請透過 landing 頁重新進入評測。
+        </div>
+        <p style="font-size:13px; color:var(--gray-600);">
+          已與 IA v2 與架構一致性報告校對：只有單一路徑，移除版本選擇器。
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="layout footer">
+    Assessment Page Preview · 對應 IA v2 §4.3、Frontend Architecture §4.3。
+  </footer>
+</body>
+</html>

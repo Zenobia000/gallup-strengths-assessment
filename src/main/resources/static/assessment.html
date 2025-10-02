@@ -1,1079 +1,509 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>優勢天賦評測 - 智能天賦識別引擎™</title>
-    <meta name="description" content="基於Thurstonian IRT模型的科學評測，5分鐘發現你的獨特優勢">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            /* 領域色彩（主要） */
-            --executing: #7C3AED;        /* 執行力 - 紫色 */
-            --influencing: #F59E0B;      /* 影響力 - 橙色 */
-            --relationship: #0EA5E9;     /* 關係建立 - 藍色 */
-            --strategic: #10B981;        /* 戰略思維 - 綠色 */
-
-            /* 中性色調 */
-            --neutral-50: #F9FAFB;
-            --neutral-100: #F3F4F6;
-            --neutral-200: #E5E7EB;
-            --neutral-500: #6B7280;
-            --neutral-600: #4B5563;
-            --neutral-700: #374151;
-            --neutral-900: #111827;
-
-            /* 功能色彩 */
-            --emerald-500: #10B981;
-            --emerald-600: #059669;
-            --red-500: #EF4444;
-            --amber-500: #F59E0B;
-
-            /* 語義色彩 */
-            --success: var(--emerald-500);
-            --warning: var(--amber-500);
-            --error: var(--red-500);
-            --info: var(--relationship);
-
-            /* 兼容性別名 */
-            --primary-blue: var(--relationship);
-            --trust-navy: var(--neutral-900);
-            --growth-green: var(--strategic);
-            --energy-orange: var(--influencing);
-            --text-primary: var(--neutral-900);
-            --text-secondary: var(--neutral-500);
-            --background: #FFFFFF;
-            --surface: var(--neutral-50);
-            --border: var(--neutral-200);
-            --most-like: var(--emerald-600);
-            --least-like: var(--red-500);
-
-            /* 陰影系統 */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background: var(--neutral-50);
-            min-height: 100vh;
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Progress Header */
-        .progress-header {
-            background: white;
-            padding: 20px 0;
-            box-shadow: var(--shadow-sm);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .progress-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .progress-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--primary-blue);
-        }
-
-        .progress-stats {
-            display: flex;
-            gap: 24px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .progress-bar {
-            background: var(--surface);
-            height: 8px;
-            border-radius: 999px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--growth-green) 100%);
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
-        }
-
-        .progress-percentage {
-            position: absolute;
-            right: 16px;
-            top: -28px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--primary-blue);
-        }
-
-        /* Main Container */
-        .assessment-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Question Card - 統一設計系統 */
-        .question-card {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem; /* rounded-2xl */
-            padding: 2.5rem; /* p-10 */
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem; /* mb-6 */
-        }
-
-        .question-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .question-number {
-            display: inline-block;
-            background: var(--primary-blue);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .question-text {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-primary);
-            line-height: 1.4;
-        }
-
-        .question-instruction {
-            margin-top: 16px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* Statement Grid */
-        .statements-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-top: 32px;
-        }
-
-        .statement-card {
-            background: white;
-            border: 2px solid var(--neutral-200);
-            border-radius: 0.75rem; /* rounded-xl */
-            padding: 1.25rem; /* p-5 */
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 1rem; /* gap-4 */
-        }
-
-        .statement-card:hover {
-            border-color: var(--strategic);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-            background: #F0FDF4; /* green-50 */
-        }
-
-        .statement-letter {
-            background: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--primary-blue);
-            flex-shrink: 0;
-        }
-
-        .statement-text {
-            flex: 1;
-            font-size: 16px;
-            color: var(--text-primary);
-        }
-
-        .statement-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .choice-btn {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: none;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-most {
-            background: var(--surface);
-            color: var(--most-like);
-            border: 1px solid var(--most-like);
-        }
-
-        .btn-most:hover,
-        .btn-most.selected {
-            background: var(--most-like);
-            color: white;
-        }
-
-        .btn-least {
-            background: var(--surface);
-            color: var(--least-like);
-            border: 1px solid var(--least-like);
-        }
-
-        .btn-least:hover,
-        .btn-least.selected {
-            background: var(--least-like);
-            color: white;
-        }
-
-        .statement-card.selected-most {
-            background: #ECFDF5;
-            border-color: var(--most-like);
-        }
-
-        .statement-card.selected-least {
-            background: #FEF2F2;
-            border-color: var(--least-like);
-        }
-
-        /* Statement badges for intuitive selection */
-        .statement-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-most {
-            background: var(--most-like);
-            color: white;
-        }
-
-        .badge-least {
-            background: var(--least-like);
-            color: white;
-        }
-
-        .statement-badge.hidden {
-            display: none;
-        }
-
-        /* Selection Status */
-        .selection-status {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .selection-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .selection-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .selection-value {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .selection-most {
-            color: var(--most-like);
-        }
-
-        .selection-least {
-            color: var(--least-like);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 32px;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-        .btn-primary {
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 12px 32px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: var(--trust-navy);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-primary:disabled,
-        .btn-secondary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Encouragement Section */
-        .encouragement {
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 24px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .encouragement-icon {
-            font-size: 24px;
-        }
-
-        .encouragement-text {
-            font-size: 14px;
-            color: #92400E;
-            font-weight: 500;
-        }
-
-        /* Loading State */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 60px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--surface);
-            border-top-color: var(--primary-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Welcome Screen */
-        .welcome-screen {
-            background: white;
-            border-radius: 16px;
-            padding: 48px;
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .welcome-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin-bottom: 16px;
-        }
-
-        .welcome-subtitle {
-            font-size: 18px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-
-        .feature-list {
-            text-align: left;
-            margin: 32px 0;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .feature-icon {
-            color: var(--growth-green);
-            font-size: 20px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .question-card {
-                padding: 24px;
-            }
-
-            .question-text {
-                font-size: 20px;
-            }
-
-            .statement-card {
-                padding: 16px;
-            }
-
-            .statement-text {
-                font-size: 14px;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>評測執行 | 顧問式體驗</title>
+  <meta name="description" content="McKinsey 顧問風格的評測介面，提供清晰流程與行為心理導向的引導，快速完成四選二評測。" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <!-- Progress Header -->
-    <div class="progress-header">
+  <header class="global-header">
+    <div class="layout">
+      <div class="brand">Strength DNA Lab</div>
+      <nav>
+        <ul class="nav-list">
+          <li><a class="nav-link" href="landing.html">首頁</a></li>
+          <li><a class="nav-link" href="assessment-intro.html">評測準備</a></li>
+          <li><a class="nav-link active" href="assessment.html">進入評測</a></li>
+          <li><a class="nav-link" href="results.html">成果示意</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page assessment-page">
+    <div class="layout assessment-stage">
+      <div class="progress-header">
         <div class="progress-container">
-            <div class="progress-info">
-                <div class="progress-title">優勢天賦評測</div>
-                <div class="progress-stats">
-                    <span id="questionCounter">問題 1 / 20</span>
-                    <span id="timeRemaining">預計剩餘 5 分鐘</span>
-                </div>
+          <div class="progress-info">
+            <div class="progress-title">優勢天賦評測</div>
+            <div class="progress-stats">
+              <span id="questionCounter">問題 1 / 20</span>
+              <span id="timeRemaining">預計剩餘 5 分鐘</span>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%">
-                    <span class="progress-percentage" id="progressPercentage">0%</span>
-                </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%">
+              <span class="progress-percentage" id="progressPercentage">0%</span>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Main Assessment Container -->
-    <div class="assessment-container">
-        <!-- Welcome Screen -->
+      <div class="assessment-container">
         <div class="welcome-screen" id="welcomeScreen">
-            <h1 class="welcome-title">歡迎來到優勢天賦評測</h1>
-            <p class="welcome-subtitle">5分鐘時間，發現你的獨特競爭力</p>
+          <p class="eyebrow">Step 3 · Assessment</p>
+          <h1 class="welcome-title">歡迎進入顧問式評測體驗</h1>
+          <p class="welcome-subtitle">3-5 分鐘，透過四選二題組，萃取你的優勢 DNA</p>
 
-            <div class="feature-list">
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>基於諾貝爾獎理論的科學評測</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>12維度全面分析你的優勢</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>即時生成個性化報告</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>保護隱私，數據加密存儲</span>
-                </div>
+          <div class="feature-list">
+            <div class="feature-item">
+              <span class="feature-icon">🧭</span>
+              <span>顧問式流程設計，行為心理引導降低作答壓力</span>
             </div>
+            <div class="feature-item">
+              <span class="feature-icon">🧬</span>
+              <span>每題對應 12 維度，確保 T1-T12 全面覆蓋</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">⚡</span>
+              <span>即時計算，完成後立即進入結果頁</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🔒</span>
+              <span>本地 FileStorage 儲存，資料自主可控</span>
+            </div>
+          </div>
 
-            <button class="btn-primary" onclick="startAssessment()" style="margin: 0 auto;">
-                開始測評 →
-            </button>
+          <button class="btn-primary" onclick="startAssessment()">
+            開始測評 →
+          </button>
         </div>
 
-        <!-- Question Card (Hidden Initially) -->
         <div class="question-card" id="questionCard" style="display: none;">
-            <div class="question-header">
-                <span class="question-number" id="questionNumber">第 1 題</span>
-                <h2 class="question-text" id="questionText">
-                    請選擇最符合和最不符合你的選項
-                </h2>
-                <p class="question-instruction">
-                    請從以下4個選項中，選擇1個「最像我」和1個「最不像我」
-                </p>
-            </div>
-
-            <div class="statements-grid" id="statementsGrid">
-                <!-- Statements will be dynamically inserted here -->
-            </div>
+          <div class="question-header">
+            <span class="question-number" id="questionNumber">第 1 題</span>
+            <h2 class="question-text" id="questionText">請選擇最符合和最不符合你的選項</h2>
+            <p class="question-instruction">請從以下 4 個選項中，選擇 1 個「最像我」和 1 個「最不像我」</p>
+          </div>
+          <div class="statements-grid" id="statementsGrid"></div>
         </div>
 
-        <!-- Selection Status (Hidden Initially) -->
         <div class="selection-status" id="selectionStatus" style="display: none;">
-            <div class="selection-item">
-                <span class="selection-label">最像我：</span>
-                <span class="selection-value selection-most" id="mostLikeSelection">未選擇</span>
-            </div>
-            <div class="selection-item">
-                <span class="selection-label">最不像我：</span>
-                <span class="selection-value selection-least" id="leastLikeSelection">未選擇</span>
-            </div>
+          <div class="selection-item">
+            <span class="selection-label">最像我：</span>
+            <span class="selection-value selection-most" id="mostLikeSelection">未選擇</span>
+          </div>
+          <div class="selection-item">
+            <span class="selection-label">最不像我：</span>
+            <span class="selection-value selection-least" id="leastLikeSelection">未選擇</span>
+          </div>
         </div>
 
-        <!-- Action Buttons (Hidden Initially) -->
         <div class="action-buttons" id="actionButtons" style="display: none;">
-            <button class="btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
-                ← 上一題
-            </button>
-            <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
-                下一題 →
-            </button>
+          <button class="btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>← 上一題</button>
+          <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>下一題 →</button>
         </div>
 
-        <!-- Encouragement -->
         <div class="encouragement" id="encouragement" style="display: none;">
-            <span class="encouragement-icon">💡</span>
-            <span class="encouragement-text">請憑直覺選擇，沒有對錯之分</span>
+          <span class="encouragement-icon">💡</span>
+          <span class="encouragement-text">憑第一直覺作答，沒有標準答案 — 目的在於找出你的優勢偏好</span>
         </div>
 
-        <!-- Loading State -->
         <div class="loading" id="loadingState">
-            <div class="spinner"></div>
-            <p>正在準備你的專屬報告...</p>
+          <div class="spinner"></div>
+          <p>正在準備你的專屬報告...</p>
         </div>
+      </div>
     </div>
+  </main>
 
-    <script>
-        // API Configuration - detect environment
-        const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
+  <footer class="footer">
+    <div class="layout">
+      <div class="footer__meta">
+        <strong class="brand">Strength DNA Lab</strong>
+        <span>Step 3 · Assessment · 強迫選擇流程</span>
+        <div class="footer__links">
+          <a href="assessment-intro.html">回到準備頁</a>
+          <a href="results.html">預覽結果頁</a>
+          <a href="report-detail.html">深入報告</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-        // Assessment State
-        let currentQuestion = 0;
-        let totalQuestions = 20;
-        let responses = [];
-        let sessionId = null;
-        let startTime = null;
-        let questions = [];
+  <script>
+    const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
 
-        // Sample Questions (will be loaded from API)
-        const sampleQuestions = [
-            {
-                id: 'q1',
-                statements: [
-                    { id: 's1', text: '我喜歡在團隊中領導他人完成任務', dimension: 'leadership' },
-                    { id: 's2', text: '我更願意深入分析問題找出最佳解決方案', dimension: 'analytical' },
-                    { id: 's3', text: '我擅長激勵他人並建立良好的人際關係', dimension: 'relationship' },
-                    { id: 's4', text: '我注重細節並確保一切按計劃執行', dimension: 'execution' }
-                ]
-            }
-        ];
+    let currentQuestion = 0;
+    let totalQuestions = 20;
+    let responses = [];
+    let sessionId = null;
+    let startTime = null;
+    let questions = [];
 
-        // Initialize Assessment
-        async function initAssessment() {
-            try {
-                // Load assessment blocks from V4 API (let API determine optimal count)
-                const response = await fetch(`${apiBase}/api/assessment/blocks?v=1`);
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Loaded blocks from API:', data);
+    const sampleQuestions = [
+      {
+        id: 'q1',
+        statements: [
+          { id: 's1', text: '我喜歡在團隊中領導他人完成任務', dimension: 'leadership' },
+          { id: 's2', text: '我更願意深入分析問題找出最佳解決方案', dimension: 'analytical' },
+          { id: 's3', text: '我擅長激勵他人並建立良好的人際關係', dimension: 'relationship' },
+          { id: 's4', text: '我注重細節並確保一切按計劃執行', dimension: 'execution' }
+        ]
+      }
+    ];
 
-                    // Store session ID
-                    sessionId = data.session_id;
+    async function initAssessment() {
+      try {
+        const response = await fetch(`${apiBase}/api/assessment/blocks?v=1`);
+        if (response.ok) {
+          const data = await response.json();
+          sessionId = data.session_id;
 
-                    // Transform blocks to questions format
-                    questions = data.blocks.map(block => ({
-                        id: `q${block.block_id}`,
-                        block_id: block.block_id,
-                        statements: block.statements.map((stmt, idx) => ({
-                            id: stmt.id,
-                            text: stmt.text,
-                            dimension: stmt.dimension,
-                            index: idx
-                        }))
-                    }));
+          questions = data.blocks.map(block => ({
+            id: `q${block.block_id}`,
+            block_id: block.block_id,
+            statements: block.statements.map((stmt, idx) => ({
+              id: stmt.id,
+              text: stmt.text,
+              dimension: stmt.dimension,
+              index: idx
+            }))
+          }));
 
-                    totalQuestions = questions.length;
-                    console.log(`Loaded ${totalQuestions} balanced blocks from API (T1-T12 complete coverage)`);
+          totalQuestions = questions.length;
 
-                    // Verify we have reasonable number of blocks
-                    if (totalQuestions < 9) {
-                        console.warn(`Warning: Only ${totalQuestions} blocks loaded, may not cover all T1-T12 dimensions`);
-                    } else {
-                        console.log('✅ Sufficient blocks for complete T1-T12 dimensional coverage');
-                    }
-                } else {
-                    throw new Error('Failed to load blocks from API');
-                }
-            } catch (error) {
-                console.error('Error loading blocks:', error);
-                // Check if it's an HTML response (404)
-                if (error.message && error.message.includes('Unexpected token')) {
-                    alert('無法載入測驗題目：API 端點不存在');
-                } else {
-                    console.log('Using sample questions as fallback');
-                    // Generate a session ID for fallback mode
-                    sessionId = generateSessionId();
-                    questions = sampleQuestions;
-                    totalQuestions = sampleQuestions.length;
-                }
-            }
+          if (totalQuestions < 9) {
+            console.warn(`Warning: Only ${totalQuestions} blocks loaded, may not cover all T1-T12 dimensions`);
+          }
+        } else {
+          throw new Error('Failed to load blocks from API');
         }
-
-        // Start Assessment
-        async function startAssessment() {
-            startTime = new Date();
-            // sessionId is already set from initAssessment
-            if (!sessionId) {
-                sessionId = generateSessionId();
-            }
-
-            // Hide welcome screen
-            document.getElementById('welcomeScreen').style.display = 'none';
-
-            // Show assessment UI
-            document.getElementById('questionCard').style.display = 'block';
-            document.getElementById('selectionStatus').style.display = 'flex';
-            document.getElementById('actionButtons').style.display = 'flex';
-            document.getElementById('encouragement').style.display = 'flex';
-
-            // Load first question
-            loadQuestion(0);
-
-            // Track start event
-            trackEvent('assessment_started', {
-                session_id: sessionId,
-                timestamp: startTime.toISOString()
-            });
+      } catch (error) {
+        console.error('Error loading blocks:', error);
+        if (error.message && error.message.includes('Unexpected token')) {
+          alert('無法載入測驗題目：API 端點不存在');
+        } else {
+          sessionId = generateSessionId();
+          questions = sampleQuestions;
+          totalQuestions = sampleQuestions.length;
         }
+      }
+    }
 
-        // Load Question
-        function loadQuestion(index) {
-            if (index >= questions.length) {
-                questions = sampleQuestions; // Use sample for demo
-            }
+    async function startAssessment() {
+      startTime = new Date();
+      if (!sessionId) {
+        sessionId = generateSessionId();
+      }
 
-            const question = questions[index] || sampleQuestions[0];
-            currentQuestion = index;
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('questionCard').style.display = 'block';
+      document.getElementById('selectionStatus').style.display = 'flex';
+      document.getElementById('actionButtons').style.display = 'flex';
+      document.getElementById('encouragement').style.display = 'flex';
 
-            // Update progress
-            updateProgress();
+      loadQuestion(0);
 
-            // Update question display
-            document.getElementById('questionNumber').textContent = `第 ${index + 1} 題`;
-            document.getElementById('questionText').textContent = '請選擇最符合和最不符合你的選項';
+      trackEvent('assessment_started', {
+        session_id: sessionId,
+        timestamp: startTime.toISOString()
+      });
+    }
 
-            // Clear previous selections
-            clearSelections();
+    function loadQuestion(index) {
+      if (index >= questions.length) {
+        questions = sampleQuestions;
+      }
 
-            // Render statements
-            const grid = document.getElementById('statementsGrid');
-            grid.innerHTML = '';
+      const question = questions[index] || sampleQuestions[0];
+      currentQuestion = index;
+      updateProgress();
 
-            question.statements.forEach((statement, idx) => {
-                const card = createStatementCard(statement, idx);
-                grid.appendChild(card);
-            });
+      document.getElementById('questionNumber').textContent = `第 ${index + 1} 題`;
+      document.getElementById('questionText').textContent = '請選擇最符合和最不符合你的選項';
 
-            // Initialize response for this question if not exists
-            if (!responses[currentQuestion]) {
-                responses[currentQuestion] = {
-                    most_like_index: null,
-                    least_like_index: null
-                };
-            }
+      clearSelections();
 
-            // Restore previous selections if any
-            const savedResponse = responses[currentQuestion];
-            const cards = document.querySelectorAll('.statement-card');
+      const grid = document.getElementById('statementsGrid');
+      grid.innerHTML = '';
 
-            // Restore "most like" selection
-            if (savedResponse.most_like_index !== null && savedResponse.most_like_index !== undefined) {
-                const mostCard = cards[savedResponse.most_like_index];
-                if (mostCard) {
-                    mostCard.classList.add('selected-most');
-                    mostCard.querySelector('.badge-most').classList.remove('hidden');
-                    const statement = mostCard.querySelector('.statement-text').textContent;
-                    document.getElementById('mostLikeSelection').textContent =
-                        statement.substring(0, 30) + '...';
-                }
-            }
+      question.statements.forEach((statement, idx) => {
+        const card = createStatementCard(statement, idx);
+        grid.appendChild(card);
+      });
 
-            // Restore "least like" selection
-            if (savedResponse.least_like_index !== null && savedResponse.least_like_index !== undefined) {
-                const leastCard = cards[savedResponse.least_like_index];
-                if (leastCard) {
-                    leastCard.classList.add('selected-least');
-                    leastCard.querySelector('.badge-least').classList.remove('hidden');
-                    const statement = leastCard.querySelector('.statement-text').textContent;
-                    document.getElementById('leastLikeSelection').textContent =
-                        statement.substring(0, 30) + '...';
-                }
-            }
+      if (!responses[currentQuestion]) {
+        responses[currentQuestion] = {
+          question_id: question.id,
+          most_like_index: null,
+          least_like_index: null,
+          block_id: question.block_id || index + 1
+        };
+      } else {
+        restoreSelections(responses[currentQuestion]);
+      }
 
-            // Update button states
-            document.getElementById('prevBtn').disabled = index === 0;
-            checkSelectionComplete();
-        }
+      document.getElementById('prevBtn').disabled = index === 0;
+      checkSelectionComplete();
+    }
 
-        // Create Statement Card
-        function createStatementCard(statement, index) {
-            const card = document.createElement('div');
-            card.className = 'statement-card';
-            card.dataset.statementId = statement.id;
-            card.dataset.index = index;
+    function createStatementCard(statement, index) {
+      const card = document.createElement('div');
+      card.className = 'statement-card';
+      card.dataset.statementId = statement.id;
+      card.dataset.index = index;
 
-            // Make the entire card clickable
-            card.onclick = () => handleStatementClick(index, statement);
+      card.onclick = () => handleStatementClick(index, statement);
 
-            card.innerHTML = `
-                <div class="statement-letter">${String.fromCharCode(65 + index)}</div>
-                <div class="statement-text">${statement.text}</div>
-                <span class="statement-badge badge-most hidden">最像我</span>
-                <span class="statement-badge badge-least hidden">最不像我</span>
-            `;
+      card.innerHTML = `
+        <div class="statement-letter">${String.fromCharCode(65 + index)}</div>
+        <div class="statement-text">${statement.text}</div>
+        <span class="statement-badge badge-most hidden">最像我</span>
+        <span class="statement-badge badge-least hidden">最不像我</span>
+      `;
 
-            return card;
-        }
+      return card;
+    }
 
-        // Handle Statement Click - New intuitive interface
-        function handleStatementClick(index, statement) {
-            const currentResponse = responses[currentQuestion] || {
-                most_like_index: null,
-                least_like_index: null
-            };
+    function handleStatementClick(index, statement) {
+      const currentResponse = responses[currentQuestion] || {
+        most_like_index: null,
+        least_like_index: null
+      };
 
-            const card = document.querySelectorAll('.statement-card')[index];
+      const card = document.querySelectorAll('.statement-card')[index];
 
-            // If already selected as most, toggle it off
-            if (currentResponse.most_like_index === index) {
-                currentResponse.most_like_index = null;
-                card.classList.remove('selected-most');
-                card.querySelector('.badge-most').classList.add('hidden');
-                document.getElementById('mostLikeSelection').textContent = '未選擇';
-            }
-            // If already selected as least, toggle it off
-            else if (currentResponse.least_like_index === index) {
-                currentResponse.least_like_index = null;
-                card.classList.remove('selected-least');
-                card.querySelector('.badge-least').classList.add('hidden');
-                document.getElementById('leastLikeSelection').textContent = '未選擇';
-            }
-            // If not selected, select as most (if most is empty) or least
-            else if (currentResponse.most_like_index === null) {
-                // Clear any previous most selection
-                document.querySelectorAll('.statement-card').forEach((c, i) => {
-                    if (i === currentResponse.most_like_index) {
-                        c.classList.remove('selected-most');
-                        c.querySelector('.badge-most').classList.add('hidden');
-                    }
-                });
-
-                currentResponse.most_like_index = index;
-                card.classList.add('selected-most');
-                card.querySelector('.badge-most').classList.remove('hidden');
-                document.getElementById('mostLikeSelection').textContent =
-                    statement.text.substring(0, 30) + '...';
-            }
-            else if (currentResponse.least_like_index === null) {
-                // Clear any previous least selection
-                document.querySelectorAll('.statement-card').forEach((c, i) => {
-                    if (i === currentResponse.least_like_index) {
-                        c.classList.remove('selected-least');
-                        c.querySelector('.badge-least').classList.add('hidden');
-                    }
-                });
-
-                currentResponse.least_like_index = index;
-                card.classList.add('selected-least');
-                card.querySelector('.badge-least').classList.remove('hidden');
-                document.getElementById('leastLikeSelection').textContent =
-                    statement.text.substring(0, 30) + '...';
-            }
-            else {
-                // Both are selected, show hint
-                alert('請先取消其中一個選擇，再選擇新的選項');
-            }
-
-            // Update response
-            responses[currentQuestion] = currentResponse;
-
-            // Check if selection is complete
-            checkSelectionComplete();
-        }
-
-        // Handle Selection (Old method - keep for compatibility)
-        function selectChoice(statementId, type, button) {
-            // Check if this statement is already selected for the opposite type
-            const card = button.closest('.statement-card');
-            const oppositeType = type === 'most' ? 'least' : 'most';
-
-            // If this card is already selected for opposite type, prevent selection
-            if (card.classList.contains(`selected-${oppositeType}`)) {
-                alert(`此選項已被選為「${oppositeType === 'most' ? '最像我' : '最不像我'}」，請選擇其他選項`);
-                return;
-            }
-
-            // Remove previous selection of same type
-            document.querySelectorAll(`.btn-${type === 'most' ? 'most' : 'least'}.selected`).forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.querySelectorAll(`.selected-${type === 'most' ? 'most' : 'least'}`).forEach(card => {
-                card.classList.remove(`selected-${type === 'most' ? 'most' : 'least'}`);
-            });
-
-            // Add new selection
-            button.classList.add('selected');
-            button.closest('.statement-card').classList.add(`selected-${type === 'most' ? 'most' : 'least'}`);
-
-            // Save selection to responses
-            if (!responses[currentQuestion]) {
-                responses[currentQuestion] = {};
-            }
-            const cards = Array.from(document.querySelectorAll('.statement-card'));
-            const cardIndex = cards.indexOf(card);
-
-            if (type === 'most') {
-                responses[currentQuestion].most_like_index = cardIndex;
-            } else {
-                responses[currentQuestion].least_like_index = cardIndex;
-            }
-
-            // Update display
-            const statement = button.closest('.statement-card').querySelector('.statement-text').textContent;
-            if (type === 'most') {
-                document.getElementById('mostLikeSelection').textContent =
-                    statement.substring(0, 20) + '...';
-            } else {
-                document.getElementById('leastLikeSelection').textContent =
-                    statement.substring(0, 20) + '...';
-            }
-
-            // Check if both selections made
-            checkSelectionComplete();
-        }
-
-        // Check Selection Complete
-        function checkSelectionComplete() {
-            const currentResponse = responses[currentQuestion] || {};
-            const hasMost = currentResponse.most_like_index !== null && currentResponse.most_like_index !== undefined;
-            const hasLeast = currentResponse.least_like_index !== null && currentResponse.least_like_index !== undefined;
-
-            document.getElementById('nextBtn').disabled = !(hasMost && hasLeast);
-        }
-
-        // Clear Selections
-        function clearSelections() {
-            document.querySelectorAll('.choice-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.querySelectorAll('.statement-card').forEach(card => {
-                card.classList.remove('selected-most', 'selected-least');
-                // Hide badges
-                const badges = card.querySelectorAll('.statement-badge');
-                badges.forEach(badge => badge.classList.add('hidden'));
-            });
-            document.getElementById('mostLikeSelection').textContent = '未選擇';
-            document.getElementById('leastLikeSelection').textContent = '未選擇';
-        }
-
-        // Navigate Questions
-        function nextQuestion() {
-            // Check if current response is complete
-            const currentResponse = responses[currentQuestion] || {};
-
-            if (currentResponse.most_like_index === null || currentResponse.most_like_index === undefined ||
-                currentResponse.least_like_index === null || currentResponse.least_like_index === undefined) {
-                alert('請選擇最像和最不像的選項');
-                return;
-            }
-
-            // Update response with timing data
-            responses[currentQuestion] = {
-                ...currentResponse,
-                block_id: currentQuestion,
-                response_time_ms: Date.now() - (startTime?.getTime() || Date.now())
-            };
-
-            if (currentQuestion < totalQuestions - 1) {
-                loadQuestion(currentQuestion + 1);
-            } else {
-                submitAssessment();
-            }
-        }
-
-        function previousQuestion() {
-            if (currentQuestion > 0) {
-                loadQuestion(currentQuestion - 1);
-            }
-        }
-
-        // Update Progress
-        function updateProgress() {
-            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
-            document.getElementById('progressFill').style.width = `${progress}%`;
-            document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
-            document.getElementById('questionCounter').textContent =
-                `問題 ${currentQuestion + 1} / ${totalQuestions}`;
-
-            // Update time estimate
-            const avgTimePerQuestion = 15; // seconds
-            const remainingQuestions = totalQuestions - currentQuestion;
-            const remainingSeconds = remainingQuestions * avgTimePerQuestion;
-            const remainingMinutes = Math.ceil(remainingSeconds / 60);
-            document.getElementById('timeRemaining').textContent =
-                `預計剩餘 ${remainingMinutes} 分鐘`;
-        }
-
-        // Submit Assessment
-        async function submitAssessment() {
-            // Show loading
-            document.getElementById('questionCard').style.display = 'none';
-            document.getElementById('selectionStatus').style.display = 'none';
-            document.getElementById('actionButtons').style.display = 'none';
-            document.getElementById('encouragement').style.display = 'none';
-            document.getElementById('loadingState').classList.add('active');
-
-            const endTime = new Date();
-            const completionTime = Math.round((endTime - startTime) / 1000);
-
-            try {
-                // Submit to API - use relative URL for better compatibility
-                const response = await fetch(`${apiBase}/api/assessment/submit?v=1`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        session_id: sessionId,
-                        responses: responses.filter(r => r !== undefined),  // Remove any undefined responses
-                        completion_time_seconds: completionTime
-                    })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    // Redirect to results page
-                    window.location.href = `/results.html?session=${sessionId}`;
-                } else {
-                    const errorData = await response.json();
-                    console.error('API Error:', errorData);
-                    alert(`提交失敗: ${errorData.error?.message || '未知錯誤'}`);
-                    // Hide loading state
-                    document.getElementById('loadingState').classList.remove('active');
-                    document.getElementById('questionCard').style.display = 'block';
-                    document.getElementById('actionButtons').style.display = 'flex';
-                }
-            } catch (error) {
-                console.error('Submission error:', error);
-                // Check if the response is HTML (404 page)
-                if (error.message && error.message.includes('Unexpected token')) {
-                    alert('API 端點不存在或路徑錯誤，請檢查系統設定');
-                } else {
-                    alert(`網路錯誤: ${error.message}`);
-                }
-                // Hide loading state
-                document.getElementById('loadingState').classList.remove('active');
-                document.getElementById('questionCard').style.display = 'block';
-                document.getElementById('actionButtons').style.display = 'flex';
-            }
-        }
-
-        // Utility Functions
-        function generateSessionId() {
-            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function trackEvent(eventName, data) {
-            if (typeof gtag !== 'undefined') {
-                gtag('event', eventName, data);
-            }
-            console.log('Event:', eventName, data);
-        }
-
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', () => {
-            initAssessment();
+      if (currentResponse.most_like_index === index) {
+        currentResponse.most_like_index = null;
+        card.classList.remove('selected-most');
+        card.querySelector('.badge-most').classList.add('hidden');
+        document.getElementById('mostLikeSelection').textContent = '未選擇';
+      }
+      else if (currentResponse.least_like_index === index) {
+        currentResponse.least_like_index = null;
+        card.classList.remove('selected-least');
+        card.querySelector('.badge-least').classList.add('hidden');
+        document.getElementById('leastLikeSelection').textContent = '未選擇';
+      }
+      else if (currentResponse.most_like_index === null) {
+        document.querySelectorAll('.statement-card').forEach((c, i) => {
+          if (i === currentResponse.most_like_index) {
+            c.classList.remove('selected-most');
+            c.querySelector('.badge-most').classList.add('hidden');
+          }
         });
-    </script>
+
+        currentResponse.most_like_index = index;
+        card.classList.add('selected-most');
+        card.querySelector('.badge-most').classList.remove('hidden');
+        document.getElementById('mostLikeSelection').textContent =
+          statement.text.substring(0, 30) + '...';
+      }
+      else if (currentResponse.least_like_index === null) {
+        document.querySelectorAll('.statement-card').forEach((c, i) => {
+          if (i === currentResponse.least_like_index) {
+            c.classList.remove('selected-least');
+            c.querySelector('.badge-least').classList.add('hidden');
+          }
+        });
+
+        currentResponse.least_like_index = index;
+        card.classList.add('selected-least');
+        card.querySelector('.badge-least').classList.remove('hidden');
+        document.getElementById('leastLikeSelection').textContent =
+          statement.text.substring(0, 30) + '...';
+      }
+      else {
+        alert('請先取消其中一個選擇，再選擇新的選項');
+      }
+
+      responses[currentQuestion] = currentResponse;
+      checkSelectionComplete();
+    }
+
+    function restoreSelections(savedResponse) {
+      if (!savedResponse) return;
+
+      const cards = document.querySelectorAll('.statement-card');
+
+      if (savedResponse.most_like_index !== null && savedResponse.most_like_index !== undefined) {
+        const mostCard = cards[savedResponse.most_like_index];
+        if (mostCard) {
+          mostCard.classList.add('selected-most');
+          mostCard.querySelector('.badge-most').classList.remove('hidden');
+          const statement = mostCard.querySelector('.statement-text').textContent;
+          document.getElementById('mostLikeSelection').textContent = statement.substring(0, 30) + '...';
+        }
+      }
+
+      if (savedResponse.least_like_index !== null && savedResponse.least_like_index !== undefined) {
+        const leastCard = cards[savedResponse.least_like_index];
+        if (leastCard) {
+          leastCard.classList.add('selected-least');
+          leastCard.querySelector('.badge-least').classList.remove('hidden');
+          const statement = leastCard.querySelector('.statement-text').textContent;
+          document.getElementById('leastLikeSelection').textContent = statement.substring(0, 30) + '...';
+        }
+      }
+    }
+
+    function selectChoice(statementId, type, button) {
+      const card = button.closest('.statement-card');
+      const oppositeType = type === 'most' ? 'least' : 'most';
+
+      if (card.classList.contains(`selected-${oppositeType}`)) {
+        alert(`此選項已被選為「${oppositeType === 'most' ? '最像我' : '最不像我'}」，請選擇其他選項`);
+        return;
+      }
+
+      document.querySelectorAll(`.btn-${type === 'most' ? 'most' : 'least'}.selected`).forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      document.querySelectorAll(`.selected-${type === 'most' ? 'most' : 'least'}`).forEach(card => {
+        card.classList.remove(`selected-${type === 'most' ? 'most' : 'least'}`);
+      });
+
+      button.classList.add('selected');
+      button.closest('.statement-card').classList.add(`selected-${type === 'most' ? 'most' : 'least'}`);
+
+      if (!responses[currentQuestion]) {
+        responses[currentQuestion] = {};
+      }
+      const cards = Array.from(document.querySelectorAll('.statement-card'));
+      const cardIndex = cards.indexOf(card);
+
+      if (type === 'most') {
+        responses[currentQuestion].most_like_index = cardIndex;
+      } else {
+        responses[currentQuestion].least_like_index = cardIndex;
+      }
+
+      const statement = button.closest('.statement-card').querySelector('.statement-text').textContent;
+      if (type === 'most') {
+        document.getElementById('mostLikeSelection').textContent = statement.substring(0, 20) + '...';
+      } else {
+        document.getElementById('leastLikeSelection').textContent = statement.substring(0, 20) + '...';
+      }
+
+      checkSelectionComplete();
+    }
+
+    function checkSelectionComplete() {
+      const currentResponse = responses[currentQuestion] || {};
+      const hasMost = currentResponse.most_like_index !== null && currentResponse.most_like_index !== undefined;
+      const hasLeast = currentResponse.least_like_index !== null && currentResponse.least_like_index !== undefined;
+
+      document.getElementById('nextBtn').disabled = !(hasMost && hasLeast);
+    }
+
+    function clearSelections() {
+      document.querySelectorAll('.choice-btn').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      document.querySelectorAll('.statement-card').forEach(card => {
+        card.classList.remove('selected-most', 'selected-least');
+        const badges = card.querySelectorAll('.statement-badge');
+        badges.forEach(badge => badge.classList.add('hidden'));
+      });
+      document.getElementById('mostLikeSelection').textContent = '未選擇';
+      document.getElementById('leastLikeSelection').textContent = '未選擇';
+    }
+
+    function nextQuestion() {
+      const currentResponse = responses[currentQuestion] || {};
+
+      if (currentResponse.most_like_index === null || currentResponse.most_like_index === undefined ||
+          currentResponse.least_like_index === null || currentResponse.least_like_index === undefined) {
+        alert('請選擇最像和最不像的選項');
+        return;
+      }
+
+      responses[currentQuestion] = {
+        ...currentResponse,
+        block_id: currentQuestion,
+        response_time_ms: Date.now() - (startTime?.getTime() || Date.now())
+      };
+
+      if (currentQuestion < totalQuestions - 1) {
+        loadQuestion(currentQuestion + 1);
+      } else {
+        submitAssessment();
+      }
+    }
+
+    function previousQuestion() {
+      if (currentQuestion > 0) {
+        loadQuestion(currentQuestion - 1);
+      }
+    }
+
+    function updateProgress() {
+      const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+      document.getElementById('progressFill').style.width = `${progress}%`;
+      document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
+      document.getElementById('questionCounter').textContent = `問題 ${currentQuestion + 1} / ${totalQuestions}`;
+
+      const avgTimePerQuestion = 15;
+      const remainingQuestions = totalQuestions - currentQuestion;
+      const remainingSeconds = remainingQuestions * avgTimePerQuestion;
+      const remainingMinutes = Math.ceil(remainingSeconds / 60);
+      document.getElementById('timeRemaining').textContent = `預計剩餘 ${remainingMinutes} 分鐘`;
+    }
+
+    async function submitAssessment() {
+      document.getElementById('questionCard').style.display = 'none';
+      document.getElementById('selectionStatus').style.display = 'none';
+      document.getElementById('actionButtons').style.display = 'none';
+      document.getElementById('encouragement').style.display = 'none';
+      document.getElementById('loadingState').classList.add('active');
+
+      const endTime = new Date();
+      const completionTime = Math.round((endTime - startTime) / 1000);
+
+      try {
+        const response = await fetch(`${apiBase}/api/assessment/submit?v=1`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            responses: responses.filter(r => r !== undefined),
+            completion_time_seconds: completionTime
+          })
+        });
+
+        if (response.ok) {
+          await response.json();
+          window.location.href = `/results.html?session=${sessionId}`;
+        } else {
+          const errorData = await response.json();
+          console.error('API Error:', errorData);
+          alert(`提交失敗: ${errorData.error?.message || '未知錯誤'}`);
+          document.getElementById('loadingState').classList.remove('active');
+          document.getElementById('questionCard').style.display = 'block';
+          document.getElementById('actionButtons').style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Submission error:', error);
+        if (error.message && error.message.includes('Unexpected token')) {
+          alert('API 端點不存在或路徑錯誤，請檢查系統設定');
+        } else {
+          alert(`網路錯誤: ${error.message}`);
+        }
+        document.getElementById('loadingState').classList.remove('active');
+        document.getElementById('questionCard').style.display = 'block';
+        document.getElementById('actionButtons').style.display = 'flex';
+      }
+    }
+
+    function generateSessionId() {
+      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function trackEvent(eventName, data) {
+      if (typeof gtag !== 'undefined') {
+        gtag('event', eventName, data);
+      }
+      console.log('Event:', eventName, data);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initAssessment();
+    });
+  </script>
 </body>
 </html>

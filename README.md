@@ -1,10 +1,22 @@
-# Gallup 優勢評測系統 V4.0 → V5.0
+# Gallup 優勢評測系統 V4.0 - 文件存儲版本
 
 **基於 Thurstonian IRT 的科學化優勢評測平台**
 
-> **當前版本**: V4.0 (生產就緒) - 純淨架構，技術債已清理
-> **開發中**: V5.0 (H-MIRT 均衡版) - 基於設計文檔的全面升級
-> **更新日期**: 2025-10-01
+> **當前版本**: V4.0-FileStorage (快速開發版) - 支持極速 Try-and-Error 開發
+> **數據庫版本**: V4.0 (穩定版) - SQLite 持久化存儲
+> **文件存儲版本**: V4.0-FileStorage (開發版) - CSV/JSON 靈活存儲 ⭐
+> **更新日期**: 2025-10-02
+
+## 🚀 **新增文件存儲架構**
+
+### 雙版本並行部署
+```
+📊 數據庫版本 (端口 8004)     📁 文件存儲版本 (端口 8005) ⭐
+├── SQLite 持久化            ├── CSV/JSON 文件存儲
+├── 事務支持               ├── 即時修改生效
+├── 適合穩定測試            ├── 零配置部署
+└── 生產就緒               └── 極速開發迭代
+```
 
 ---
 
@@ -109,7 +121,9 @@ Week 6: 系統整合測試 + A/B 遷移部署
 - **Node.js**: 16+ (前端開發)
 - **系統**: Linux/macOS/Windows
 
-### 快速啟動
+### 🚀 **快速啟動 - 雙版本選擇**
+
+#### 方式一：文件存儲版本 (推薦開發使用) ⭐
 ```bash
 # 1. 設置環境
 git clone https://github.com/Zenobia000/gallup-strengths-assessment.git
@@ -117,43 +131,93 @@ cd gallup-strengths-assessment
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# 2. 啟動後端 API (V4)
+# 2. 啟動文件存儲版本
 cd src/main/python
-PYTHONPATH=. python main.py
-# API: http://localhost:8004
+python3 -m uvicorn api.main_files:app --host 0.0.0.0 --port 8005 --reload
+# API: http://localhost:8005
 
-# 3. 啟動前端服務 (另一終端)
-cd src/main/resources/static
-python -m http.server 3000
-# 前端: http://localhost:3000
+# 3. 直接訪問前端 (無需單獨服務)
+# 前端: http://localhost:8005/landing.html
+```
+
+#### 方式二：數據庫版本 (穩定測試使用)
+```bash
+# 啟動數據庫版本
+cd src/main/python
+python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8004 --reload
+# API: http://localhost:8004
 ```
 
 ### 🌐 **系統訪問入口**
 
-#### 用戶端
-- **評測入口**: http://localhost:3000/
-- **評測頁面**: http://localhost:3000/assessment.html
-- **結果頁面**: http://localhost:3000/results.html?session={id}
+#### 文件存儲版本 (端口 8005) ⭐
+- **著陸頁**: http://localhost:8005/landing.html
+- **評測頁面**: http://localhost:8005/assessment.html
+- **結果頁面**: http://localhost:8005/results.html?session={id}
+- **API 文檔**: http://localhost:8005/api/docs
+- **系統狀態**: http://localhost:8005/api/system/health
 
-#### 開發端
+#### 數據庫版本 (端口 8004)
 - **API 文檔**: http://localhost:8004/api/docs
 - **系統狀態**: http://localhost:8004/api/system/health
 - **系統資訊**: http://localhost:8004/api/system/info
 
-### 📊 **功能導向 API 端點**
+### 🎯 **Try-and-Error 快速開發流程**
+
+文件存儲版本支持極速開發迭代：
+
+```bash
+# 1. 修改評測語句
+vim data/file_storage/v4_statements.json
+
+# 2. 立即測試新配置 (無需重啟)
+curl http://localhost:8005/api/assessment/blocks
+
+# 3. 前端實時測試
+open http://localhost:8005/assessment.html
+
+# 4. 版本控制
+git add data/file_storage/
+git commit -m "test: 調整評測語句配置"
+
+# 5. 快速回滾 (如需要)
+git checkout -- data/file_storage/
+```
+
+### 📊 **API 端點 - 雙版本對照**
+
+#### 文件存儲版本 (端口 8005)
 ```
 系統相關:
-├── GET  /api/system/health              # 系統健康檢查
+└── GET  /api/system/health              # 文件存儲健康檢查
+
+評測相關:
+├── GET  /api/assessment/blocks          # 獲取平衡題組 (文件存儲)
+├── POST /api/assessment/submit          # 提交評測回答 (文件存儲)
+├── GET  /api/assessment/results/{id}    # 獲取完整結果 (文件存儲)
+└── GET  /api/assessment/questions       # 獲取評測題目 (文件存儲)
+
+前端頁面:
+├── GET  /landing.html                   # 著陸頁
+├── GET  /assessment.html                # 評測頁面
+├── GET  /results.html                   # 結果頁面
+└── GET  /report-detail.html             # 詳細報告頁面
+```
+
+#### 數據庫版本 (端口 8004)
+```
+系統相關:
+├── GET  /api/system/health              # 數據庫健康檢查
 └── GET  /api/system/info                # 系統資訊
 
 隱私相關:
 └── POST /api/privacy/consent            # 隱私同意管理
 
 評測相關:
-├── GET  /api/assessment/blocks          # 獲取平衡題組
-├── POST /api/assessment/submit          # 提交評測回答
-├── GET  /api/assessment/results/{id}    # 獲取完整結果
-└── GET  /api/assessment/questions       # 獲取評測題目
+├── GET  /api/assessment/blocks          # 獲取平衡題組 (數據庫)
+├── POST /api/assessment/submit          # 提交評測回答 (數據庫)
+├── GET  /api/assessment/results/{id}    # 獲取完整結果 (數據庫)
+└── GET  /api/assessment/questions       # 獲取評測題目 (數據庫)
 
 報告相關:
 ├── POST /api/reports/generate/{id}      # 生成報告
@@ -167,7 +231,28 @@ python -m http.server 3000
 
 ## 🧪 **測試與驗證**
 
-### 執行測試
+### 🧪 **雙版本測試方式**
+
+#### 文件存儲版本測試 (推薦) ⭐
+```bash
+# 系統健康檢查
+curl -s http://localhost:8005/api/system/health | jq '.status'
+
+# 功能測試
+curl -s http://localhost:8005/api/assessment/blocks | jq '.total_blocks'
+
+# 完整評測流程測試
+# 1. 訪問 http://localhost:8005/landing.html
+# 2. 點擊開始評測
+# 3. 完成題組 (11個四選二題組)
+# 4. 查看結果頁面
+
+# 數據修改測試
+vim data/file_storage/v4_statements.json
+curl -s http://localhost:8005/api/assessment/blocks  # 立即生效
+```
+
+#### 數據庫版本測試
 ```bash
 # V4 系統完整測試
 PYTHONPATH=src/main/python python -m pytest src/test/ -v
@@ -175,18 +260,35 @@ PYTHONPATH=src/main/python python -m pytest src/test/ -v
 # 特定功能測試
 python -m pytest src/test/unit/test_archetype_service.py -v
 python -m pytest src/test/integration/test_v4_archetype_integration.py -v
-```
 
-### 系統驗證
-```bash
-# 檢查核心功能
+# 系統驗證
 curl -s http://localhost:8004/api/assessment/blocks | jq '.total_blocks'
 curl -s http://localhost:8004/api/system/health | jq '.status'
+```
 
-# 評測流程測試
-# 1. 訪問 http://localhost:3000/assessment.html
-# 2. 完成 9 個四選二題組
-# 3. 查看 http://localhost:3000/results.html?session={id}
+### 🚀 **文件存儲優勢體驗**
+
+#### 即時數據修改
+```bash
+# 1. 修改語句內容
+echo '修改評測語句內容...' > data/file_storage/custom_statement.json
+
+# 2. 立即測試效果 (無需重啟服務)
+curl http://localhost:8005/api/assessment/blocks
+
+# 3. 版本控制友好
+git diff data/file_storage/  # 查看變更
+git add data/file_storage/ && git commit -m "test: 新語句配置"
+```
+
+#### 零配置部署
+```bash
+# 一條命令啟動完整系統
+python3 -m uvicorn api.main_files:app --port 8005 --reload
+
+# 無需額外的數據庫服務
+# 無需複雜的環境配置
+# 開箱即用！
 ```
 
 ---
@@ -210,19 +312,64 @@ curl -s http://localhost:8004/api/system/health | jq '.status'
 
 ## 🚀 **開始使用**
 
-### 立即體驗 V4.0
-1. 啟動系統: `PYTHONPATH=src/main/python python main.py`
-2. 訪問: http://localhost:3000/
-3. 體驗: 完整的 T1-T12 動態優勢評測
+### ⭐ 立即體驗文件存儲版本 (推薦)
+```bash
+# 1. 一鍵啟動
+cd src/main/python
+python3 -m uvicorn api.main_files:app --port 8005 --reload
 
-### 參與 V5.0 開發
-1. 查看重構計畫: `docs/development/v5-refactoring-master-plan.md`
-2. 了解設計理念: `docs/design/system-design-and-scoring-mechanism.md`
-3. 建立開發分支: `git checkout -b feature/v5.0-h-mirt-balance`
+# 2. 立即訪問
+open http://localhost:8005/landing.html
+
+# 3. 開始極速開發
+vim data/file_storage/v4_statements.json  # 修改數據
+curl http://localhost:8005/api/assessment/blocks  # 立即測試
+```
+
+### 📊 立即體驗數據庫版本 (穩定版)
+```bash
+# 1. 啟動系統
+cd src/main/python
+python3 -m uvicorn api.main:app --port 8004 --reload
+
+# 2. 訪問 API
+open http://localhost:8004/api/docs
+
+# 3. 完整測試流程
+python -m pytest src/test/ -v
+```
+
+### 🎯 選擇版本指南
+
+| 使用場景 | 推薦版本 | 端口 | 優勢 |
+|:---------|:---------|:-----|:-----|
+| **快速開發測試** | 文件存儲版本 ⭐ | 8005 | 即時修改、零配置 |
+| **算法實驗** | 文件存儲版本 ⭐ | 8005 | 數據靈活、版本控制 |
+| **演示準備** | 文件存儲版本 ⭐ | 8005 | 快速調整、穩定運行 |
+| **穩定功能測試** | 數據庫版本 | 8004 | 數據持久、事務支持 |
+| **生產部署準備** | 數據庫版本 | 8004 | 成熟穩定、完整功能 |
+
+### 🔄 版本切換
+```bash
+# 切換到文件存儲版本
+python3 -m uvicorn api.main_files:app --port 8005
+
+# 切換到數據庫版本
+python3 -m uvicorn api.main:app --port 8004
+
+# 同時運行兩個版本 (不同端口)
+# 終端1: python3 -m uvicorn api.main:app --port 8004
+# 終端2: python3 -m uvicorn api.main_files:app --port 8005
+```
 
 ---
 
 ## 📚 **技術文檔**
+
+### 🆕 **文件存儲架構文檔**
+- `docs/file-storage-architecture.md` - 文件存儲完整架構指南 ⭐
+- `logs/file_storage_migration_report.md` - 遷移完成報告
+- `docs/design/information-architecture-v2.md` - 更新的資訊架構
 
 ### 設計文檔
 - `docs/design/system-design-and-scoring-mechanism.md` - 系統設計理念
@@ -235,8 +382,13 @@ curl -s http://localhost:8004/api/system/health | jq '.status'
 - `CLAUDE.md` - 開發協作規則
 
 ### API 文檔
-- **自動生成**: http://localhost:8004/docs
-- **OpenAPI**: http://localhost:8004/openapi.json
+#### 文件存儲版本 ⭐
+- **自動生成**: http://localhost:8005/api/docs
+- **OpenAPI**: http://localhost:8005/api/openapi.json
+
+#### 數據庫版本
+- **自動生成**: http://localhost:8004/api/docs
+- **OpenAPI**: http://localhost:8004/api/openapi.json
 
 ---
 
@@ -258,8 +410,59 @@ git commit -m "refactor(component): 重構描述"
 
 ---
 
-**💡 這是一個活躍開發的科學級心理測量系統，歡迎參與 V5.0 H-MIRT 均衡版的重構開發！**
+---
+
+## ⭐ **文件存儲版本 - 極速開發體驗**
+
+### 🚀 **為什麼選擇文件存儲版本？**
+
+1. **秒級 Try-and-Error 循環**
+   ```bash
+   vim data/file_storage/v4_statements.json  # 修改
+   curl localhost:8005/api/assessment/blocks  # 測試
+   # 立即看到效果！
+   ```
+
+2. **零配置啟動**
+   ```bash
+   python3 -m uvicorn api.main_files:app --port 8005 --reload
+   # 就這麼簡單！
+   ```
+
+3. **Git 友好的版本控制**
+   ```bash
+   git diff data/file_storage/  # 清晰的變更對比
+   git commit -m "test: 新算法配置"  # 版本化實驗
+   ```
+
+4. **人類可讀的數據格式**
+   - 直接編輯 JSON 配置
+   - 無需 SQL 遷移腳本
+   - 實時可視化調試
+
+### 🎯 **適用場景**
+- ✅ 算法參數調優
+- ✅ 語句內容實驗
+- ✅ 快速原型驗證
+- ✅ 演示數據準備
+- ✅ 教學和研究
+
+**💡 這是一個科學級心理測量系統，現在支持極速 Try-and-Error 開發！文件存儲版本讓您的創意實驗變得前所未有的簡單快速！**
 
 ---
 
-*由 TaskMaster Hub 系統管理 | 人類駕駛，AI 協助* 🤖⚔️
+## 🔄 **快速切換指南**
+
+```bash
+# 文件存儲版本 (推薦開發使用)
+python3 -m uvicorn api.main_files:app --port 8005 --reload
+open http://localhost:8005/landing.html
+
+# 數據庫版本 (穩定測試使用)
+python3 -m uvicorn api.main:app --port 8004 --reload
+open http://localhost:8004/api/docs
+```
+
+---
+
+*由 TaskMaster Hub 系統管理 | 人類駕駛，AI 協助 | 現已支援文件存儲極速開發模式* 🚀🤖⚔️

@@ -1,414 +1,109 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallup 優勢測驗系統 - v4.1</title>
-    <style>
-        :root {
-            /* 領域色彩（主要） */
-            --executing: #7C3AED;        /* 執行力 - 紫色 */
-            --influencing: #F59E0B;      /* 影響力 - 橙色 */
-            --relationship: #0EA5E9;     /* 關係建立 - 藍色 */
-            --strategic: #10B981;        /* 戰略思維 - 綠色 */
-
-            /* 中性色調 */
-            --neutral-50: #F9FAFB;
-            --neutral-100: #F3F4F6;
-            --neutral-200: #E5E7EB;
-            --neutral-500: #6B7280;
-            --neutral-600: #4B5563;
-            --neutral-700: #374151;
-            --neutral-900: #111827;
-
-            /* 功能色彩 */
-            --emerald-500: #10B981;
-            --emerald-600: #059669;
-            --red-500: #EF4444;
-            --amber-500: #F59E0B;
-
-            /* 語義色彩 */
-            --success: var(--emerald-500);
-            --warning: var(--amber-500);
-            --error: var(--red-500);
-            --info: var(--relationship);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background: var(--neutral-50);
-            color: var(--neutral-900);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .page-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1.5rem;
-        }
-
-        .main-card {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem; /* rounded-2xl */
-            padding: 3rem 2rem;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            max-width: 72rem; /* max-w-6xl */
-            width: 100%;
-            text-align: center;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-        }
-
-        .brand-icon {
-            width: 2.25rem; /* w-9 */
-            height: 2.25rem; /* h-9 */
-            border-radius: 0.75rem; /* rounded-xl */
-            background: var(--strategic);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .brand-info h1 {
-            color: var(--neutral-900);
-            font-size: 1.5rem; /* text-2xl */
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .brand-subtitle {
-            color: var(--neutral-500);
-            font-size: 0.75rem; /* text-xs */
-        }
-
-        .hero-content {
-            margin-bottom: 3rem;
-        }
-
-        .hero-title {
-            color: var(--neutral-900);
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .hero-description {
-            color: var(--neutral-700);
-            font-size: 1.125rem; /* text-lg */
-            margin-bottom: 2rem;
-            max-width: 42rem;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .version-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .version-card {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem;
-            padding: 2rem;
-            transition: all 0.2s ease;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .version-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
-
-        .version-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            background: var(--strategic);
-            color: white;
-            border-radius: 9999px; /* rounded-full */
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem; /* text-xs */
-            font-weight: 500;
-            margin-bottom: 1rem;
-        }
-
-        .version-badge.beta {
-            background: var(--amber-500);
-        }
-
-        .version-title {
-            color: var(--neutral-900);
-            font-size: 1.25rem; /* text-xl */
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .version-description {
-            color: var(--neutral-600);
-            font-size: 0.875rem; /* text-sm */
-            margin-bottom: 1.5rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            padding: 0.75rem 1.5rem;
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-        }
-
-        .btn-primary {
-            background: var(--neutral-900);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--neutral-700);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--neutral-700);
-            border: 1px solid var(--neutral-200);
-        }
-
-        .btn-secondary:hover {
-            background: var(--neutral-50);
-            border-color: var(--neutral-300);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-
-        .feature-card {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .feature-icon {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem auto;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .feature-icon.strategic { background: var(--strategic); }
-        .feature-icon.executing { background: var(--executing); }
-        .feature-icon.influencing { background: var(--influencing); }
-
-        .feature-title {
-            color: var(--neutral-900);
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .feature-description {
-            color: var(--neutral-600);
-            font-size: 0.75rem;
-        }
-
-        .system-info {
-            background: var(--neutral-50);
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            text-align: left;
-        }
-
-        .system-info-title {
-            color: var(--neutral-900);
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            font-size: 0.75rem;
-            color: var(--neutral-700);
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--neutral-900);
-        }
-
-        /* 響應式設計 */
-        @media (max-width: 768px) {
-            .page-container {
-                padding: 1rem;
-            }
-
-            .main-card {
-                padding: 2rem 1rem;
-            }
-
-            .hero-title {
-                font-size: 1.875rem; /* text-3xl */
-            }
-
-            .hero-description {
-                font-size: 1rem;
-            }
-
-            .version-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>入口 | Strength DNA Lab</title>
+  <meta name="description" content="Strength DNA Lab 的 FileStorage 版本導覽。快速連結至顧問式 UX 的各個頁面與 API。" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="page-container">
-        <div class="main-card">
-            <!-- Brand Header -->
-            <div class="brand-header">
-                <div class="brand-icon">🎯</div>
-                <div class="brand-info">
-                    <h1>優勢評測系統 v4.1</h1>
-                    <div class="brand-subtitle">Thurstonian IRT • 常模化百分位</div>
-                </div>
-            </div>
-
-            <!-- Hero Content -->
-            <div class="hero-content">
-                <h2 class="hero-title">發現你的優勢DNA</h2>
-                <p class="hero-description">
-                    透過科學化的Thurstonian IRT心理測量模型，精準分析12維度優勢組合，
-                    為您的職涯發展提供專業洞察與個人化建議
-                </p>
-            </div>
-
-            <!-- Version Selection Cards -->
-            <div class="version-cards">
-                <div class="version-card">
-                    <div class="version-badge">
-                        <span>穩定版</span>
-                    </div>
-                    <div class="version-title">v3.0 標準評測</div>
-                    <div class="version-description">
-                        基於Big Five人格理論的成熟評測系統，提供可靠的12維度優勢分析。
-                        適合需要穩定結果的正式評估。
-                    </div>
-                    <a href="assessment.html" class="btn btn-primary">
-                        開始標準評測 →
-                    </a>
-                </div>
-
-                <div class="version-card">
-                    <div class="version-badge beta">
-                        <span>Beta</span>
-                    </div>
-                    <div class="version-title">v4.0 IRT先導測試</div>
-                    <div class="version-description">
-                        採用前沿Thurstonian IRT模型的新一代評測系統，提供更精準的常模化百分位結果。
-                        體驗最新科研成果。
-                    </div>
-                    <a href="v4_pilot_test.html" class="btn btn-secondary">
-                        體驗IRT測試 →
-                    </a>
-                </div>
-            </div>
-
-            <!-- Features Grid -->
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon strategic">📊</div>
-                    <div class="feature-title">科學測評</div>
-                    <div class="feature-description">基於心理測量學原理</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon executing">🎯</div>
-                    <div class="feature-title">精準分析</div>
-                    <div class="feature-description">12維度優勢深度解析</div>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon influencing">💼</div>
-                    <div class="feature-title">職涯建議</div>
-                    <div class="feature-description">個人化發展路徑推薦</div>
-                </div>
-            </div>
-
-            <!-- System Information -->
-            <div class="system-info">
-                <div class="system-info-title">系統資訊</div>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">系統版本</span>
-                        <span>v3.0 (穩定版) | v4.0 (Beta)</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">更新時間</span>
-                        <span>2025-10-01</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">技術支援</span>
-                        <span>Thurstonian IRT 心理測量模型</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">分析維度</span>
-                        <span>12維度優勢 + 4領域分類</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <header class="global-header">
+    <div class="layout">
+      <div class="brand">Strength DNA Lab</div>
+      <nav>
+        <ul class="nav-list">
+          <li><a class="nav-link" href="landing.html">首頁</a></li>
+          <li><a class="nav-link" href="assessment-intro.html">評測準備</a></li>
+          <li><a class="nav-link" href="assessment.html">進入評測</a></li>
+          <li><a class="nav-link" href="results.html">成果示意</a></li>
+          <li><a class="nav-link" href="report-detail.html">詳細報告</a></li>
+        </ul>
+      </nav>
     </div>
+  </header>
+
+  <main class="page">
+    <section class="layout hero">
+      <div class="hero__grid">
+        <div class="hero__content">
+          <p class="eyebrow">FileStorage Edition Hub</p>
+          <h1>快速導覽 · 一鍵進入顧問式體驗</h1>
+          <p class="lead">這裡整合新版資訊架構與設計文件，幫你在開發或測試時快速抵達關鍵頁面。</p>
+          <div class="hero__ctas">
+            <a class="button button--primary" href="landing.html">查看新版 Landing</a>
+            <a class="button button--secondary" href="docs/webpage/results.html">預覽靜態成果</a>
+          </div>
+        </div>
+        <aside class="hero__panel">
+          <h3>快速指引</h3>
+          <ul>
+            <li>依照 IA v2 → Landing → Intro → Assessment → Results。</li>
+            <li>檢視 docs/design 了解資訊架構與前端風格。</li>
+            <li>使用 API 端點驗證 FileStorage 版本功能。</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="layout section">
+      <div class="section__header">
+        <p class="eyebrow">Primary Links</p>
+        <h2>核心頁面入口</h2>
+        <p class="section__intro">按照用戶旅程排序：從建立信任到洞察輸出。</p>
+      </div>
+      <div class="grid grid--2">
+        <a class="card" href="landing.html">
+          <h3 class="card__title">Landing · 建立信任</h3>
+          <p class="card__body">瀏覽 McKinsey 顧問式首頁，理解價值主張與用戶旅程。</p>
+        </a>
+        <a class="card" href="assessment-intro.html">
+          <h3 class="card__title">Intro · 評測準備</h3>
+          <p class="card__body">進入行為心理學設計的前導頁，完成準備清單。</p>
+        </a>
+        <a class="card" href="assessment.html">
+          <h3 class="card__title">Assessment · 評測執行</h3>
+          <p class="card__body">啟動 11 題組評測，體驗強迫選擇與進度引導。</p>
+        </a>
+        <a class="card" href="results.html">
+          <h3 class="card__title">Results · 顧問式摘要</h3>
+          <p class="card__body">查看 KPI 摘要、優勢原型與行動建議示意。</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="layout section">
+      <div class="section__header">
+        <p class="eyebrow">For Developers</p>
+        <h2>開發者資源與 API</h2>
+        <p class="section__intro">支援 FileStorage 架構的快速測試與佈署。</p>
+      </div>
+      <div class="grid grid--2">
+        <a class="card" href="http://localhost:8005/api/docs" target="_blank" rel="noopener">
+          <h3 class="card__title">📚 API Docs</h3>
+          <p class="card__body">FastAPI 自動文件，檢視所有端點與 Schema。</p>
+        </a>
+        <div class="card">
+          <h3 class="card__title">🔐 健康檢查</h3>
+          <p class="card__body">GET /api/system/health — 確認 FileStorage 版本狀態。</p>
+          <p class="caption">本機測試：確保 data/file_storage 資料可讀寫。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="layout">
+      <div class="footer__meta">
+        <strong class="brand">Strength DNA Lab</strong>
+        <span>FileStorage 版本 · 對應 IA v2 與 McKinsey UX 指南</span>
+        <div class="footer__links">
+          <a href="docs/design/information-architecture-v2.md">資訊架構 v2</a>
+          <a href="docs/design/frontend-architecture-mckinsey-style.md">前端設計指南</a>
+          <a href="docs/webpage/results.html">靜態頁面預覽</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
