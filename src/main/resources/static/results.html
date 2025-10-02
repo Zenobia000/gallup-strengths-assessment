@@ -416,11 +416,34 @@
         loadResults(sessionId);
     });
 
+    // Load talent mapping rules from API
+    let TALENT_MAPPING_RULES = null;
+    let ARCHETYPE_DEFINITIONS = null;
+
+    async function loadTalentMappingRules() {
+        try {
+            const response = await fetch(`${apiBase}/api/assessment/talent-mapping`);
+            if (response.ok) {
+                const data = await response.json();
+                TALENT_MAPPING_RULES = data.talent_mapping;
+                ARCHETYPE_DEFINITIONS = TALENT_MAPPING_RULES?.archetype_definitions || {};
+                console.log('Loaded talent mapping rules:', Object.keys(ARCHETYPE_DEFINITIONS));
+                return true;
+            }
+        } catch (error) {
+            console.error('Error loading talent mapping rules:', error);
+        }
+        return false;
+    }
+
     // Load results from API
     async function loadResults(sessionId) {
         showLoading();
 
         try {
+            // Load talent mapping rules first
+            await loadTalentMappingRules();
+
             const response = await fetch(`${apiBase}/api/assessment/results/${sessionId}`);
 
             if (!response.ok) {
@@ -449,11 +472,15 @@
         // Update header info
         document.getElementById('sessionId').textContent = sessionId;
 
+        // Use real assessment time from session data
         const assessmentDate = sessionInfo.created_at ?
             new Date(sessionInfo.created_at).toLocaleDateString('zh-TW', {
                 year: 'numeric', month: '2-digit', day: '2-digit',
                 hour: '2-digit', minute: '2-digit'
-            }) : '2025-10-02 15:30';
+            }) : new Date().toLocaleDateString('zh-TW', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+            });
         document.getElementById('assessmentTime').textContent = assessmentDate;
 
         const confidence = Math.round((scoringInfo.overall_confidence || 0.85) * 100);

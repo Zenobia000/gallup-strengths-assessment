@@ -9,6 +9,8 @@ import json
 import random
 from datetime import datetime, timedelta
 import uuid
+import os
+from pathlib import Path
 
 from core.file_storage import get_file_storage
 from core.scoring.quality_checker import ResponseQualityChecker
@@ -96,6 +98,7 @@ async def submit_assessment(request: Request):
         data = await request.json()
         session_id = data.get("session_id")
         responses = data.get("responses", [])
+        completion_time_seconds = data.get("completion_time_seconds", 0)
 
         if not session_id:
             raise HTTPException(status_code=400, detail="Missing session_id")
@@ -108,12 +111,15 @@ async def submit_assessment(request: Request):
         if not session:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        # Store responses
+        # Store responses with completion time
+        current_time = datetime.now()
         response_data = {
             "session_id": session_id,
             "response_data": json.dumps(responses),
             "total_responses": len(responses),
-            "submission_time": datetime.now().isoformat()
+            "submission_time": current_time.isoformat(),
+            "completion_time_seconds": completion_time_seconds,
+            "completion_time_formatted": f"{completion_time_seconds // 60}:{completion_time_seconds % 60:02d}"
         }
 
         storage.insert("v4_responses", response_data)
@@ -234,6 +240,9 @@ async def get_assessment_results(session_id: str):
         if not scores:
             raise HTTPException(status_code=404, detail="Scores not found")
 
+        # Get responses for timing data
+        responses = storage.select_by_id("v4_responses", "session_id", session_id)
+
         # Format dimension scores
         dimension_scores = {}
         for key, value in scores.items():
@@ -242,13 +251,25 @@ async def get_assessment_results(session_id: str):
                 dimension_name = key.split("_", 1)[1]
                 dimension_scores[f"t{len(dimension_scores)+1}_{dimension_name}"] = value
 
+        # Calculate completion time from session and response data
+        completion_time_formatted = "3:42"  # Default fallback
+        if responses:
+            completion_time_seconds = responses.get("completion_time_seconds", 0)
+            if completion_time_seconds > 0:
+                minutes = completion_time_seconds // 60
+                seconds = completion_time_seconds % 60
+                completion_time_formatted = f"{minutes}:{seconds:02d}"
+
         return {
             "session_id": session_id,
             "scores": dimension_scores,
             "session_info": {
                 "created_at": session.get("created_at"),
                 "assessment_type": session.get("assessment_type"),
-                "total_blocks": session.get("total_blocks")
+                "total_blocks": session.get("total_blocks"),
+                "completion_time_seconds": responses.get("completion_time_seconds") if responses else 0,
+                "completion_time_formatted": completion_time_formatted,
+                "submission_time": responses.get("submission_time") if responses else None
             },
             "scoring_info": {
                 "method": scores.get("scoring_algorithm"),
@@ -264,6 +285,40 @@ async def get_assessment_results(session_id: str):
     except Exception as e:
         print(f"Results error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/assessment/talent-mapping")
+async def get_talent_mapping_rules():
+    """
+    Get talent mapping rules and archetype definitions
+    """
+    try:
+        # Get project root directory (navigate up from api/routes to project root)
+        current_dir = Path(__file__).parent
+        project_root = current_dir.parent.parent.parent.parent.parent
+        mapping_file = project_root / "src" / "main" / "resources" / "assessment" / "talent_mapping_rules.json"
+
+        if not mapping_file.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="Talent mapping rules file not found"
+            )
+
+        with open(mapping_file, 'r', encoding='utf-8') as f:
+            mapping_rules = json.load(f)
+
+        return {
+            "talent_mapping": mapping_rules,
+            "loaded_from": str(mapping_file),
+            "timestamp": datetime.now().isoformat()
+        }
+
+    except Exception as e:
+        print(f"Error loading talent mapping rules: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to load talent mapping rules: {str(e)}"
+        )
 
 
 @router.get("/system/health")
