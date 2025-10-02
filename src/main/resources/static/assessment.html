@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>評測執行 | 顧問式體驗</title>
   <meta name="description" content="McKinsey 顧問風格的評測介面，提供清晰流程與行為心理導向的引導，快速完成四選二評測。" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <header class="global-header">
@@ -127,7 +127,7 @@
   </footer>
 
   <script>
-    const apiBase = window.location.port === '3000' ? 'http://localhost:8005' : '';
+    const apiBase = window.location.port === '8005' ? '' : 'http://localhost:8005';
 
     let currentQuestion = 0;
     let totalQuestions = 20;
