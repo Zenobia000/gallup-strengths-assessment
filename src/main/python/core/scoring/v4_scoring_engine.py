@@ -38,43 +38,74 @@ class V4ScoringEngine:
         # Simplified scoring: count preferences per dimension
         dimension_counts = {dim: 0 for dim in self.dimensions}
 
-        # Mock scoring based on response patterns
+        # Handle both old format (most_like/least_like) and new format (indices)
         for response in responses:
-            most_like = response.get("most_like", "")
-            least_like = response.get("least_like", "")
+            # Support both formats for backward compatibility
+            if "most_like_index" in response and "least_like_index" in response:
+                # New format: indices (0-3) representing choices within a block
+                most_like_index = response.get("most_like_index", -1)
+                least_like_index = response.get("least_like_index", -1)
 
-            # Extract dimension from statement ID (e.g., T1001 -> T1)
-            if most_like:
-                dim_id = most_like[:2]  # T1, T2, etc.
-                if dim_id in ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]:
-                    dim_index = int(dim_id[1:]) - 1
-                    if 0 <= dim_index < len(self.dimensions):
-                        dimension_counts[self.dimensions[dim_index]] += 2
+                # In simplified scoring, map indices to dimensions by rotating
+                # This is a simplified approach - in real scoring we'd need the actual statements
+                if 0 <= most_like_index < 4:
+                    # Map each index to a dimension group (rough approximation)
+                    dim_group = most_like_index % 4  # 0=EXECUTING, 1=INFLUENCING, 2=RELATIONSHIP, 3=STRATEGIC
+                    start_idx = dim_group * 3
+                    for i in range(3):
+                        if start_idx + i < len(self.dimensions):
+                            dimension_counts[self.dimensions[start_idx + i]] += 0.67
 
-            if least_like:
-                dim_id = least_like[:2]
-                if dim_id in ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]:
-                    dim_index = int(dim_id[1:]) - 1
-                    if 0 <= dim_index < len(self.dimensions):
-                        dimension_counts[self.dimensions[dim_index]] -= 1
+                if 0 <= least_like_index < 4:
+                    dim_group = least_like_index % 4
+                    start_idx = dim_group * 3
+                    for i in range(3):
+                        if start_idx + i < len(self.dimensions):
+                            dimension_counts[self.dimensions[start_idx + i]] -= 0.33
+            else:
+                # Old format: statement IDs
+                most_like = response.get("most_like", "")
+                least_like = response.get("least_like", "")
+
+                # Extract dimension from statement ID (e.g., T1001 -> T1)
+                if most_like:
+                    dim_id = most_like[:2]  # T1, T2, etc.
+                    if dim_id in ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]:
+                        dim_index = int(dim_id[1:]) - 1
+                        if 0 <= dim_index < len(self.dimensions):
+                            dimension_counts[self.dimensions[dim_index]] += 2
+
+                if least_like:
+                    dim_id = least_like[:2]
+                    if dim_id in ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"]:
+                        dim_index = int(dim_id[1:]) - 1
+                        if 0 <= dim_index < len(self.dimensions):
+                            dimension_counts[self.dimensions[dim_index]] -= 1
 
         # Convert to percentiles (improved realistic scoring)
         total_responses = len(responses)
         base_percentiles = [95, 88, 82, 74, 68, 58, 52, 45, 38, 28, 22, 15]  # Realistic distribution
-        random.shuffle(base_percentiles)  # Randomize assignment
 
         dimension_scores = {}
         theta_estimates = {}
-        for i, (dim, count) in enumerate(dimension_counts.items()):
-            # Use realistic percentile distribution based on response patterns
-            if count > 0:
-                # Higher count = higher percentile, with some randomization
-                base_score = base_percentiles[i % len(base_percentiles)]
-                adjustment = (count / max(1, total_responses)) * 20  # Response influence
-                percentile = min(99, max(1, base_score + adjustment + random.uniform(-5, 5)))
-            else:
-                # No positive responses = lower score
-                percentile = random.uniform(15, 35)
+
+        # Sort dimensions by count for realistic distribution
+        sorted_dims = sorted(dimension_counts.items(), key=lambda x: x[1], reverse=True)
+
+        for i, (dim, count) in enumerate(sorted_dims):
+            # Use position-based percentile with count influence
+            base_index = i % len(base_percentiles)
+            base_score = base_percentiles[base_index]
+
+            # Add count-based adjustment
+            count_adjustment = count * 5  # Each point adds ~5 percentiles
+
+            # Add controlled randomization to avoid identical scores
+            random_adjustment = random.uniform(-8, 8)
+
+            # Calculate final percentile
+            percentile = base_score + count_adjustment + random_adjustment
+            percentile = min(99, max(1, percentile))  # Clamp to valid range
 
             dimension_scores[dim] = round(percentile, 1)
 

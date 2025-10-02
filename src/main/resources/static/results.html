@@ -59,26 +59,71 @@
     .legend-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:6px}
     .dot-executing{background:#7C3AED}.dot-influencing{background:#F59E0B}.dot-relationship{background:#0EA5E9}.dot-strategic{background:#10B981}
 
-    /* 表格 */
-    .table-wrap{overflow:hidden;border-radius:var(--radius-md);border:var(--border-thin) solid var(--gray-200);background:var(--white)}
-    table{width:100%;border-collapse:collapse}
-    thead{background:var(--gray-50)}
-    th{padding:16px 20px;text-align:left;font-size:12px;font-weight:600;color:#4D4D4D;text-transform:uppercase;letter-spacing:.05em;border-bottom:var(--border-medium) solid var(--gray-300)}
-    td{padding:16px 20px;font-size:14px;color:#333;border-bottom:var(--border-thin) solid var(--gray-200)}
-    tbody tr:last-child td{border-bottom:none}
-    tbody tr:hover{background:var(--gray-50)}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:9999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-    .badge-executing{background:rgba(124,58,237,.1);color:#7C3AED}
-    .badge-influencing{background:rgba(245,158,11,.1);color:#F59E0B}
-    .badge-relationship{background:rgba(14,165,233,.1);color:#0EA5E9}
-    .badge-strategic{background:rgba(16,185,129,.1);color:#10B981}
-    .tier{display:inline-block;padding:4px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;text-transform:uppercase;color:#fff}
-    .tier-dominant{background:var(--success-green)}
-    .tier-supporting{background:var(--mckinsey-blue)}
-    .tier-lesser{background:var(--gray-400)}
-    .bar{position:relative;height:24px;background:var(--gray-100);border-radius:var(--radius-sm);overflow:hidden}
-    .bar-fill{height:100%;background:var(--mckinsey-blue);transition:width .6s ease}
-    .bar-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:600;color:#555}
+    /* 12 維度分析 */
+    .section-headline{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+    .section-subtitle{margin:0;color:var(--gray-600);font-size:14px;line-height:1.5}
+    .analysis-legend{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+    @media(min-width:768px){.analysis-legend{flex-direction:row;justify-content:space-between;align-items:center}}
+    .legend-group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .legend-label{font-size:12px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.06em}
+    .legend-pill{--pill-color:var(--gray-500);display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 32px;border-radius:999px;font-size:12px;font-weight:600;background:#fff;color:var(--pill-color);border:1.5px solid rgba(8,31,63,.12);position:relative;box-shadow:0 4px 10px rgba(0,31,63,.06)}
+    .legend-pill::before{content:"";position:absolute;left:12px;top:50%;width:10px;height:10px;border-radius:50%;background:var(--pill-color);box-shadow:0 0 0 2px rgba(8,31,63,.08);transform:translateY(-50%)}
+    .tier-pill.dominant{--pill-color:var(--success-green);border-color:rgba(45,134,89,.32)}
+    .tier-pill.supporting{--pill-color:var(--mckinsey-blue);border-color:rgba(0,102,166,.28)}
+    .tier-pill.managing{--pill-color:var(--data-orange);border-color:rgba(255,107,53,.28)}
+    .domain-pill{border-color:rgba(0,31,63,.16)}
+    .domain-pill.domain-executing{--pill-color:#6f3ad9}
+    .domain-pill.domain-influencing{--pill-color:#d98205}
+    .domain-pill.domain-relationship-building{--pill-color:#0e8cc6}
+    .domain-pill.domain-strategic-thinking{--pill-color:#0c8a60}
+
+    .talent-grid{display:grid;gap:18px}
+    @media(min-width:768px){.talent-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:1200px){.talent-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+    .talent-card{position:relative;padding:24px;border-radius:18px;background:var(--white);border:1px solid rgba(0,31,63,.08);box-shadow:0 10px 28px rgba(0,31,63,.06);display:flex;flex-direction:column;gap:18px;transition:transform .2s ease,box-shadow .2s ease}
+    .talent-card::after{content:"";position:absolute;top:0;left:0;right:0;height:4px;border-radius:18px 18px 0 0;background:var(--domain-color,#0066A6)}
+    .talent-card:hover{transform:translateY(-3px);box-shadow:0 18px 36px rgba(0,31,63,.12)}
+
+    .talent-card.domain-executing{--domain-color:#7C3AED;background:rgba(124,58,237,.05);border-color:rgba(124,58,237,.25)}
+    .talent-card.domain-influencing{--domain-color:#F59E0B;background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.22)}
+    .talent-card.domain-relationship-building{--domain-color:#0EA5E9;background:rgba(14,165,233,.05);border-color:rgba(14,165,233,.22)}
+    .talent-card.domain-strategic-thinking{--domain-color:#10B981;background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.22)}
+
+    .talent-card__header{display:flex;gap:16px;align-items:flex-start}
+    .talent-card__icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--domain-color),rgba(255,255,255,.6));color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 6px 16px rgba(0,31,63,.15)}
+    .talent-card__title{margin:0;font-size:18px;font-weight:600;color:var(--gray-900)}
+    .talent-card__domain{margin:4px 0 0;font-size:13px;color:rgba(0,0,0,.6);letter-spacing:.05em;text-transform:uppercase}
+    .tier-chip{margin-left:auto;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fff;box-shadow:0 6px 14px rgba(0,31,63,.12)}
+    .tier-chip.dominant{background:var(--success-green)}
+    .tier-chip.supporting{background:var(--mckinsey-blue)}
+    .tier-chip.managing{background:var(--data-orange)}
+
+    .talent-card__score{display:flex;flex-direction:column;gap:10px}
+    .score-value{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:28px;font-weight:600;color:var(--gray-900)}
+    .score-bar{position:relative;height:10px;border-radius:999px;background:rgba(0,0,0,.08);overflow:hidden}
+    .score-bar__fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,var(--domain-color),rgba(255,255,255,.6))}
+    .score-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--gray-600);letter-spacing:.02em}
+    .score-meta strong{font-size:12px;color:var(--domain-color)}
+
+    .talent-card__note{margin:0;color:var(--gray-700);font-size:13px;line-height:1.5}
+    .talent-empty{padding:24px;border-radius:18px;border:1px dashed rgba(0,31,63,.16);color:var(--gray-600);font-size:14px;text-align:center;background:rgba(0,0,0,.02)}
+
+    .domain-grid{display:grid;gap:18px}
+    @media(min-width:768px){.domain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(min-width:1200px){.domain-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    .domain-card{position:relative;padding:24px;border-radius:20px;background:var(--white);border:1px solid rgba(0,31,63,.08);box-shadow:0 12px 24px rgba(0,31,63,.08);display:flex;flex-direction:column;gap:16px;overflow:hidden}
+    .domain-card::before{content:"";position:absolute;inset:0;opacity:0.12;background:linear-gradient(135deg,var(--domain-color,#0066A6),transparent);pointer-events:none}
+    .domain-card__header{display:flex;align-items:center;justify-content:space-between;position:relative}
+    .domain-card__title{margin:0;font-size:18px;font-weight:600;color:var(--gray-900)}
+    .domain-card__meta{font-size:12px;color:rgba(0,0,0,.6);letter-spacing:.04em;text-transform:uppercase}
+    .domain-score{display:flex;align-items:flex-end;gap:8px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--gray-900);position:relative}
+    .domain-score strong{font-size:36px;line-height:1}
+    .domain-score span{font-size:13px;color:var(--gray-600)}
+    .domain-best{position:relative;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.65);backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:6px;border:1px solid rgba(0,31,63,.06)}
+    .domain-best__label{font-size:12px;font-weight:600;color:rgba(0,0,0,.55);letter-spacing:.04em;text-transform:uppercase}
+    .domain-best__talent{font-size:15px;font-weight:600;color:var(--gray-900)}
+    .domain-best__desc{margin:0;font-size:13px;color:var(--gray-700);line-height:1.5}
 
     /* Persona */
     .persona-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -165,6 +210,7 @@
           </div>
         </div>
         <div class="actions">
+          <button class="btn btn-secondary" onclick="window.location.href='landing.html'">🏠 返回首頁</button>
           <button class="btn btn-secondary" onclick="shareReport()">📤 分享報告</button>
           <button class="btn btn-primary" onclick="downloadPDF()">📄 下載 PDF</button>
         </div>
@@ -249,24 +295,40 @@
         </div>
       </section>
 
+      <!-- Domain Summary -->
+      <section class="section">
+        <div class="section-headline">
+          <h2 class="section-title">四大領域表現</h2>
+          <p class="section-subtitle">快速了解四大領域的整體趨勢、平均百分位與最佳代表才幹，幫助你聚焦發展重點。</p>
+        </div>
+        <div class="domain-grid" id="domainSummaryGrid">
+          <!-- Domain cards injected by script -->
+        </div>
+      </section>
+
       <!-- 詳細分析表格 -->
       <section class="section">
-        <h2 class="section-title">12 維度詳細分析</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>維度</th>
-                <th>領域</th>
-                <th>百分位</th>
-                <th>分級</th>
-                <th>與常模對比</th>
-              </tr>
-            </thead>
-            <tbody id="talentTableBody">
-              <!-- Talent rows will be dynamically inserted here -->
-            </tbody>
-          </table>
+        <div class="section-headline">
+          <h2 class="section-title">12 維度詳細分析</h2>
+          <p class="section-subtitle">顏色對應四大領域，長條反映常模百分位，提示協助你善用或管理此才幹。</p>
+        </div>
+        <div class="analysis-legend">
+          <div class="legend-group">
+            <span class="legend-label">分級意義</span>
+            <span class="legend-pill tier-pill dominant">主導 ≥ 75</span>
+            <span class="legend-pill tier-pill supporting">支援 25–75</span>
+            <span class="legend-pill tier-pill managing">待管理 &lt; 25</span>
+          </div>
+          <div class="legend-group">
+            <span class="legend-label">領域色彩</span>
+            <span class="legend-pill domain-pill domain-executing">執行力</span>
+            <span class="legend-pill domain-pill domain-influencing">影響力</span>
+            <span class="legend-pill domain-pill domain-relationship-building">關係建立</span>
+            <span class="legend-pill domain-pill domain-strategic-thinking">戰略思維</span>
+          </div>
+        </div>
+        <div class="talent-grid" id="talentGrid">
+          <!-- Talent cards will be dynamically inserted here -->
         </div>
       </section>
 
@@ -323,6 +385,15 @@
             <p style="margin:4px 0 8px;color:#555">與團隊領導或職涯顧問討論評測結果，制定發展計劃。</p>
             <button class="link" onclick="shareReport()">分享報告 →</button>
           </li>
+          <li class="step">
+            <span class="step-num">4</span>
+            <strong>返回首頁或再度評測</strong>
+            <p style="margin:4px 0 8px;color:#555">隨時回到首頁瀏覽說明，或透過準備頁重新啟動下一次測評。</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="link" onclick="window.location.href='landing.html'">返回首頁 →</button>
+              <button class="link" onclick="window.location.href='assessment-intro.html'">再次評測 →</button>
+            </div>
+          </li>
         </ol>
       </section>
     </div>
@@ -334,18 +405,18 @@
 
     // Talent definitions with domain mapping
     const TALENT_DEFINITIONS = {
-        "T1": { name: "結構化執行", domain: "EXECUTING", icon: "🎯" },
-        "T2": { name: "品質與完備", domain: "EXECUTING", icon: "✅" },
-        "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING", icon: "🔍" },
-        "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING", icon: "📊" },
-        "T5": { name: "影響與倡議", domain: "INFLUENCING", icon: "💪" },
-        "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING", icon: "🤝" },
-        "T7": { name: "客戶導向", domain: "INFLUENCING", icon: "🎯" },
-        "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING", icon: "📚" },
-        "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING", icon: "⚖️" },
-        "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING", icon: "🧘" },
-        "T11": { name: "衝突整合", domain: "INFLUENCING", icon: "🎭" },
-        "T12": { name: "責任與當責", domain: "EXECUTING", icon: "💼" }
+        "T1": { name: "結構化執行", domain: "EXECUTING", icon: "🎯", description: "將目標拆解成步驟，建立流程和追蹤機制" },
+        "T2": { name: "品質與完備", domain: "EXECUTING", icon: "✅", description: "注重細節，追求第一次就把事情做對" },
+        "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING", icon: "🔍", description: "嘗試新方法，從失敗中學習，連結不同概念" },
+        "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING", icon: "📊", description: "界定問題，用數據檢驗假設，辨識因果關係" },
+        "T5": { name: "影響與倡議", domain: "INFLUENCING", icon: "💪", description: "說服他人，表達觀點，推動變革" },
+        "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING", icon: "🤝", description: "建立團隊合作，分享資源，促進和諧" },
+        "T7": { name: "客戶導向", domain: "INFLUENCING", icon: "🎯", description: "理解客戶需求，創造價值，建立長期關係" },
+        "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING", icon: "📚", description: "持續學習，反思改進，培養他人" },
+        "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING", icon: "⚖️", description: "守約守時，維持穩定，建立可靠形象" },
+        "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING", icon: "🧘", description: "在壓力下保持冷靜，穩定團隊情緒" },
+        "T11": { name: "衝突整合", domain: "INFLUENCING", icon: "🎭", description: "處理分歧，尋求共識，促進決策" },
+        "T12": { name: "責任與當責", domain: "EXECUTING", icon: "💼", description: "承擔責任，主動回報，確保交付" }
     };
 
     // Career archetypes
@@ -386,6 +457,50 @@
         "INFLUENCING": "#F59E0B",
         "RELATIONSHIP_BUILDING": "#0EA5E9",
         "STRATEGIC_THINKING": "#10B981"
+    };
+
+    const DOMAIN_LABELS = {
+        "EXECUTING": "執行力",
+        "INFLUENCING": "影響力",
+        "RELATIONSHIP_BUILDING": "關係建立",
+        "STRATEGIC_THINKING": "戰略思維"
+    };
+
+    const TIER_META = {
+        dominant: {
+            label: "主導",
+            summary: "優先投入",
+            note: "這是你最具影響力的區域，適合承接高複雜度或關鍵任務，將資源聚焦於此。"
+        },
+        supporting: {
+            label: "支援",
+            summary: "搭配主導",
+            note: "此才幹能夠穩定支援主導優勢，設定明確角色或流程即可放大整體成效。"
+        },
+        managing: {
+            label: "待管理",
+            summary: "善用協作",
+            note: "避免獨自承擔關鍵決策，爭取工具或夥伴支援，把心力放在主導與支援優勢上。"
+        }
+    };
+
+    const DOMAIN_META = {
+        "EXECUTING": {
+            label: "執行力",
+            description: "善於拆解目標、建立流程並確保交付品質，適合主導執行與落地任務。"
+        },
+        "STRATEGIC_THINKING": {
+            label: "戰略思維",
+            description: "擅長分析與創新，能在複雜資訊中找出洞察並規劃長期方向。"
+        },
+        "INFLUENCING": {
+            label: "影響力",
+            description: "透過溝通說服帶動他人行動，適合對外協調與變革推動。"
+        },
+        "RELATIONSHIP_BUILDING": {
+            label: "關係建立",
+            description: "維持團隊信任與穩定，擅長協作與情緒調節，適合成為團隊凝聚核心。"
+        }
     };
 
     // Get session ID from URL
@@ -496,8 +611,11 @@
         // Generate DNA visualization
         generateDNAVisualization(talents);
 
-        // Update detailed analysis table
-        updateDetailedTable(talents);
+        // Render domain summary
+        renderDomainSummary(talents);
+
+        // Update detailed analysis cards
+        renderTalentGrid(talents);
 
         // Update career archetype
         updateCareerArchetype(categorized);
@@ -528,6 +646,7 @@
                             name: talentDef.name,
                             domain: talentDef.domain,
                             icon: talentDef.icon,
+                            description: talentDef.description,
                             score: score
                         });
                     }
@@ -628,34 +747,28 @@
         });
     }
 
-    // Update detailed analysis table
-    function updateDetailedTable(talents) {
-        const tbody = document.getElementById('talentTableBody');
-        tbody.innerHTML = '';
+    // Render detailed analysis cards
+    function renderTalentGrid(talents) {
+        const container = document.getElementById('talentGrid');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (!talents || talents.length === 0) {
+            container.innerHTML = '<div class="talent-empty">尚未取得各維度分數，請確認評測是否完成。</div>';
+            return;
+        }
 
         talents.forEach(talent => {
-            const row = document.createElement('tr');
+            const tierKey = talent.score > 75 ? 'dominant' : (talent.score >= 25 ? 'supporting' : 'managing');
+            const tierConfig = TIER_META[tierKey];
+            const domainClass = talent.domain ? talent.domain.toLowerCase().replace(/_/g, '-') : '';
+            const domainLabel = DOMAIN_LABELS[talent.domain] || talent.domain.replace('_', ' ');
+            const tierTooltip = tierConfig.note;
 
-            // Determine tier
-            let tier, tierClass;
-            if (talent.score > 75) {
-                tier = '主導';
-                tierClass = 'tier-dominant';
-            } else if (talent.score >= 25) {
-                tier = '支援';
-                tierClass = 'tier-supporting';
-            } else {
-                tier = '待管理';
-                tierClass = 'tier-lesser';
-            }
-
-            // Determine domain badge class
-            const domainBadgeClass = `badge-${talent.domain.toLowerCase().replace('_', '')}`;
-
-            // Generate comparison text
             let comparisonText;
             if (talent.score >= 80) {
-                comparisonText = `高於 ${talent.score}% 同儕`;
+                comparisonText = `高於 ${Math.round(talent.score)}% 同儕`;
             } else if (talent.score >= 60) {
                 comparisonText = '略高於平均';
             } else if (talent.score >= 40) {
@@ -666,31 +779,111 @@
                 comparisonText = '低於平均';
             }
 
-            row.innerHTML = `
-                <td><strong>${talent.name}</strong></td>
-                <td><span class="badge ${domainBadgeClass}">${talent.domain.replace('_', ' ')}</span></td>
-                <td><span class="mono" style="font-weight:600">PR ${talent.score}</span></td>
-                <td><span class="tier ${tierClass}">${tier}</span></td>
-                <td>
-                    <div class="bar">
-                        <div class="bar-fill" style="width:${talent.score}%"></div>
-                        <span class="bar-label">${comparisonText}</span>
+            const scoreValue = Math.round(talent.score);
+            const barWidth = Math.min(100, Math.max(6, scoreValue));
+            const talentDescription = talent.description || tierTooltip;
+
+            const card = document.createElement('article');
+            card.className = `talent-card domain-${domainClass}`;
+            card.innerHTML = `
+                <div class="talent-card__header">
+                    <div class="talent-card__icon" title="${tierTooltip}" aria-label="${tierTooltip}">${talent.icon || '🧬'}</div>
+                    <div>
+                        <h3 class="talent-card__title">${talent.name}</h3>
+                        <p class="talent-card__domain">${domainLabel}</p>
                     </div>
-                </td>
+                    <span class="tier-chip ${tierKey}">${tierConfig.label}</span>
+                </div>
+                <div class="talent-card__score">
+                    <span class="score-value">PR ${scoreValue}</span>
+                    <div class="score-bar">
+                        <span class="score-bar__fill" style="width:${barWidth}%;"></span>
+                    </div>
+                    <div class="score-meta">
+                        <strong>${comparisonText}</strong>
+                        <span>${tierConfig.summary}</span>
+                    </div>
+                </div>
+                <p class="talent-card__note">${talentDescription}</p>
             `;
 
-            tbody.appendChild(row);
+            container.appendChild(card);
+        });
+    }
+
+    // Render domain summary cards
+    function renderDomainSummary(talents) {
+        const grid = document.getElementById('domainSummaryGrid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+
+        const grouped = talents.reduce((acc, talent) => {
+            if (!acc[talent.domain]) {
+                acc[talent.domain] = [];
+            }
+            acc[talent.domain].push(talent);
+            return acc;
+        }, {});
+
+        Object.keys(DOMAIN_META).forEach(domainKey => {
+            const domainTalents = grouped[domainKey] || [];
+            const meta = DOMAIN_META[domainKey];
+            const avgScore = domainTalents.length
+                ? Math.round(domainTalents.reduce((sum, t) => sum + t.score, 0) / domainTalents.length)
+                : 0;
+
+            const highlight = domainTalents.length
+                ? domainTalents.reduce((prev, current) => (current.score > prev.score ? current : prev), domainTalents[0])
+                : null;
+
+            const card = document.createElement('article');
+            card.className = 'domain-card';
+            card.style.setProperty('--domain-color', DOMAIN_COLORS[domainKey] || '#0066A6');
+
+            card.innerHTML = `
+                <div class="domain-card__header">
+                    <div>
+                        <h3 class="domain-card__title">${meta.label}</h3>
+                        <span class="domain-card__meta">平均百分位 · PR ${avgScore}</span>
+                    </div>
+                </div>
+                <div class="domain-score">
+                    <strong>${avgScore}</strong>
+                    <span>Average PR</span>
+                </div>
+                <div class="domain-best">
+                    <span class="domain-best__label">代表才幹</span>
+                    <span class="domain-best__talent">${highlight ? highlight.name : '尚未取得資料'}</span>
+                    <p class="domain-best__desc">${highlight ? (highlight.description || DOMAIN_META[domainKey].description) : meta.description}</p>
+                </div>
+            `;
+
+            grid.appendChild(card);
         });
     }
 
     // Update career archetype
     function updateCareerArchetype(categorized) {
-        // Determine dominant domain
+        if (!ARCHETYPE_DEFINITIONS || !TALENT_MAPPING_RULES) {
+            console.warn('Archetype definitions not loaded, using fallback');
+            updateCareerArchetypeFallback(categorized);
+            return;
+        }
+
+        // Run the full classification algorithm
+        const archetypeResult = classifyArchetype(categorized);
+        console.log('Archetype classification result:', archetypeResult);
+
+        // Update persona content with dynamic results
+        updatePersonaUI(archetypeResult);
+    }
+
+    // Fallback to domain-based classification when mapping rules unavailable
+    function updateCareerArchetypeFallback(categorized) {
         const domainCounts = {
-            "EXECUTING": 0,
-            "INFLUENCING": 0,
-            "RELATIONSHIP_BUILDING": 0,
-            "STRATEGIC_THINKING": 0
+            "EXECUTING": 0, "INFLUENCING": 0,
+            "RELATIONSHIP_BUILDING": 0, "STRATEGIC_THINKING": 0
         };
 
         categorized.dominant.forEach(talent => {
@@ -700,53 +893,262 @@
         const topDomain = Object.entries(domainCounts)
             .sort(([,a], [,b]) => b - a)[0];
 
-        let archetype;
-        if (topDomain && topDomain[1] > 0) {
-            archetype = CAREER_ARCHETYPES[topDomain[0]];
-        } else {
-            // Use the domain with highest average score as fallback
-            const domainAverages = {};
-            Object.keys(CAREER_ARCHETYPES).forEach(domain => {
-                const domainTalents = categorized.dominant.concat(categorized.supporting)
-                    .filter(t => t.domain === domain);
-                domainAverages[domain] = domainTalents.length > 0 ?
-                    domainTalents.reduce((sum, t) => sum + t.score, 0) / domainTalents.length : 0;
+        const archetype = CAREER_ARCHETYPES[topDomain[0]] || CAREER_ARCHETYPES["STRATEGIC_THINKING"];
+
+        document.getElementById('personaDescription').innerHTML = `
+            <div style="margin-bottom: 8px; color: var(--data-orange); font-size: 12px; font-weight: 600;">
+                ⚠️ 基礎分析 - 基於領域偏好的簡化分類
+            </div>
+            ${archetype.description}
+        `;
+
+        // Update lists with fallback data
+        updateArchetypeLists(archetype.roles, archetype.contexts, archetype.tips);
+    }
+
+    // Implement the full archetype classification algorithm from talent_mapping_rules.json
+    function classifyArchetype(categorized) {
+        const allTalents = [...categorized.dominant, ...categorized.supporting, ...categorized.managing];
+
+        // Step 1: Initialize archetype scores
+        const archetypeScores = {};
+        Object.keys(ARCHETYPE_DEFINITIONS).forEach(archetypeId => {
+            archetypeScores[archetypeId] = 0;
+        });
+
+        // Step 2: Calculate talent-based scores with weighted pattern matching
+        const weightDistribution = { rank_1: 0.4, rank_2: 0.3, rank_3: 0.2, rank_4: 0.1 };
+
+        allTalents.forEach((talent, index) => {
+            let weight = 0;
+            if (index < 4) {
+                weight = Object.values(weightDistribution)[index];
+            } else {
+                weight = 0.02; // Minimal weight for other talents
+            }
+
+            Object.keys(ARCHETYPE_DEFINITIONS).forEach(archetypeId => {
+                let affinity = 0;
+                const archetype = ARCHETYPE_DEFINITIONS[archetypeId];
+
+                // Check primary/secondary talent matches
+                if (archetype.primary_talents && archetype.primary_talents.includes(talent.id)) {
+                    affinity = 1.0;
+                } else if (archetype.secondary_talents && archetype.secondary_talents.includes(talent.id)) {
+                    affinity = 0.7;
+                } else {
+                    // Use domain affinity from mapping rules
+                    const mappingRules = TALENT_MAPPING_RULES.mapping_rules;
+                    if (mappingRules && mappingRules.domain_preference_scoring) {
+                        const domainScoring = mappingRules.domain_preference_scoring[talent.domain];
+                        if (domainScoring && domainScoring.archetype_affinity) {
+                            affinity = domainScoring.archetype_affinity[archetypeId] || 0;
+                        }
+                    }
+                }
+
+                // Calculate weighted contribution
+                const contribution = (talent.score / 100) * weight * affinity;
+                archetypeScores[archetypeId] += contribution;
             });
+        });
 
-            const highestDomain = Object.entries(domainAverages)
-                .sort(([,a], [,b]) => b - a)[0];
+        // Step 3: Apply pattern bonuses for specific talent combinations
+        Object.keys(ARCHETYPE_DEFINITIONS).forEach(archetypeId => {
+            const mappingRules = TALENT_MAPPING_RULES.mapping_rules;
+            const indicators = mappingRules?.specific_talent_indicators?.[`${archetypeId}_indicators`];
 
-            archetype = CAREER_ARCHETYPES[highestDomain[0]];
+            if (indicators && indicators.must_have && indicators.threshold) {
+                const topTalentIds = categorized.dominant.map(t => t.id);
+                const mustHaveCount = indicators.must_have.filter(talentId =>
+                    topTalentIds.includes(talentId)
+                ).length;
+
+                const mustHaveRatio = mustHaveCount / indicators.must_have.length;
+
+                if (mustHaveRatio >= (indicators.threshold || 0.5)) {
+                    const bonusMultiplier = mappingRules?.classification_algorithm?.step_3_pattern_matching?.bonus_multiplier || 1.5;
+                    archetypeScores[archetypeId] *= bonusMultiplier;
+                }
+            }
+        });
+
+        // Step 4: Normalize to probabilities
+        const totalScore = Object.values(archetypeScores).reduce((sum, score) => sum + score, 0);
+        const archetypeProbabilities = {};
+
+        if (totalScore > 0) {
+            Object.keys(archetypeScores).forEach(archetypeId => {
+                archetypeProbabilities[archetypeId] = archetypeScores[archetypeId] / totalScore;
+            });
+        } else {
+            // Equal probabilities as fallback
+            const equalProb = 1 / Object.keys(ARCHETYPE_DEFINITIONS).length;
+            Object.keys(ARCHETYPE_DEFINITIONS).forEach(archetypeId => {
+                archetypeProbabilities[archetypeId] = equalProb;
+            });
         }
 
-        // Update persona content
-        document.getElementById('personaDescription').textContent = archetype.description;
+        // Step 5: Determine primary and secondary archetypes
+        const sortedArchetypes = Object.entries(archetypeProbabilities)
+            .sort(([,a], [,b]) => b - a);
 
+        const primaryArchetype = sortedArchetypes[0];
+        const secondaryArchetype = sortedArchetypes.length > 1 ? sortedArchetypes[1] : [null, 0];
+
+        // Step 6: Calculate confidence based on margin and pattern strength
+        let confidence = 'low';
+        if (primaryArchetype[1] > 0.45) {
+            confidence = 'high';
+        } else if (primaryArchetype[1] > 0.35) {
+            confidence = 'medium';
+        }
+
+        return {
+            primary: {
+                id: primaryArchetype[0],
+                name: ARCHETYPE_DEFINITIONS[primaryArchetype[0]]?.name || primaryArchetype[0],
+                probability: primaryArchetype[1],
+                confidence: confidence,
+                definition: ARCHETYPE_DEFINITIONS[primaryArchetype[0]]
+            },
+            secondary: secondaryArchetype[0] ? {
+                id: secondaryArchetype[0],
+                name: ARCHETYPE_DEFINITIONS[secondaryArchetype[0]]?.name || secondaryArchetype[0],
+                probability: secondaryArchetype[1],
+                definition: ARCHETYPE_DEFINITIONS[secondaryArchetype[0]]
+            } : null,
+            all_scores: archetypeProbabilities,
+            supporting_talents: categorized.dominant.map(t => t.id),
+            raw_scores: archetypeScores
+        };
+    }
+
+    // Update the persona UI with dynamic archetype results
+    function updatePersonaUI(archetypeResult) {
+        const primary = archetypeResult.primary;
+        const secondary = archetypeResult.secondary;
+
+        // Update main description with detailed analysis
+        const descriptionEl = document.getElementById('personaDescription');
+        const confidenceColor = primary.confidence === 'high' ? 'var(--success-green)' :
+                               primary.confidence === 'medium' ? 'var(--data-orange)' : 'var(--alert-red)';
+
+        const confidenceText = primary.confidence === 'high' ? '高信心' :
+                              primary.confidence === 'medium' ? '中信心' : '低信心';
+
+        descriptionEl.innerHTML = `
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px;">
+                <span style="background: ${confidenceColor}; color: white; padding: 4px 12px; border-radius: 16px; font-size: 11px; font-weight: 600; text-transform: uppercase;">
+                    ${Math.round(primary.probability * 100)}% 匹配 | ${confidenceText}
+                </span>
+                <span style="padding: 2px 8px; background: var(--gray-100); border-radius: 12px; font-size: 11px; color: var(--gray-600);">
+                    ${primary.definition?.keirsey_temperament || ''}
+                </span>
+            </div>
+            <div style="margin-bottom: 12px; font-weight: 600; color: var(--mckinsey-navy); font-size: 18px;">
+                ${primary.name}
+            </div>
+            <div style="line-height: 1.6; margin-bottom: 12px;">
+                ${primary.definition?.description || ''}
+            </div>
+            <div style="padding: 12px; background: var(--mckinsey-light-blue); border-radius: 6px; font-size: 13px; line-height: 1.5; border-left: 3px solid var(--mckinsey-blue);">
+                <strong>核心驅動:</strong> ${primary.definition?.core_drive || '載入中...'}
+            </div>
+            ${secondary && secondary.probability > 0.18 ? `
+                <div style="margin-top: 16px; padding: 12px; background: var(--gray-50); border-radius: 6px; font-size: 13px; border-left: 3px solid var(--gray-400);">
+                    <strong>次要特質:</strong> ${secondary.name} (${Math.round(secondary.probability * 100)}%)
+                    <div style="margin-top: 4px; color: var(--gray-600); font-size: 12px;">
+                        您同時展現 ${secondary.definition?.name || secondary.name} 的特質
+                    </div>
+                </div>
+            ` : ''}
+        `;
+
+        // Update content areas with dynamic data
+        const roles = primary.definition?.career_suggestions || ['載入中...'];
+        const contexts = [
+            primary.definition?.work_environment || '載入中...',
+            primary.definition?.leadership_style || ''
+        ].filter(item => item);
+        const tips = generateDevelopmentTips(primary, secondary, archetypeResult);
+
+        updateArchetypeLists(roles, contexts, tips);
+    }
+
+    // Generate development tips based on archetype analysis
+    function generateDevelopmentTips(primary, secondary, archetypeResult) {
+        const tips = [];
+
+        // Core talent reinforcement
+        if (archetypeResult.supporting_talents.length > 0) {
+            const topTalents = archetypeResult.supporting_talents.slice(0, 3);
+            tips.push(`發揮您的 ${topTalents.join('、')} 才幹組合優勢`);
+        }
+
+        // Development based on confidence level
+        if (primary.confidence === 'low') {
+            if (secondary) {
+                tips.push(`您的才幹組合較為多元，可探索 ${secondary.name} 領域的發展機會`);
+            } else {
+                tips.push('您具備均衡的才幹分布，適合多元發展路徑');
+            }
+        } else if (primary.confidence === 'high') {
+            tips.push(`深化您的 ${primary.name} 專業，建立此領域的專家聲譽`);
+        }
+
+        // Domain-specific suggestions
+        if (primary.definition?.domain_preference) {
+            const domains = primary.definition.domain_preference.split(' + ').join(' 和 ');
+            tips.push(`重點發展 ${domains} 相關的核心技能`);
+        }
+
+        // Pattern-specific advice
+        if (primary.definition?.primary_talents) {
+            const hasPattern = primary.definition.primary_talents.some(talentId =>
+                archetypeResult.supporting_talents.includes(talentId)
+            );
+            if (hasPattern) {
+                tips.push(`您具備 ${primary.name} 的核心才幹模式，建議承接相應的挑戰項目`);
+            }
+        }
+
+        return tips.length > 0 ? tips : ['持續發揮您的獨特才幹組合優勢'];
+    }
+
+    // Helper function to update archetype content lists
+    function updateArchetypeLists(roles, contexts, tips) {
         // Update suggested roles
         const rolesContainer = document.getElementById('suggestedRoles');
         rolesContainer.innerHTML = '';
-        archetype.roles.forEach(role => {
-            const li = document.createElement('li');
-            li.textContent = role;
-            rolesContainer.appendChild(li);
+        (roles || []).forEach(role => {
+            if (role) {
+                const li = document.createElement('li');
+                li.textContent = role;
+                rolesContainer.appendChild(li);
+            }
         });
 
         // Update key contexts
         const contextsContainer = document.getElementById('keyContexts');
         contextsContainer.innerHTML = '';
-        archetype.contexts.forEach(context => {
-            const li = document.createElement('li');
-            li.textContent = context;
-            contextsContainer.appendChild(li);
+        (contexts || []).forEach(context => {
+            if (context && context.trim()) {
+                const li = document.createElement('li');
+                li.textContent = context;
+                contextsContainer.appendChild(li);
+            }
         });
 
         // Update development tips
         const tipsContainer = document.getElementById('developmentTips');
         tipsContainer.innerHTML = '';
-        archetype.tips.forEach(tip => {
-            const li = document.createElement('li');
-            li.textContent = tip;
-            tipsContainer.appendChild(li);
+        (tips || []).forEach(tip => {
+            if (tip && tip.trim()) {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                tipsContainer.appendChild(li);
+            }
         });
     }
 
