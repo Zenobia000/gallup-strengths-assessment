@@ -55,7 +55,7 @@ class Settings(BaseSettings):
 
     # Database Configuration
     database_url: str = Field(
-        default="sqlite:///./data/gallup_assessment.db",
+        default="sqlite:///../../../../data/gallup_assessment.db",
         description="Database connection URL"
     )
 

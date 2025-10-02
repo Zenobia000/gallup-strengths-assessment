@@ -247,12 +247,33 @@ async def v4_pilot_page():
     else:
         raise HTTPException(status_code=404, detail="V4 pilot test page not found")
 
-# Additional frontend endpoints
-@app.get("/results.html", include_in_schema=False)
-async def results_page():
-    """Serve the assessment results display page."""
+# Frontend UI endpoints - 基於 API 端點設計
+@app.get("/ui/assessment/start", include_in_schema=False)
+async def assessment_start_ui():
+    """評測開始頁面 - 對應 /api/assessment/blocks API"""
     from fastapi.responses import FileResponse
     import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    assessment_file = os.path.join(static_dir, "assessment.html")
+
+    if os.path.exists(assessment_file):
+        return FileResponse(assessment_file)
+    else:
+        raise HTTPException(status_code=404, detail="Assessment page not found")
+
+@app.get("/ui/assessment/results/{session_id}", include_in_schema=False)
+async def assessment_results_ui(session_id: str):
+    """評測結果頁面 - 對應 /api/assessment/results/{session_id} API"""
+    from fastapi.responses import FileResponse
+    import os
+
+    # 先驗證 session 是否存在
+    with get_session() as db_session:
+        from models.v4_models import V4Score
+        score = db_session.query(V4Score).filter(V4Score.session_id == session_id).first()
+        if not score:
+            raise HTTPException(status_code=404, detail=f"Assessment results not found for session {session_id}")
 
     static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
     results_file = os.path.join(static_dir, "results.html")
@@ -262,11 +283,18 @@ async def results_page():
     else:
         raise HTTPException(status_code=404, detail="Results page not found")
 
-@app.get("/report-detail.html", include_in_schema=False)
-async def report_detail_page():
-    """Serve the detailed report page."""
+@app.get("/ui/reports/{session_id}", include_in_schema=False)
+async def reports_ui(session_id: str):
+    """詳細報告頁面 - 對應 /api/reports/generate/{session_id} API"""
     from fastapi.responses import FileResponse
     import os
+
+    # 先驗證 session 是否存在
+    with get_session() as db_session:
+        from models.v4_models import V4Score
+        score = db_session.query(V4Score).filter(V4Score.session_id == session_id).first()
+        if not score:
+            raise HTTPException(status_code=404, detail=f"Report not available for session {session_id}")
 
     static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
     report_file = os.path.join(static_dir, "report-detail.html")
@@ -274,11 +302,11 @@ async def report_detail_page():
     if os.path.exists(report_file):
         return FileResponse(report_file)
     else:
-        raise HTTPException(status_code=404, detail="Report detail page not found")
+        raise HTTPException(status_code=404, detail="Report page not found")
 
-@app.get("/landing.html", include_in_schema=False)
-async def landing_page():
-    """Serve the landing page."""
+@app.get("/ui/home", include_in_schema=False)
+async def home_ui():
+    """首頁 - 系統入口點"""
     from fastapi.responses import FileResponse
     import os
 
@@ -288,17 +316,31 @@ async def landing_page():
     if os.path.exists(landing_file):
         return FileResponse(landing_file)
     else:
-        raise HTTPException(status_code=404, detail="Landing page not found")
+        raise HTTPException(status_code=404, detail="Home page not found")
 
 # Root endpoint redirect
 @app.get("/", include_in_schema=False)
 async def root():
-    """Redirect root to API documentation."""
+    """系統根目錄 - 提供 API 和 UI 端點資訊"""
     return JSONResponse({
-        "message": "Gallup Strengths Assessment API",
-        "documentation": "/api/docs",
-        "health_check": "/api/system/health",
-        "assessment": "/assessment"
+        "message": "Gallup Strengths Assessment System v4.0",
+        "api": {
+            "documentation": "/api/docs",
+            "health_check": "/api/system/health",
+            "assessment_blocks": "/api/assessment/blocks",
+            "assessment_submit": "/api/assessment/submit",
+            "assessment_results": "/api/assessment/results/{session_id}",
+            "reports": "/api/reports/generate/{session_id}"
+        },
+        "ui": {
+            "home": "/ui/home",
+            "assessment_start": "/ui/assessment/start",
+            "assessment_results": "/ui/assessment/results/{session_id}",
+            "detailed_reports": "/ui/reports/{session_id}",
+            "legacy_assessment": "/assessment",
+            "v4_pilot": "/v4-pilot"
+        },
+        "architecture": "API-first design with corresponding UI endpoints"
     })
 
 
