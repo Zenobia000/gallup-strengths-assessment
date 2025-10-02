@@ -16,7 +16,7 @@ import pandas as pd
 from dataclasses import dataclass, asdict
 import logging
 
-from utils.database import get_database_manager
+from database.engine import get_database_engine
 
 logger = logging.getLogger(__name__)
 
@@ -67,12 +67,12 @@ class DataCollector:
             target_sample_size: Target number of participants
         """
         self.target_sample_size = target_sample_size
-        self.db_manager = get_database_manager()
+        self.db_engine = get_database_engine()
         self._init_tables()
 
     def _init_tables(self):
         """Initialize data collection tables"""
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             # Participants table
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS v4_test_participants (
@@ -130,7 +130,7 @@ class DataCollector:
         """
         participant_id = f"P{uuid.uuid4().hex[:8].upper()}"
 
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             conn.execute("""
                 INSERT INTO v4_test_participants
                 (participant_id, age, gender, education, test_group, metadata)
@@ -165,7 +165,7 @@ class DataCollector:
         """
         session_id = f"TS{uuid.uuid4().hex[:8].upper()}"
 
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             conn.execute("""
                 INSERT INTO v4_test_sessions
                 (session_id, participant_id, test_version, blocks_data,
@@ -200,7 +200,7 @@ class DataCollector:
         # Validate responses
         quality_flags = self._validate_responses(responses, completion_time_seconds)
 
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             conn.execute("""
                 UPDATE v4_test_sessions
                 SET responses = ?,
@@ -280,7 +280,7 @@ class DataCollector:
         Returns:
             Statistics dictionary
         """
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             # Total participants
             cursor = conn.execute("SELECT COUNT(*) FROM v4_test_participants")
             total_participants = cursor.fetchone()[0]
@@ -362,7 +362,7 @@ class DataCollector:
         Returns:
             Tuple of (responses, blocks)
         """
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             cursor = conn.execute("""
                 SELECT responses, blocks_data, quality_flags
                 FROM v4_test_sessions
@@ -404,7 +404,7 @@ class DataCollector:
         Returns:
             Progress information
         """
-        with self.db_manager.get_connection() as conn:
+        with self.db_engine.get_session() as session:
             # Get participant info
             cursor = conn.execute("""
                 SELECT * FROM v4_test_participants

@@ -625,7 +625,7 @@
 
     <script>
         // API Configuration - detect environment
-        const apiBase = window.location.port === '3000' ? 'http://localhost:8002' : '';
+        const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
 
         // Assessment State
         let currentQuestion = 0;
@@ -652,7 +652,7 @@
         async function initAssessment() {
             try {
                 // Load assessment blocks from V4 API (let API determine optimal count)
-                const response = await fetch(`${apiBase}/api/v4/assessment/blocks`);
+                const response = await fetch(`${apiBase}/api/assessment/blocks?v=1`);
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Loaded blocks from API:', data);
@@ -1018,7 +1018,7 @@
 
             try {
                 // Submit to API - use relative URL for better compatibility
-                const response = await fetch(`${apiBase}/api/v4/assessment/submit`, {
+                const response = await fetch(`${apiBase}/api/assessment/submit?v=1`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -961,8 +961,8 @@
                 if (sessionId) {
                     try {
                         // Try to fetch real data from API (correct v4 endpoint)
-                        const apiBase = window.location.port === '3000' ? 'http://localhost:8002' : '';
-                        const response = await fetch(`${apiBase}/api/v4/assessment/results/${sessionId}`);
+                        const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
+                        const response = await fetch(`${apiBase}/api/assessment/results/${sessionId}`);
 
                         if (response.ok) {
                             const apiData = await response.json();

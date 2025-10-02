@@ -230,7 +230,6 @@ class CareerArchetype(Base):
     # 關聯
     archetype_talents = relationship("ArchetypeTalent", back_populates="archetype")
     job_matches = relationship("ArchetypeJobMatch", back_populates="archetype")
-    user_results = relationship("UserArchetypeResult", back_populates="primary_archetype")
 
     def __repr__(self):
         return f"<CareerArchetype(archetype_id={self.archetype_id}, name={self.archetype_name})>"
@@ -354,7 +353,7 @@ class UserArchetypeResult(Base):
 
     # 關聯
     session = relationship("AssessmentSession", back_populates="archetype_result")
-    primary_archetype = relationship("CareerArchetype", back_populates="user_results", foreign_keys=[primary_archetype_id])
+    primary_archetype = relationship("CareerArchetype", foreign_keys=[primary_archetype_id])
     secondary_archetype = relationship("CareerArchetype", foreign_keys=[secondary_archetype_id])
 
     def __repr__(self):

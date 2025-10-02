@@ -32,8 +32,11 @@ from models.schemas import (
 # NOTE: AssessmentService temporarily disabled - uses legacy MiniIPIPScorer
 # TODO: Refactor AssessmentService to use ScoringEngine (Task: future)
 # from services.assessment import AssessmentService
-from utils.database import get_db_connection
-from api.routes import consent, reports_v4_only, v4_assessment, v4_data_collection
+from database.engine import get_session
+# Import new SQLAlchemy-based V4 assessment
+from api.routes import reports_v4_only
+from api.routes import v4_assessment_sqlalchemy
+# from api.routes import consent, v4_data_collection
 from api.middleware.error_handler import register_error_handlers
 
 
@@ -92,83 +95,38 @@ async def get_questions(include_situational: bool = True):
     Supports both traditional Mini-IPIP and situational questions.
     """
     try:
-        from utils.database import get_database_manager
+        from database.engine import get_session
+        from models.v4_models import V4Statement
         import json
 
-        db_manager = get_database_manager()
-        raw_items = db_manager.get_assessment_items("mini_ipip_v1.0")
-
         questions = []
-        for item in raw_items:
-            # Skip situational questions if not requested
-            if not include_situational and item.get("question_type") == "situational":
-                continue
+        with get_session() as session:
+            raw_items = session.query(V4Statement).all()
 
-            question_data = {
-                "id": item["item_id"],
-                "text": item["text_chinese"],
-                "dimension": item["dimension"],
-                "reverse": bool(item["reverse_scored"]),
-                "question_type": item.get("question_type", "traditional")
-            }
+            for item in raw_items:
+                # V4 statements are all for Thurstonian IRT
+                # Access all attributes while session is active
+                question_data = {
+                    "id": item.statement_id,
+                    "text": item.text,
+                    "dimension": item.dimension,
+                    "context": item.context,
+                    "social_desirability": item.social_desirability,
+                    "question_type": "thurstonian_irt"
+                }
+                questions.append(question_data)
 
-            # Add situational question specific fields
-            if item.get("question_type") == "situational":
-                scenario_id = item.get("scenario_context")
-                scenario_description = None
-
-                # Get full scenario description from database
-                if scenario_id:
-                    try:
-                        with db_manager.get_connection() as conn:
-                            cursor = conn.cursor()
-                            cursor.execute(
-                                "SELECT description FROM situational_scenarios WHERE scenario_id = ?",
-                                (scenario_id,)
-                            )
-                            result = cursor.fetchone()
-                            if result:
-                                scenario_description = result[0]
-                    except Exception as e:
-                        print(f"Error fetching scenario description: {e}")
-
-                question_data["scenario_context"] = scenario_description or scenario_id
-
-                # Parse custom response options
-                if item.get("response_options"):
-                    try:
-                        response_options = json.loads(item["response_options"])
-                        question_data["response_options"] = response_options
-                    except json.JSONDecodeError:
-                        pass
-
-                # Parse dimension weights
-                if item.get("dimension_weights"):
-                    try:
-                        dimension_weights = json.loads(item["dimension_weights"])
-                        question_data["dimension_weights"] = dimension_weights
-                    except json.JSONDecodeError:
-                        pass
-
-            questions.append(question_data)
-
-        # Sort by item order
-        questions.sort(key=lambda x: int(x["id"].split("_")[-1]) if "_" in x["id"] else int(x["id"]))
+        # Sort by dimension and statement ID
+        questions.sort(key=lambda x: (x["dimension"], x["id"]))
 
         return {
             "questions": questions,
             "total_count": len(questions),
-            "traditional_count": len([q for q in questions if q.get("question_type", "traditional") == "traditional"]),
-            "situational_count": len([q for q in questions if q.get("question_type") == "situational"]),
-            "version": "mini_ipip_v1.0_enhanced",
-            "instructions": "請根據您的真實感受，選擇最符合您情況的答案。",
-            "scale": [
-                {"value": 1, "label": "非常不同意"},
-                {"value": 2, "label": "不同意"},
-                {"value": 3, "label": "中立"},
-                {"value": 4, "label": "同意"},
-                {"value": 5, "label": "非常同意"}
-            ]
+            "dimensions": list(set(q["dimension"] for q in questions)),
+            "version": "v4_thurstonian_irt",
+            "instructions": "這些是用於四選二強制選擇評測的語句，將組成評測題組。",
+            "assessment_type": "thurstonian_irt",
+            "response_format": "forced_choice_quartet"
         }
 
     except Exception as e:
@@ -189,9 +147,12 @@ async def health_check() -> HealthResponse:
     """
     try:
         # Test database connection
-        with get_db_connection() as conn:
-            cursor = conn.execute("SELECT 1")
-            cursor.fetchone()
+        from database.engine import get_database_engine
+        engine = get_database_engine()
+        health = engine.health_check()
+
+        if health["status"] != "healthy":
+            raise Exception(health.get("error", "Database unhealthy"))
 
         return HealthResponse(
             status="healthy",
@@ -201,7 +162,8 @@ async def health_check() -> HealthResponse:
             services={
                 "assessment": "ready",
                 "scoring": "ready",
-                "reporting": "ready"
+                "reporting": "ready",
+                "v4_engine": "ready"
             }
         )
 
@@ -216,10 +178,10 @@ async def health_check() -> HealthResponse:
 
 
 # Include route modules - Functional grouping
-app.include_router(consent.router, prefix="/api", tags=["Privacy"])
+# app.include_router(consent.router, prefix="/api", tags=["Privacy"])
 app.include_router(reports_v4_only.router, prefix="/api", tags=["Reports"])
-app.include_router(v4_assessment.router, prefix="/api", tags=["Assessment"])
-app.include_router(v4_data_collection.router, prefix="/api", tags=["Data Collection"])
+app.include_router(v4_assessment_sqlalchemy.router, prefix="/api", tags=["V4 Assessment"])
+# app.include_router(v4_data_collection.router, prefix="/api", tags=["Data Collection"])
 
 # Mount static files for frontend
 import os
@@ -238,12 +200,16 @@ async def startup_event():
     Follows fail-fast principle.
     """
     try:
-        # Validate database schema
-        with get_db_connection() as conn:
-            conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        # Initialize database engine and validate schema
+        from database.engine import get_database_engine
+        engine = get_database_engine()
+        health = engine.health_check()
+
+        if health["status"] != "healthy":
+            raise Exception(f"Database not healthy: {health}")
 
         print("FastAPI application started successfully")
-        print(f"Psychometric assessment system ready")
+        print(f"V4 SQLAlchemy database ready - {health['table_count']} tables")
         print(f"API documentation: http://localhost:8004/api/docs")
 
     except Exception as e:
