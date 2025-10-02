@@ -247,6 +247,49 @@ async def v4_pilot_page():
     else:
         raise HTTPException(status_code=404, detail="V4 pilot test page not found")
 
+# Additional frontend endpoints
+@app.get("/results.html", include_in_schema=False)
+async def results_page():
+    """Serve the assessment results display page."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    results_file = os.path.join(static_dir, "results.html")
+
+    if os.path.exists(results_file):
+        return FileResponse(results_file)
+    else:
+        raise HTTPException(status_code=404, detail="Results page not found")
+
+@app.get("/report-detail.html", include_in_schema=False)
+async def report_detail_page():
+    """Serve the detailed report page."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    report_file = os.path.join(static_dir, "report-detail.html")
+
+    if os.path.exists(report_file):
+        return FileResponse(report_file)
+    else:
+        raise HTTPException(status_code=404, detail="Report detail page not found")
+
+@app.get("/landing.html", include_in_schema=False)
+async def landing_page():
+    """Serve the landing page."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    landing_file = os.path.join(static_dir, "landing.html")
+
+    if os.path.exists(landing_file):
+        return FileResponse(landing_file)
+    else:
+        raise HTTPException(status_code=404, detail="Landing page not found")
+
 # Root endpoint redirect
 @app.get("/", include_in_schema=False)
 async def root():
