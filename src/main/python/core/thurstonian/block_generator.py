@@ -276,7 +276,12 @@ def generate_balanced_blocks(statements: List[Dict[str, Any]] = None, target_blo
         return generate_fallback_blocks()
 
 def generate_optimized_blocks_from_statements(statements: List[Dict[str, Any]], target_blocks: int) -> List[Dict[str, Any]]:
-    """從現有 statements 生成優化的區塊（相容原有文件存儲格式）"""
+    """從現有 statements 生成優化的區塊（相容原有文件存儲格式）
+
+    遵循 talent-domain-mapping.md 的要求：
+    - 總題數 b=30，每題選項 k=4
+    - 12個才幹，每個才幹總出現次數 r=10
+    """
 
     # Group statements by dimension
     dimension_statements = defaultdict(list)
@@ -291,87 +296,78 @@ def generate_optimized_blocks_from_statements(statements: List[Dict[str, Any]], 
     dimension_counts = {dim: len(stmts) for dim, stmts in dimension_statements.items()}
     print(f"各維度 statement 數量: {dimension_counts}")
 
-    blocks = []
-    used_statements = set()
+    # Force target_blocks to 30 for compliance with design
+    target_blocks = 30
+    target_occurrences_per_dimension = 10  # Each talent should appear 10 times
 
-    # Generate blocks with domain balance
+    blocks = []
+    dimension_usage_count = {dim: 0 for dim in dimensions}
+
+    # Use systematic rotation as specified in talent-domain-mapping.md
+    # Rotation pattern: (block_index + offset) mod 12, offsets = [0, 3, 6, 9]
+    offsets = [0, 3, 6, 9]
+
     for block_id in range(target_blocks):
         block_statements = []
-        block_dimensions = set()
-        block_domains = set()
+        block_dimensions = []
 
-        # Try to select statements that ensure domain diversity
-        available_dimensions = [dim for dim in dimensions if dim not in block_dimensions]
+        # Generate talent sequence for this block using rotation
+        for offset in offsets:
+            talent_idx = (block_id + offset) % 12
+            if talent_idx < len(dimensions):
+                selected_dimension = dimensions[talent_idx]
+                block_dimensions.append(selected_dimension)
 
-        # Prioritize dimensions from different domains
-        if available_dimensions:
-            # Sort dimensions to ensure domain diversity
-            available_dimensions.sort(key=lambda d: (
-                len([dom for dom, talents in DOMAIN_MAPPING.items() if d in talents]),  # Domain spreading
-                len([s for s in dimension_statements[d] if s['statement_id'] not in used_statements])  # Statement availability
-            ), reverse=True)
+        # Select statements for each dimension in the block
+        for dim in block_dimensions:
+            if dim in dimension_statements and dimension_statements[dim]:
+                # Select statement with lowest usage count to balance usage
+                available_statements = dimension_statements[dim]
 
-        for dim in available_dimensions[:4]:
-            # Get unused statements from this dimension
-            available_statements = [
-                stmt for stmt in dimension_statements[dim]
-                if stmt['statement_id'] not in used_statements
-            ]
-
-            if available_statements:
-                # Prefer statements that add domain diversity
-                preferred_statements = []
-                for stmt in available_statements:
-                    stmt_domain = TALENT_TO_DOMAIN.get(dim, 'UNKNOWN')
-                    if stmt_domain not in block_domains:
-                        preferred_statements.append(stmt)
-
-                if preferred_statements:
-                    selected = random.choice(preferred_statements)
+                # If we have enough statements, pick the least used one
+                if len(available_statements) > 1:
+                    # Cycle through statements to ensure even usage
+                    usage_index = dimension_usage_count[dim] % len(available_statements)
+                    selected = available_statements[usage_index]
                 else:
-                    selected = random.choice(available_statements)
+                    selected = available_statements[0]
 
                 block_statements.append(selected)
-                block_dimensions.add(dim)
-                block_domains.add(TALENT_TO_DOMAIN.get(dim, 'UNKNOWN'))
-                used_statements.add(selected['statement_id'])
+                dimension_usage_count[dim] += 1
 
-        # If we need more statements and have room, fill from any available
-        while len(block_statements) < 4:
-            all_available = [
-                stmt for stmt in statements
-                if stmt['statement_id'] not in used_statements
-            ]
-
-            if not all_available:
-                break
-
-            selected = random.choice(all_available)
-            block_statements.append(selected)
-            used_statements.add(selected['statement_id'])
-
-        if len(block_statements) >= 4:
+        # Only add complete blocks (must have 4 statements)
+        if len(block_statements) == 4:
             blocks.append({
                 "block_id": block_id,
-                "statement_ids": [stmt['statement_id'] for stmt in block_statements[:4]],
-                "statements": block_statements[:4],
-                "dimensions": list(set(stmt['dimension'] for stmt in block_statements[:4]))
+                "statement_ids": [stmt['statement_id'] for stmt in block_statements],
+                "statements": block_statements,
+                "dimensions": [stmt['dimension'] for stmt in block_statements]
             })
 
-    # Validation
+    # Validation and reporting
     covered_dimensions = set()
+    dimension_occurrence_count = defaultdict(int)
+
     for block in blocks:
         covered_dimensions.update(block['dimensions'])
+        for dim in block['dimensions']:
+            dimension_occurrence_count[dim] += 1
 
     print(f"維度覆蓋報告:")
     print(f"  總題組數: {len(blocks)}")
     print(f"  覆蓋維度: {len(covered_dimensions)}/{len(dimensions)}")
+    print(f"  各維度出現次數: {dict(dimension_occurrence_count)}")
+    print(f"  目標出現次數: {target_occurrences_per_dimension}")
 
-    if len(covered_dimensions) < len(dimensions):
-        print(f"警告: 未覆蓋所有維度")
+    # Check if we meet the target occurrence count
+    occurrence_compliance = all(
+        dimension_occurrence_count[dim] >= target_occurrences_per_dimension
+        for dim in dimensions
+    )
 
     print(f"✅ 最終題組數: {len(blocks)}")
     print(f"✅ 維度覆蓋完整性: {len(covered_dimensions) == len(dimensions)}")
+    print(f"✅ 出現次數達標: {occurrence_compliance}")
 
     return blocks
 

@@ -39,6 +39,9 @@
             </div>
           </div>
         </div>
+        <div class="progress-note">
+          🧭 直覺作答、平均 3-5 分鐘 · 隨時可返回上一題調整
+        </div>
       </div>
 
       <div class="assessment-container">
@@ -67,7 +70,7 @@
           </div>
 
           <button class="btn-primary" onclick="startAssessment()">
-            開始測評 →
+            開始顧問式評測 →
           </button>
         </div>
 
@@ -80,7 +83,7 @@
           <div class="statements-grid" id="statementsGrid"></div>
         </div>
 
-        <div class="selection-status" id="selectionStatus" style="display: none;">
+        <div class="selection-status" id="selectionStatus" style="display: none;" aria-live="polite">
           <div class="selection-item">
             <span class="selection-label">最像我：</span>
             <span class="selection-value selection-most" id="mostLikeSelection">未選擇</span>
@@ -124,7 +127,7 @@
   </footer>
 
   <script>
-    const apiBase = window.location.port === '3000' ? 'http://localhost:8004' : '';
+    const apiBase = window.location.port === '3000' ? 'http://localhost:8005' : '';
 
     let currentQuestion = 0;
     let totalQuestions = 20;

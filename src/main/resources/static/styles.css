@@ -824,6 +824,12 @@ img {
   gap: 18px;
 }
 
+.progress-note {
+  font-size: 13px;
+  color: var(--slate-500);
+  letter-spacing: 0.02em;
+}
+
 .progress-info {
   display: flex;
   align-items: center;

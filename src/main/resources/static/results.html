@@ -1,367 +1,766 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>評測結果 | 顧問式洞察輸出</title>
-  <meta name="description" content="McKinsey 風格的結果頁，將評測數據化為顧問式 KPI、人物原型與行動建議，快速啟動下一步。" />
-  <link rel="stylesheet" href="/static/styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>優勢評測專業報告 | 評測結果</title>
+  <meta name="description" content="基於 Thurstonian IRT 模型的專業優勢評測結果，動態載入您的個人化天賦分析。">
+  <style>
+    /* McKinsey Style Variables */
+    :root{
+      --mckinsey-navy:#001F3F;--mckinsey-deep-blue:#003D73;--mckinsey-blue:#0066A6;
+      --mckinsey-bright-blue:#0080D9;--mckinsey-light-blue:#E6F2FF;--consultant-gold:#D4AF37;
+      --insight-teal:#008080;--data-orange:#FF6B35;--success-green:#2D8659;--alert-red:#C1272D;
+      --gray-900:#1A1A1A;--gray-800:#333333;--gray-700:#4D4D4D;--gray-600:#666666;
+      --gray-500:#7A7A7A;--gray-400:#999999;--gray-300:#CCCCCC;--gray-200:#E5E5E5;
+      --gray-100:#F2F2F2;--gray-50:#F8F8F8;--white:#FFFFFF;
+      --radius-sm:2px;--radius-md:4px;--radius-lg:8px;--radius-full:9999px;
+      --border-thin:1px;--border-medium:2px;--border-thick:3px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--gray-50);color:var(--gray-900);font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;}
+    .container{max-width:1280px;margin:0 auto;padding:40px;}
+
+    /* Header */
+    .report-header{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;justify-content:space-between;background:var(--white);
+      border:var(--border-thin) solid var(--gray-200);border-bottom:var(--border-medium) solid var(--mckinsey-navy);
+      border-radius:var(--radius-md);padding:32px;margin-bottom:32px;}
+    .brand{display:flex;gap:16px;align-items:flex-start}
+    .brand-logo{width:40px;height:40px;border-radius:8px;background:var(--mckinsey-navy)}
+    .report-title{font-size:28px;font-weight:600;color:var(--mckinsey-navy);margin:0 0 4px}
+    .report-info{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--gray-600)}
+    code.badge{background:var(--gray-100);padding:2px 6px;border-radius:var(--radius-sm);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .actions{display:flex;gap:12px;align-items:center}
+    .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;letter-spacing:.02em;text-transform:uppercase;border-radius:var(--radius-sm);transition:.2s all;text-decoration:none;cursor:pointer}
+    .btn-primary{background:var(--mckinsey-blue);color:#fff;border:none;padding:10px 20px}
+    .btn-primary:hover{background:var(--mckinsey-deep-blue);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,31,63,.08)}
+    .btn-secondary{background:transparent;color:var(--mckinsey-blue);border:var(--border-medium) solid var(--mckinsey-blue);padding:10px 20px}
+    .btn-secondary:hover{background:var(--mckinsey-light-blue);border-color:var(--mckinsey-deep-blue)}
+
+    /* Section 基礎 */
+    .section{margin-bottom:32px}
+    .section-title{font-size:24px;font-weight:600;margin:0 0 12px}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media(min-width:768px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+    .kpi-card{position:relative;background:var(--white);border:var(--border-thin) solid var(--gray-200);border-radius:var(--radius-md);padding:28px}
+    .kpi-card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--gray-400);border-top-left-radius:var(--radius-md);border-bottom-left-radius:var(--radius-md)}
+    .kpi-card[data-variant="dominant"]::before{background:var(--success-green)}
+    .kpi-card[data-variant="supporting"]::before{background:var(--mckinsey-blue)}
+    .kpi-label{font-size:12px;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+    .kpi-value{font:600 48px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--gray-900);margin-bottom:4px}
+    .kpi-desc{font-size:13px;color:var(--gray-600);margin-bottom:6px}
+    .kpi-trend{font-size:12px;font-weight:600;color:var(--mckinsey-blue)}
+
+    /* DNA 視覺化卡 */
+    .card{background:var(--white);border:var(--border-thin) solid var(--gray-200);border-radius:var(--radius-md);padding:28px}
+    .legend{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:14px;color:var(--gray-700)}
+    .legend-dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:6px}
+    .dot-executing{background:#7C3AED}.dot-influencing{background:#F59E0B}.dot-relationship{background:#0EA5E9}.dot-strategic{background:#10B981}
+
+    /* 表格 */
+    .table-wrap{overflow:hidden;border-radius:var(--radius-md);border:var(--border-thin) solid var(--gray-200);background:var(--white)}
+    table{width:100%;border-collapse:collapse}
+    thead{background:var(--gray-50)}
+    th{padding:16px 20px;text-align:left;font-size:12px;font-weight:600;color:#4D4D4D;text-transform:uppercase;letter-spacing:.05em;border-bottom:var(--border-medium) solid var(--gray-300)}
+    td{padding:16px 20px;font-size:14px;color:#333;border-bottom:var(--border-thin) solid var(--gray-200)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:var(--gray-50)}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:9999px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .badge-executing{background:rgba(124,58,237,.1);color:#7C3AED}
+    .badge-influencing{background:rgba(245,158,11,.1);color:#F59E0B}
+    .badge-relationship{background:rgba(14,165,233,.1);color:#0EA5E9}
+    .badge-strategic{background:rgba(16,185,129,.1);color:#10B981}
+    .tier{display:inline-block;padding:4px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:600;text-transform:uppercase;color:#fff}
+    .tier-dominant{background:var(--success-green)}
+    .tier-supporting{background:var(--mckinsey-blue)}
+    .tier-lesser{background:var(--gray-400)}
+    .bar{position:relative;height:24px;background:var(--gray-100);border-radius:var(--radius-sm);overflow:hidden}
+    .bar-fill{height:100%;background:var(--mckinsey-blue);transition:width .6s ease}
+    .bar-label{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:600;color:#555}
+
+    /* Persona */
+    .persona-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .badge-premium{display:inline-flex;align-items:center;border-radius:9999px;padding:4px 10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,var(--consultant-gold) 0%,#F2D675 100%);color:var(--gray-900)}
+    .grid-3{display:grid;grid-template-columns:1fr;gap:24px}
+    @media(min-width:768px){.grid-3{grid-template-columns:repeat(3,1fr)}}
+    .subttl{font-size:12px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.03em;margin:0 0 8px}
+    .list{list-style:none;margin:0;padding:0}
+    .list li{padding:8px 0;border-bottom:var(--border-thin) solid var(--gray-200)}
+    .list li:last-child{border-bottom:none}
+
+    /* Next steps */
+    .steps{list-style:none;margin:8px 0 0;padding:0}
+    .step{position:relative;padding-left:60px;margin-bottom:24px}
+    .step-num{position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      background:var(--mckinsey-blue);color:#fff;font:600 18px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .step strong{display:block;font-size:18px;margin-bottom:4px}
+    .link{background:none;border:none;color:var(--mckinsey-blue);font-weight:700;padding:0;cursor:pointer}
+    .link:hover{text-decoration:underline}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .mb-0{margin-bottom:0}
+
+    /* DNA SVG */
+    .dna{width:100%;height:240px}
+
+    /* Loading & Error States */
+    .loading, .error {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: var(--border-thin) solid var(--gray-200);
+      margin: 2rem 0;
+    }
+    .loading.active, .error.active { display: block; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--gray-200);
+      border-top-color: var(--mckinsey-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error { color: var(--alert-red); }
+  </style>
 </head>
 <body>
-  <header class="global-header">
-    <div class="layout">
-      <div class="brand">Strength DNA Lab</div>
-      <nav>
-        <ul class="nav-list">
-          <li><a class="nav-link" href="landing.html">首頁</a></li>
-          <li><a class="nav-link" href="assessment-intro.html">評測準備</a></li>
-          <li><a class="nav-link" href="assessment.html">進入評測</a></li>
-          <li><a class="nav-link active" href="results.html">成果示意</a></li>
-        </ul>
-      </nav>
+  <main class="container">
+    <!-- Loading State -->
+    <div class="loading" id="loadingState">
+      <div class="spinner"></div>
+      <h3>正在載入您的評測結果...</h3>
+      <p>分析您的優勢DNA組合</p>
     </div>
-  </header>
 
-  <main class="page">
-    <section class="layout hero">
-      <div class="hero__grid">
-        <div class="hero__content">
-          <p class="eyebrow">Consulting-Grade Outputs</p>
-          <h1>結果摘要：轉化洞察，啟動行動</h1>
-          <p class="lead">評測完成後，你會立即看到顧問式 KPI 儀表板、優勢原型以及下一步建議，方便與主管、團隊或教練同步。</p>
-          <div class="hero__ctas">
-            <a class="button button--primary" href="report-detail.html">查看完整報告</a>
-            <a class="button button--secondary" href="#actions">下一步行動</a>
-          </div>
-          <div class="hero__metrics">
-            <div class="metric-card">
-              <strong id="sessionId">載入中...</strong>
-              <span>Session ID</span>
+    <!-- Error State -->
+    <div class="error" id="errorState">
+      <h3>載入結果時發生錯誤</h3>
+      <p id="errorMessage">請重新整理頁面或聯繫技術支援</p>
+      <button class="btn btn-secondary" onclick="window.location.reload()">
+        🔄 重新載入
+      </button>
+    </div>
+
+    <!-- Results Content -->
+    <div id="resultsContent" style="display: none;">
+
+      <!-- Header -->
+      <header class="report-header">
+        <div class="brand">
+          <div class="brand-logo" aria-hidden="true"></div>
+          <div>
+            <h1 class="report-title">優勢評測專業報告</h1>
+            <div class="report-info">
+              <span>Session: <code class="badge mono" id="sessionId">載入中...</code></span>
+              <span>•</span>
+              <span>評測時間: <span id="assessmentTime">載入中...</span></span>
+              <span>•</span>
+              <span>置信度: <strong id="confidenceLevel">載入中...</strong></span>
             </div>
-            <div class="metric-card">
-              <strong id="reliabilityScore">載入中...</strong>
-              <span>信度指標</span>
-            </div>
-            <div class="metric-card">
-              <strong id="completionTime">載入中...</strong>
-              <span>完成時間</span>
-            </div>
           </div>
         </div>
-        <aside class="hero__panel">
-          <h3>顧問式閱讀引導</h3>
-          <ul>
-            <li>KPI 摘要：三行看懂你的核心優勢。</li>
-            <li>視覺化：以圖表呈現強度差異與優勢聚焦。</li>
-            <li>行動建議：30 / 60 / 90 天節奏，立即可做。</li>
-          </ul>
-          <div class="badge-ring">
-            <span class="badge badge--ghost">PDF 可下載</span>
-            <span class="badge badge--ghost">可分享摘要連結</span>
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="shareReport()">📤 分享報告</button>
+          <button class="btn btn-primary" onclick="downloadPDF()">📄 下載 PDF</button>
+        </div>
+      </header>
+
+      <!-- KPI Dashboard -->
+      <section class="section">
+        <h2 class="section-title">執行摘要</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card" data-variant="dominant">
+            <div class="kpi-label">主導才幹</div>
+            <div class="kpi-value mono" id="dominantCount">0</div>
+            <div class="kpi-desc">百分位 &gt; 75</div>
+            <div class="kpi-trend" id="dominantTrend">載入中...</div>
           </div>
-        </aside>
-      </div>
-    </section>
+          <div class="kpi-card" data-variant="supporting">
+            <div class="kpi-label">支援才幹</div>
+            <div class="kpi-value mono" id="supportingCount">0</div>
+            <div class="kpi-desc">百分位 25–75</div>
+            <div class="kpi-trend" id="supportingTrend">載入中...</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">待管理領域</div>
+            <div class="kpi-value mono" id="managingCount">0</div>
+            <div class="kpi-desc">百分位 &lt; 25</div>
+            <div class="kpi-trend" id="managingTrend">載入中...</div>
+          </div>
+        </div>
+      </section>
 
-    <section class="layout section">
-      <div class="section__header">
-        <p class="eyebrow">Executive Summary</p>
-        <h2>優勢 KPI 摘要</h2>
-        <p class="section__intro">先給你最重要的 20%，協助快速內化結果。</p>
-      </div>
-      <div class="data-band">
-        <div class="data-point">
-          <span>核心優勢領域</span>
-          <strong id="coreStrengthArea">載入中...</strong>
-        </div>
-        <div class="data-point">
-          <span>常模百分位</span>
-          <strong id="percentileRank">載入中...</strong>
-        </div>
-        <div class="data-point">
-          <span>人物原型</span>
-          <strong id="archetypeProfile">載入中...</strong>
-        </div>
-      </div>
-      <div class="grid grid--3">
-        <div class="card">
-          <h3 class="card__title">優勢組合</h3>
-          <p class="card__body">遠見規劃 × 深度整合 × 決策協調，適合帶領跨部門專案與客戶諮詢。</p>
-        </div>
-        <div class="card">
-          <h3 class="card__title">建議焦點</h3>
-          <p class="card__body">優先安排策略規劃、影響利害關係人、以及導入新流程的任務。</p>
-        </div>
-        <div class="card">
-          <h3 class="card__title">風險提醒</h3>
-          <p class="card__body">注意避免過度追求完美而延遲決策，建議設置每週回顧節點。</p>
-        </div>
-      </div>
-    </section>
+      <!-- DNA Visualization -->
+      <section class="section card">
+        <h2 class="section-title mb-0">您的優勢 DNA</h2>
 
-    <section class="layout section section--brand">
-      <div class="section__header">
-        <p class="eyebrow">Visual Insights</p>
-        <h2>視覺化呈現：一眼看出優勢結構</h2>
-        <p class="section__intro">正式版本將使用動態圖表，這裡示意顯示兩大模組。</p>
-      </div>
-      <div class="grid grid--2">
-        <div class="card">
-          <h3 class="card__title">🧬 優勢雷達圖</h3>
-          <p class="card__body">12 維度強度比較，突出你的主導優勢與待管理領域。</p>
-          <p class="caption">正式版將可自訂範圍、比較歷史或團隊平均值。</p>
-        </div>
-        <div class="card">
-          <h3 class="card__title">📊 四大領域柱狀圖</h3>
-          <p class="card__body">執行力、影響力、關係建立、戰略思維的總體趨勢。</p>
-          <p class="caption">標註高於 75 百分位的區域，讓成長機會一目了然。</p>
-        </div>
-      </div>
-    </section>
+        <svg class="dna" viewBox="0 0 960 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="優勢DNA視覺化" id="dnaVisualization">
+          <defs>
+            <!-- 品牌漸層與柔光 -->
+            <linearGradient id="dnaGrad1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#003D73"/>
+              <stop offset="100%" stop-color="#0080D9"/>
+            </linearGradient>
+            <linearGradient id="dnaGrad2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#8FB7E7"/>
+              <stop offset="100%" stop-color="#B6D8FF"/>
+            </linearGradient>
+            <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="g"/>
+              <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
 
-    <section id="actions" class="layout section">
-      <div class="section__header">
-        <p class="eyebrow">Next Steps</p>
-        <h2>下一步行動：把洞察轉成成果</h2>
-        <p class="section__intro">我們以顧問式結構規劃你的行動路線，確保動能不中斷。</p>
-      </div>
-      <div class="report-preview">
-        <div class="report-card">
-          <h3>30 天內</h3>
-          <ul>
-            <li>與直屬主管分享「優勢摘要」，爭取策略型任務。</li>
-            <li>設定每週反思提醒，盤點優勢如何創造價值。</li>
-          </ul>
+          <!-- 雙曲線背骨 -->
+          <path d="M48,120
+                   C104,40 104,200 160,120
+                   S216,40 272,120
+                   S328,200 384,120
+                   S440,40 496,120
+                   S552,200 608,120
+                   S664,40 720,120
+                   S776,200 832,120
+                   S888,40 912,120"
+                fill="none" stroke="url(#dnaGrad1)" stroke-width="3" filter="url(#softGlow)"/>
+          <path d="M48,120
+                   C104,200 104,40 160,120
+                   S216,200 272,120
+                   S328,40 384,120
+                   S440,200 496,120
+                   S552,40 608,120
+                   S664,200 720,120
+                   S776,40 832,120
+                   S888,200 912,120"
+                fill="none" stroke="url(#dnaGrad2)" stroke-width="3" opacity="0.9"/>
+
+          <!-- Talent nodes will be dynamically inserted here -->
+        </svg>
+
+        <div class="legend">
+          <span><i class="legend-dot dot-executing"></i>執行力</span>
+          <span><i class="legend-dot dot-influencing"></i>影響力</span>
+          <span><i class="legend-dot dot-relationship"></i>關係建立</span>
+          <span><i class="legend-dot dot-strategic"></i>戰略思維</span>
         </div>
-        <div class="report-card">
-          <h3>60 天內</h3>
-          <ul>
-            <li>主導一次跨部門協作，驗證影響力與協調能力。</li>
-            <li>安排教練諮詢或同儕回饋，對齊外部觀點。</li>
-          </ul>
+      </section>
+
+      <!-- 詳細分析表格 -->
+      <section class="section">
+        <h2 class="section-title">12 維度詳細分析</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>維度</th>
+                <th>領域</th>
+                <th>百分位</th>
+                <th>分級</th>
+                <th>與常模對比</th>
+              </tr>
+            </thead>
+            <tbody id="talentTableBody">
+              <!-- Talent rows will be dynamically inserted here -->
+            </tbody>
+          </table>
         </div>
-        <div class="report-card">
-          <h3>90 天內</h3>
-          <ul>
-            <li>建置個人化優勢資產（簡報、案例庫）。</li>
-            <li>評估是否進一步購買團隊版或領導力方案。</li>
-          </ul>
+      </section>
+
+      <!-- Persona -->
+      <section class="section card">
+        <div class="persona-head">
+          <h2 class="section-title">職業原型參考</h2>
+          <span class="badge-premium">Dynamic</span>
         </div>
-      </div>
-      <div class="action-bar">
-        <a class="button button--primary" href="report-detail.html">查看完整報告</a>
-        <a class="button button--secondary" href="#">下載 PDF</a>
-        <a class="button button--secondary" href="#">分享摘要</a>
-      </div>
-    </section>
+        <p style="color:var(--gray-700)" id="personaDescription">
+          載入中...
+        </p>
+        <div class="grid-3" style="margin-top:16px">
+          <div>
+            <h4 class="subttl">建議職位</h4>
+            <ul class="list" id="suggestedRoles">
+              <li>載入中...</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="subttl">關鍵情境</h4>
+            <ul class="list" id="keyContexts">
+              <li>載入中...</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="subttl">發展建議</h4>
+            <ul class="list" id="developmentTips">
+              <li>載入中...</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Next Steps -->
+      <section class="section card">
+        <h2 class="section-title">建議後續行動</h2>
+        <ol class="steps">
+          <li class="step">
+            <span class="step-num">1</span>
+            <strong>深入閱讀</strong>
+            <p style="margin:4px 0 8px;color:#555">查看完整詳細報告，了解每個維度的具體表現與應用建議。</p>
+            <button class="link" id="detailReportLink">查看完整報告 →</button>
+          </li>
+          <li class="step">
+            <span class="step-num">2</span>
+            <strong>下載保存</strong>
+            <p style="margin:4px 0 8px;color:#555">下載 PDF 版本報告，可加入履歷或個人發展檔案。</p>
+            <button class="link" onclick="downloadPDF()">下載 PDF →</button>
+          </li>
+          <li class="step">
+            <span class="step-num">3</span>
+            <strong>分享討論</strong>
+            <p style="margin:4px 0 8px;color:#555">與團隊領導或職涯顧問討論評測結果，制定發展計劃。</p>
+            <button class="link" onclick="shareReport()">分享報告 →</button>
+          </li>
+        </ol>
+      </section>
+    </div>
   </main>
 
-  <footer class="footer">
-    <div class="layout">
-      <div class="footer__meta">
-        <strong class="brand">Strength DNA Lab</strong>
-        <span>Step 4 · Results · 顧問式輸出</span>
-        <div class="footer__links">
-          <a href="landing.html">回首頁</a>
-          <a href="assessment-intro.html">再次準備</a>
-          <a href="report-detail.html">深入閱讀</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
   <script>
-    // API Configuration - detect environment
+    // API Configuration
     const apiBase = window.location.port === '8005' ? '' : 'http://localhost:8005';
 
-    // Domain mapping for results interpretation
-    const DOMAIN_MAPPING = {
-      "EXECUTING": { name: "執行力", color: "purple" },
-      "INFLUENCING": { name: "影響力", color: "orange" },
-      "RELATIONSHIP_BUILDING": { name: "關係建立", color: "blue" },
-      "STRATEGIC_THINKING": { name: "戰略思維", color: "green" }
+    // Talent definitions with domain mapping
+    const TALENT_DEFINITIONS = {
+        "T1": { name: "結構化執行", domain: "EXECUTING", icon: "🎯" },
+        "T2": { name: "品質與完備", domain: "EXECUTING", icon: "✅" },
+        "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING", icon: "🔍" },
+        "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING", icon: "📊" },
+        "T5": { name: "影響與倡議", domain: "INFLUENCING", icon: "💪" },
+        "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING", icon: "🤝" },
+        "T7": { name: "客戶導向", domain: "INFLUENCING", icon: "🎯" },
+        "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING", icon: "📚" },
+        "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING", icon: "⚖️" },
+        "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING", icon: "🧘" },
+        "T11": { name: "衝突整合", domain: "INFLUENCING", icon: "🎭" },
+        "T12": { name: "責任與當責", domain: "EXECUTING", icon: "💼" }
     };
 
-    const TALENT_DEFINITIONS = {
-      "T1": { name: "結構化執行", domain: "EXECUTING" },
-      "T2": { name: "品質與完備", domain: "EXECUTING" },
-      "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING" },
-      "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING" },
-      "T5": { name: "影響與倡議", domain: "INFLUENCING" },
-      "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING" },
-      "T7": { name: "客戶導向", domain: "INFLUENCING" },
-      "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING" },
-      "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING" },
-      "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING" },
-      "T11": { name: "衝突整合", domain: "INFLUENCING" },
-      "T12": { name: "責任與當責", domain: "EXECUTING" }
+    // Career archetypes
+    const CAREER_ARCHETYPES = {
+        "EXECUTING": {
+            name: "執行型建構者",
+            description: "以成果導向為核心、能將策略轉為可執行計劃；在系統化流程與品質控管中發揮專業，適合複雜專案的管理執行角色。",
+            roles: ["專案經理", "營運主管", "品質工程師", "流程分析師"],
+            contexts: ["系統執行", "品質控管", "流程優化"],
+            tips: ["配對強『影響力』夥伴擴大成果", "設定明確里程碑與成功指標"]
+        },
+        "INFLUENCING": {
+            name: "影響型領導者",
+            description: "以溝通說服為核心、能將想法轉為組織行動；在跨部門協作與客戶關係中發揮影響力，適合需要對外驅動變革的角色。",
+            roles: ["銷售經理", "企業顧問", "公關主管", "業務拓展"],
+            contexts: ["變革推動", "客戶關係", "跨部門協作"],
+            tips: ["平衡『執行力』確保落地能力", "避免過度溝通，聚焦核心訊息"]
+        },
+        "RELATIONSHIP_BUILDING": {
+            name: "關係建構者",
+            description: "以團隊和諧為核心、能在複雜人際環境中保持穩定；在組織文化與團隊凝聚中發揮專業，適合人才發展與組織健康角色。",
+            roles: ["人資主管", "團隊經理", "組織發展", "客戶成功"],
+            contexts: ["團隊建設", "衝突調解", "組織文化"],
+            tips: ["結合『戰略思維』提升影響範圍", "設定明確績效指標避免過度關注過程"]
+        },
+        "STRATEGIC_THINKING": {
+            name: "策略思維者",
+            description: "以分析洞察為核心、能從複雜資訊中萃取決策要素；在策略規劃與創新思考中發揮專業，適合高複雜度與不確定情境。",
+            roles: ["策略分析師", "產品經理", "研發主管", "管理顧問"],
+            contexts: ["策略規劃", "產品創新", "市場分析"],
+            tips: ["配對強『影響力/關係』夥伴", "避免過度分析，設定決策截止點"]
+        }
+    };
+
+    // Domain colors mapping
+    const DOMAIN_COLORS = {
+        "EXECUTING": "#7C3AED",
+        "INFLUENCING": "#F59E0B",
+        "RELATIONSHIP_BUILDING": "#0EA5E9",
+        "STRATEGIC_THINKING": "#10B981"
     };
 
     // Get session ID from URL
     function getSessionId() {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('session');
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('session');
     }
 
-    // Load assessment results
-    async function loadResults() {
-      const sessionId = getSessionId();
+    // Validate session format
+    function validateSession(sessionId) {
+        if (!sessionId) return false;
+        const pattern = /^v4_[a-z0-9]+$/;
+        return pattern.test(sessionId);
+    }
 
-      if (!sessionId) {
-        showError('無法找到評測會話 ID');
-        return;
-      }
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        const sessionId = getSessionId();
 
-      try {
+        if (!validateSession(sessionId)) {
+            showError('無效的評測會話 ID，即將重新導向...');
+            setTimeout(() => {
+                window.location.href = '/static/landing.html';
+            }, 3000);
+            return;
+        }
+
+        loadResults(sessionId);
+    });
+
+    // Load results from API
+    async function loadResults(sessionId) {
         showLoading();
 
-        const response = await fetch(`${apiBase}/api/assessment/results/${sessionId}`);
+        try {
+            const response = await fetch(`${apiBase}/api/assessment/results/${sessionId}`);
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('Loaded results:', data);
-
-        displayResults(data);
-        hideLoading();
-
-      } catch (error) {
-        console.error('Error loading results:', error);
-        showError('載入結果時發生錯誤: ' + error.message);
-      }
-    }
-
-    // Display results in UI
-    function displayResults(data) {
-      const sessionId = data.session_id;
-      const scores = data.scores || {};
-      const sessionInfo = data.session_info || {};
-      const scoringInfo = data.scoring_info || {};
-
-      // Update session info
-      document.getElementById('sessionId').textContent = sessionId;
-
-      // Calculate reliability score (mock for now)
-      const reliabilityScore = scoringInfo.overall_confidence || 0.85;
-      document.getElementById('reliabilityScore').textContent = (reliabilityScore * 100).toFixed(0) + '%';
-
-      // Calculate completion time (mock for now)
-      document.getElementById('completionTime').textContent = '3:42';
-
-      // Analyze scores to determine top domains and talents
-      const talentScores = {};
-      const domainScores = {
-        EXECUTING: [],
-        INFLUENCING: [],
-        RELATIONSHIP_BUILDING: [],
-        STRATEGIC_THINKING: []
-      };
-
-      // Parse scores and group by domain
-      for (const [key, score] of Object.entries(scores)) {
-        if (key.startsWith('t') && key.includes('_')) {
-          const talentMatch = key.match(/^t(\d+)_(.+)$/);
-          if (talentMatch) {
-            const talentId = `T${talentMatch[1]}`;
-            const talentDef = TALENT_DEFINITIONS[talentId];
-
-            if (talentDef) {
-              talentScores[talentId] = {
-                name: talentDef.name,
-                domain: talentDef.domain,
-                score: score
-              };
-              domainScores[talentDef.domain].push(score);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-          }
+
+            const data = await response.json();
+            console.log('Loaded results data:', data);
+
+            displayResults(data);
+            hideLoading();
+
+        } catch (error) {
+            console.error('Error loading results:', error);
+            showError('載入結果失敗: ' + error.message);
         }
-      }
+    }
 
-      console.log('Parsed talent scores:', talentScores);
-      console.log('Domain scores:', domainScores);
+    // Display results
+    function displayResults(data) {
+        const sessionId = data.session_id;
+        const scores = data.scores || {};
+        const sessionInfo = data.session_info || {};
+        const scoringInfo = data.scoring_info || {};
 
-      // Calculate domain averages
-      const domainAverages = {};
-      for (const [domain, scores] of Object.entries(domainScores)) {
-        if (scores.length > 0) {
-          domainAverages[domain] = scores.reduce((a, b) => a + b, 0) / scores.length;
+        // Update header info
+        document.getElementById('sessionId').textContent = sessionId;
+
+        const assessmentDate = sessionInfo.created_at ?
+            new Date(sessionInfo.created_at).toLocaleDateString('zh-TW', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+            }) : '2025-10-02 15:30';
+        document.getElementById('assessmentTime').textContent = assessmentDate;
+
+        const confidence = Math.round((scoringInfo.overall_confidence || 0.85) * 100);
+        document.getElementById('confidenceLevel').textContent = `${confidence}%`;
+
+        // Parse talents and categorize
+        const talents = parseTalents(scores);
+        const categorized = categorizeTalents(talents);
+
+        // Update KPI Dashboard
+        updateKPIDashboard(categorized);
+
+        // Generate DNA visualization
+        generateDNAVisualization(talents);
+
+        // Update detailed analysis table
+        updateDetailedTable(talents);
+
+        // Update career archetype
+        updateCareerArchetype(categorized);
+
+        // Update action buttons
+        document.getElementById('detailReportLink').onclick = () => {
+            window.location.href = `report-detail.html?session=${sessionId}`;
+        };
+
+        // Show results
+        document.getElementById('resultsContent').style.display = 'block';
+    }
+
+    // Parse talents from scores
+    function parseTalents(scores) {
+        const talents = [];
+
+        for (const [key, score] of Object.entries(scores)) {
+            if (key.startsWith('t') && key.includes('_')) {
+                const talentMatch = key.match(/^t(\d+)_(.+)$/);
+                if (talentMatch) {
+                    const talentId = `T${talentMatch[1]}`;
+                    const talentDef = TALENT_DEFINITIONS[talentId];
+
+                    if (talentDef) {
+                        talents.push({
+                            id: talentId,
+                            name: talentDef.name,
+                            domain: talentDef.domain,
+                            icon: talentDef.icon,
+                            score: score
+                        });
+                    }
+                }
+            }
+        }
+
+        return talents.sort((a, b) => b.score - a.score);
+    }
+
+    // Categorize talents by percentile thresholds
+    function categorizeTalents(talents) {
+        return {
+            dominant: talents.filter(t => t.score > 75),
+            supporting: talents.filter(t => t.score >= 25 && t.score <= 75),
+            managing: talents.filter(t => t.score < 25)
+        };
+    }
+
+    // Update KPI Dashboard
+    function updateKPIDashboard(categorized) {
+        document.getElementById('dominantCount').textContent = categorized.dominant.length;
+        document.getElementById('supportingCount').textContent = categorized.supporting.length;
+        document.getElementById('managingCount').textContent = categorized.managing.length;
+
+        // Update trends
+        const dominantPercent = categorized.dominant.length > 0 ?
+            Math.round(categorized.dominant.reduce((sum, t) => sum + t.score, 0) / categorized.dominant.length) : 0;
+        document.getElementById('dominantTrend').textContent =
+            dominantPercent > 80 ? `↑ 高於 ${dominantPercent}% 用戶` :
+            dominantPercent > 0 ? `→ 高於平均` : '→ 需要發展';
+
+        document.getElementById('supportingTrend').textContent = '→ 平衡發展';
+        document.getElementById('managingTrend').textContent =
+            categorized.managing.length > 3 ? '↓ 需要關注' : '→ 可接受範圍';
+    }
+
+    // Generate DNA visualization
+    function generateDNAVisualization(talents) {
+        const svg = document.getElementById('dnaVisualization');
+
+        // X positions for 12 talents (evenly spaced)
+        const xPositions = [48, 128, 208, 288, 368, 448, 528, 608, 688, 768, 832, 912];
+
+        // Clear existing nodes
+        const existingNodes = svg.querySelectorAll('.dynamic-node, .dynamic-rung, .dynamic-text');
+        existingNodes.forEach(node => node.remove());
+
+        talents.forEach((talent, index) => {
+            if (index >= xPositions.length) return;
+
+            const x = xPositions[index];
+            const y = index % 2 === 0 ? 80 : 160; // Alternate sides
+            const radius = Math.max(5, talent.score / 5); // Scale radius by score
+
+            // Add connecting rung
+            const rung = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            rung.setAttribute("d", `M${x} ${y === 80 ? 80 : 160} Q ${x} 120 ${x} ${y === 80 ? 160 : 80}`);
+            rung.setAttribute("fill", "none");
+            rung.setAttribute("stroke", DOMAIN_COLORS[talent.domain]);
+            rung.setAttribute("stroke-width", "2");
+            rung.setAttribute("stroke-opacity", talent.score / 100);
+            rung.classList.add("dynamic-rung");
+            svg.appendChild(rung);
+
+            // Add outer glow circle
+            const glow = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            glow.setAttribute("cx", x);
+            glow.setAttribute("cy", y);
+            glow.setAttribute("r", radius + 4);
+            glow.setAttribute("fill", DOMAIN_COLORS[talent.domain]);
+            glow.setAttribute("opacity", "0.18");
+            glow.classList.add("dynamic-node");
+            svg.appendChild(glow);
+
+            // Add main circle
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", x);
+            circle.setAttribute("cy", y);
+            circle.setAttribute("r", radius);
+            circle.setAttribute("fill", DOMAIN_COLORS[talent.domain]);
+            circle.setAttribute("stroke", "#fff");
+            circle.setAttribute("stroke-width", "2");
+            circle.classList.add("dynamic-node");
+            circle.setAttribute("title", `${talent.name}: PR ${talent.score}`);
+            svg.appendChild(circle);
+
+            // Add label
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", x);
+            text.setAttribute("y", y === 80 ? 48 : 190);
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("font-size", "11");
+            text.setAttribute("fill", "#4D4D4D");
+            text.textContent = talent.name;
+            text.classList.add("dynamic-text");
+            svg.appendChild(text);
+        });
+    }
+
+    // Update detailed analysis table
+    function updateDetailedTable(talents) {
+        const tbody = document.getElementById('talentTableBody');
+        tbody.innerHTML = '';
+
+        talents.forEach(talent => {
+            const row = document.createElement('tr');
+
+            // Determine tier
+            let tier, tierClass;
+            if (talent.score > 75) {
+                tier = '主導';
+                tierClass = 'tier-dominant';
+            } else if (talent.score >= 25) {
+                tier = '支援';
+                tierClass = 'tier-supporting';
+            } else {
+                tier = '待管理';
+                tierClass = 'tier-lesser';
+            }
+
+            // Determine domain badge class
+            const domainBadgeClass = `badge-${talent.domain.toLowerCase().replace('_', '')}`;
+
+            // Generate comparison text
+            let comparisonText;
+            if (talent.score >= 80) {
+                comparisonText = `高於 ${talent.score}% 同儕`;
+            } else if (talent.score >= 60) {
+                comparisonText = '略高於平均';
+            } else if (talent.score >= 40) {
+                comparisonText = '接近平均';
+            } else if (talent.score >= 25) {
+                comparisonText = '略低於平均';
+            } else {
+                comparisonText = '低於平均';
+            }
+
+            row.innerHTML = `
+                <td><strong>${talent.name}</strong></td>
+                <td><span class="badge ${domainBadgeClass}">${talent.domain.replace('_', ' ')}</span></td>
+                <td><span class="mono" style="font-weight:600">PR ${talent.score}</span></td>
+                <td><span class="tier ${tierClass}">${tier}</span></td>
+                <td>
+                    <div class="bar">
+                        <div class="bar-fill" style="width:${talent.score}%"></div>
+                        <span class="bar-label">${comparisonText}</span>
+                    </div>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    // Update career archetype
+    function updateCareerArchetype(categorized) {
+        // Determine dominant domain
+        const domainCounts = {
+            "EXECUTING": 0,
+            "INFLUENCING": 0,
+            "RELATIONSHIP_BUILDING": 0,
+            "STRATEGIC_THINKING": 0
+        };
+
+        categorized.dominant.forEach(talent => {
+            domainCounts[talent.domain]++;
+        });
+
+        const topDomain = Object.entries(domainCounts)
+            .sort(([,a], [,b]) => b - a)[0];
+
+        let archetype;
+        if (topDomain && topDomain[1] > 0) {
+            archetype = CAREER_ARCHETYPES[topDomain[0]];
         } else {
-          domainAverages[domain] = 0;
+            // Use the domain with highest average score as fallback
+            const domainAverages = {};
+            Object.keys(CAREER_ARCHETYPES).forEach(domain => {
+                const domainTalents = categorized.dominant.concat(categorized.supporting)
+                    .filter(t => t.domain === domain);
+                domainAverages[domain] = domainTalents.length > 0 ?
+                    domainTalents.reduce((sum, t) => sum + t.score, 0) / domainTalents.length : 0;
+            });
+
+            const highestDomain = Object.entries(domainAverages)
+                .sort(([,a], [,b]) => b - a)[0];
+
+            archetype = CAREER_ARCHETYPES[highestDomain[0]];
         }
-      }
 
-      // Find top domain
-      const topDomain = Object.entries(domainAverages)
-        .sort(([,a], [,b]) => b - a)[0];
+        // Update persona content
+        document.getElementById('personaDescription').textContent = archetype.description;
 
-      if (topDomain) {
-        const domainName = DOMAIN_MAPPING[topDomain[0]]?.name || topDomain[0];
-        document.getElementById('coreStrengthArea').textContent = domainName;
-      }
+        // Update suggested roles
+        const rolesContainer = document.getElementById('suggestedRoles');
+        rolesContainer.innerHTML = '';
+        archetype.roles.forEach(role => {
+            const li = document.createElement('li');
+            li.textContent = role;
+            rolesContainer.appendChild(li);
+        });
 
-      // Find top talents
-      const topTalents = Object.entries(talentScores)
-        .sort(([,a], [,b]) => b.score - a.score)
-        .slice(0, 3);
+        // Update key contexts
+        const contextsContainer = document.getElementById('keyContexts');
+        contextsContainer.innerHTML = '';
+        archetype.contexts.forEach(context => {
+            const li = document.createElement('li');
+            li.textContent = context;
+            contextsContainer.appendChild(li);
+        });
 
-      // Calculate percentile (mock calculation)
-      const topScore = topTalents.length > 0 ? topTalents[0][1].score : 50;
-      const percentile = Math.min(99, Math.max(1, Math.round(topScore)));
-      document.getElementById('percentileRank').textContent = `Top ${100 - percentile}% (P${percentile})`;
-
-      // Determine archetype based on top domain
-      const archetypes = {
-        'STRATEGIC_THINKING': '策略思維者',
-        'EXECUTING': '執行型領導者',
-        'INFLUENCING': '影響型領導者',
-        'RELATIONSHIP_BUILDING': '關係建立者'
-      };
-
-      const archetype = archetypes[topDomain[0]] || '綜合型人才';
-      document.getElementById('archetypeProfile').textContent = archetype;
-
-      // Update report links to include session ID
-      const reportLinks = document.querySelectorAll('a[href="report-detail.html"]');
-      reportLinks.forEach(link => {
-        link.href = `report-detail.html?session=${sessionId}`;
-      });
-
-      console.log('Results displayed successfully');
+        // Update development tips
+        const tipsContainer = document.getElementById('developmentTips');
+        tipsContainer.innerHTML = '';
+        archetype.tips.forEach(tip => {
+            const li = document.createElement('li');
+            li.textContent = tip;
+            tipsContainer.appendChild(li);
+        });
     }
 
-    // Show loading state
+    // Show loading
     function showLoading() {
-      console.log('Loading results...');
+        document.getElementById('loadingState').classList.add('active');
     }
 
-    // Hide loading state
+    // Hide loading
     function hideLoading() {
-      console.log('Loading complete');
+        document.getElementById('loadingState').classList.remove('active');
     }
 
-    // Show error message
+    // Show error
     function showError(message) {
-      console.error('Error:', message);
-
-      // Update UI to show error
-      document.getElementById('sessionId').textContent = 'Error';
-      document.getElementById('reliabilityScore').textContent = 'Error';
-      document.getElementById('completionTime').textContent = 'Error';
-      document.getElementById('coreStrengthArea').textContent = '載入失敗';
-      document.getElementById('percentileRank').textContent = '載入失敗';
-      document.getElementById('archetypeProfile').textContent = '載入失敗';
-
-      // Optionally show user-friendly error message
-      alert('無法載入評測結果，請重新整理頁面或聯繫技術支援。');
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('errorState').classList.add('active');
+        hideLoading();
     }
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('Results page loaded, loading assessment results...');
-      loadResults();
-    });
+    // Utility functions
+    function downloadPDF() {
+        const sessionId = getSessionId();
+        alert(`PDF 下載功能開發中，Session: ${sessionId}`);
+    }
+
+    function shareReport() {
+        const sessionId = getSessionId();
+        const url = window.location.href;
+
+        if (navigator.share) {
+            navigator.share({
+                title: '我的優勢天賦評測結果',
+                text: '我剛完成了專業的優勢天賦評測，發現了獨特的競爭優勢！',
+                url: url
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(url);
+            alert('報告連結已複製到剪貼板！');
+        }
+    }
   </script>
 </body>
 </html>
