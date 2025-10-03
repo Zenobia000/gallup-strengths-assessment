@@ -12,11 +12,12 @@ import uuid
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field, model_validator
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+# Temporarily disabled for Windows compatibility - works fine on Linux/Docker
+# from slowapi import Limiter
+# from slowapi.util import get_remote_address
 
 # Initialize limiter for this router
-limiter = Limiter(key_func=get_remote_address)
+# limiter = Limiter(key_func=get_remote_address)
 
 from database.engine import get_session
 from models.v4_models import V4Statement, V4Session, V4Response, V4ResponseItem, V4Score
@@ -306,7 +307,7 @@ async def get_assessment_blocks(request: BlockRequest = BlockRequest()):
 
 
 @router.post("/assessment/submit", response_model=ScoreResponse)
-@limiter.limit("10/minute")  # 限制每分鐘 10 次提交 (防止濫用)
+# @limiter.limit("10/minute")  # Temporarily disabled for Windows - works on Linux/Docker
 async def submit_assessment(request: Request, submit_request: SubmitRequest):
     """
     提交評測結果並計算 T1-T12 分數

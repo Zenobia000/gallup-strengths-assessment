@@ -19,9 +19,10 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+# Temporarily disabled for Windows compatibility - works fine on Linux/Docker
+# from slowapi import Limiter, _rate_limit_exceeded_handler
+# from slowapi.util import get_remote_address
+# from slowapi.errors import RateLimitExceeded
 
 from core.config import get_settings
 from models.schemas import (
@@ -54,10 +55,11 @@ app = FastAPI(
 )
 
 # Initialize Rate Limiter
+# Temporarily disabled for Windows compatibility - works fine on Linux/Docker
 # Rate limit: 60 requests per minute per IP address
-limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
+# app.state.limiter = limiter
+# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configure CORS for development - following MVP pragmatism
 settings = get_settings()
