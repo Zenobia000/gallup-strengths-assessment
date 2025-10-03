@@ -9,6 +9,7 @@ import math
 from typing import List, Dict, Tuple, Any
 from pathlib import Path
 import logging
+from utils.path_utils import get_file_storage_dir  # Cross-platform paths
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +31,12 @@ class EnhancedBlockGenerator:
         else:
             # 嘗試載入改進版語句庫
             try:
-                enhanced_path = "/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements_enhanced_full.json"
+                enhanced_path = str(get_file_storage_dir() / "v4_statements_enhanced_full.json")
                 self.load_statements(enhanced_path)
                 logger.info("已載入改進版語句庫")
             except:
                 # 回退到原始語句庫
-                fallback_path = "/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements.json"
+                fallback_path = str(get_file_storage_dir() / "v4_statements.json")
                 self.load_statements(fallback_path)
                 logger.info("已載入原始語句庫")
 
@@ -316,7 +317,7 @@ def main():
 
     if blocks:
         # 保存結果
-        output_path = "/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_blocks_enhanced.json"
+        output_path = str(get_file_storage_dir() / "v4_blocks_enhanced.json")
         generator.save_blocks_to_file(blocks, output_path)
 
         # 輸出摘要統計

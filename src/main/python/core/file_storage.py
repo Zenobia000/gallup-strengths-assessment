@@ -13,14 +13,24 @@ import uuid
 import os
 from dataclasses import dataclass, asdict
 
+# Import cross-platform path utilities
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.path_utils import get_file_storage_dir, file_storage_file
+
 
 @dataclass
 class StorageConfig:
-    """Configuration for file storage system"""
-    base_path: str = "/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage"
+    """Configuration for file storage system (cross-platform)"""
+    base_path: Path = None  # Will be set in __post_init__
     backup_enabled: bool = True
     auto_save: bool = True
     format_preference: str = "json"  # "json" or "csv"
+
+    def __post_init__(self):
+        """Initialize base_path with cross-platform default"""
+        if self.base_path is None:
+            self.base_path = get_file_storage_dir()
 
 
 class FileStorageManager:
@@ -271,8 +281,8 @@ def initialize_file_storage():
         # This will be populated from existing JSON files
         sample_statements = []
 
-        # Try to load from existing v4_statements.json
-        existing_path = Path("/home/os-sunnie.gd.weng/python_workstation/side-project/strength-system/data/file_storage/v4_statements.json")
+        # Try to load from existing v4_statements.json (cross-platform)
+        existing_path = file_storage_file("v4_statements.json")
         if existing_path.exists():
             try:
                 with open(existing_path, 'r', encoding='utf-8') as f:
@@ -284,7 +294,7 @@ def initialize_file_storage():
         if sample_statements:
             storage.insert_many("v4_statements", sample_statements)
 
-    print("✅ File storage system initialized!")
+    print("[OK] File storage system initialized!")
 
 
 if __name__ == "__main__":

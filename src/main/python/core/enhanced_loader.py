@@ -7,6 +7,7 @@ import json
 import logging
 from pathlib import Path
 from typing import Dict, List, Any
+from utils.path_utils import get_file_storage_dir  # Cross-platform paths
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class EnhancedStatementLoader:
     def load_enhanced_statements() -> List[Dict[str, Any]]:
         """載入改進版語句庫"""
         try:
-            enhanced_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements_enhanced_full.json")
+            enhanced_path = Path(get_file_storage_dir() / "v4_statements_enhanced_full.json"
 
             if enhanced_path.exists():
                 with open(enhanced_path, 'r', encoding='utf-8') as f:
@@ -36,7 +37,7 @@ class EnhancedStatementLoader:
     def load_original_statements() -> List[Dict[str, Any]]:
         """載入原始語句庫作為回退"""
         try:
-            original_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements.json")
+            original_path = Path(get_file_storage_dir() / "v4_statements.json"
 
             with open(original_path, 'r', encoding='utf-8') as f:
                 statements = json.load(f)
@@ -51,7 +52,7 @@ class EnhancedStatementLoader:
     def load_enhanced_blocks() -> List[Dict[str, Any]]:
         """載入改進版題組"""
         try:
-            blocks_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_blocks_enhanced.json")
+            blocks_path = Path(get_file_storage_dir() / "v4_blocks_enhanced.json"
 
             if blocks_path.exists():
                 with open(blocks_path, 'r', encoding='utf-8') as f:
@@ -72,8 +73,8 @@ class EnhancedStatementLoader:
         """備份原始語句庫並替換為改進版"""
         try:
             # 備份原始檔案
-            original_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements.json")
-            backup_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements_backup_original.json")
+            original_path = Path(get_file_storage_dir() / "v4_statements.json"
+            backup_path = Path(get_file_storage_dir() / "v4_statements_backup_original.json"
 
             if original_path.exists():
                 import shutil
@@ -102,8 +103,8 @@ class EnhancedStatementLoader:
     def restore_original_statements():
         """恢復原始語句庫"""
         try:
-            original_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements.json")
-            backup_path = Path("/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage/v4_statements_backup_original.json")
+            original_path = Path(get_file_storage_dir() / "v4_statements.json"
+            backup_path = Path(get_file_storage_dir() / "v4_statements_backup_original.json"
 
             if backup_path.exists():
                 import shutil

@@ -18,6 +18,7 @@ from core.v4.block_designer import QuartetBlockDesigner
 from core.v4.balanced_block_designer import create_objective_assessment_blocks
 from core.v4.irt_scorer import ThurstonianIRTScorer
 from core.v4.normative_scoring import NormativeScorer
+from utils.path_utils import data_file  # Cross-platform path handling
 from core.v4.irt_calibration import ThurstonianIRTCalibrator
 from core.v4.performance_optimizer import get_optimizer, cached_computation
 from core.v4.talent_classification import ScientificTalentClassifier, get_tier_display_config
@@ -103,7 +104,7 @@ class ScoreResponse(BaseModel):
 # Initialize components
 block_designer = None  # Initialize on first use
 irt_scorer = None  # Initialize on first use
-norm_scorer = NormativeScorer(Path('/home/os-sunnie.gd.weng/python_workstation/side-project/strength-system/src/main/python/data/v4_normative_data.json'))
+norm_scorer = NormativeScorer(data_file('v4_normative_data.json'))
 
 
 def get_irt_scorer():
@@ -543,7 +544,7 @@ async def get_results(session_id: str):
                 from pathlib import Path
 
                 # Recreate norm_scores from stored data
-                norm_scorer = NormativeScorer(Path('/home/os-sunnie.gd.weng/python_workstation/side-project/strength-system/src/main/python/data/v4_normative_data.json'))
+                norm_scorer = NormativeScorer(data_file('v4_normative_data.json'))
                 theta_scores = basic_results["theta_scores"]
 
                 if theta_scores:
