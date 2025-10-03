@@ -53,12 +53,13 @@
 
 ---
 
-### 💻 階段 4：開發與品質 (11-12)
+### 💻 階段 4：開發與品質 (11-12, 17)
 
 | 序號 | 檔名 | 用途 | 適用階段 |
 |:---:|:---|:---|:---|
 | **11** | [code_review_and_refactoring_guide.md](./11_code_review_and_refactoring_guide.md) | Code Review 與重構指南，確保程式碼品質 | Development |
 | **12** | [frontend_architecture_specification.md](./12_frontend_architecture_specification.md) | 前端架構規範，定義前端技術棧與設計模式 | Development |
+| **17** | [frontend_information_architecture_template.md](./17_frontend_information_architecture_template.md) | 前端信息架構規範模板，定義用戶旅程、頁面結構、導航系統（通用模板） | Development |
 
 ---
 
@@ -136,6 +137,10 @@ graph TD
 - [08_project_structure_guide.md](./08_project_structure_guide.md) - 專案結構
 - [11_code_review_and_refactoring_guide.md](./11_code_review_and_refactoring_guide.md) - Code Review
 
+#### 前端工程師 (Frontend DEV)
+- [12_frontend_architecture_specification.md](./12_frontend_architecture_specification.md) - 前端架構規範
+- [17_frontend_information_architecture_template.md](./17_frontend_information_architecture_template.md) - 前端信息架構模板
+
 #### 安全工程師 (SEC)
 - [13_security_and_readiness_checklists.md](./13_security_and_readiness_checklists.md) - 安全檢查清單
 
@@ -145,6 +150,10 @@ graph TD
 ---
 
 ## 🔄 版本更新記錄
+
+### v2.1 (2025-10-03)
+- ✅ 新增 `17_frontend_information_architecture_template.md` - 前端信息架構規範模板（通用模板）
+- ✅ 在角色查找中新增「前端工程師」分類
 
 ### v2.0 (2025-10-03)
 - ✅ 重新組織所有模板序號，確保清晰連續

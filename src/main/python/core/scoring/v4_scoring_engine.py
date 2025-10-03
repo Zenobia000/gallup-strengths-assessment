@@ -11,6 +11,24 @@ class V4ScoringEngine:
     """Simplified scoring engine for rapid development"""
 
     def __init__(self):
+        # Fixed mapping: dimension name → T-ID
+        # This must match the frontend TALENT_DEFINITIONS in results.html
+        self.dimension_mapping = {
+            "T1": "structured_execution",         # 結構化執行 - EXECUTING
+            "T2": "quality_perfectionism",        # 品質與完備 - EXECUTING
+            "T3": "exploration_innovation",       # 探索與創新 - STRATEGIC_THINKING
+            "T4": "analytical_insight",           # 分析與洞察 - STRATEGIC_THINKING
+            "T5": "influence_advocacy",           # 影響與倡議 - INFLUENCING
+            "T6": "collaboration_harmony",        # 協作與共好 - RELATIONSHIP_BUILDING
+            "T7": "customer_orientation",         # 客戶導向 - INFLUENCING
+            "T8": "learning_growth",              # 學習與成長 - STRATEGIC_THINKING
+            "T9": "discipline_trust",             # 紀律與信任 - RELATIONSHIP_BUILDING
+            "T10": "pressure_regulation",         # 壓力調節 - RELATIONSHIP_BUILDING
+            "T11": "conflict_integration",        # 衝突整合 - INFLUENCING
+            "T12": "responsibility_accountability" # 責任與當責 - EXECUTING
+        }
+
+        # Maintain backwards compatibility
         self.dimensions = [
             "structured_execution",
             "quality_perfectionism",
@@ -159,7 +177,10 @@ class V4ScoringEngine:
         print(f"Debug - Percentile scores: {dimension_scores}")
 
         # Generate theta estimates based on actual percentiles
-        for i, (dim, percentile) in enumerate(dimension_scores.items()):
+        # Use reverse mapping to find T-ID for each dimension name
+        reverse_mapping = {v: k for k, v in self.dimension_mapping.items()}
+
+        for dim, percentile in dimension_scores.items():
             # Convert percentile to standardized theta
             if percentile >= 84:  # Top 16%
                 theta = random.uniform(1.0, 2.5)
@@ -174,7 +195,9 @@ class V4ScoringEngine:
             else:  # Bottom 16%
                 theta = random.uniform(-2.5, -1.0)
 
-            theta_estimates[f"T{i+1}"] = round(theta, 2)
+            # Find the correct T-ID for this dimension
+            t_id = reverse_mapping.get(dim, f"T{self.dimensions.index(dim) + 1}")
+            theta_estimates[t_id] = round(theta, 2)
 
         # Categorize talents
         sorted_dims = sorted(dimension_scores.items(), key=lambda x: x[1], reverse=True)

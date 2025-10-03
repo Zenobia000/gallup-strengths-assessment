@@ -190,10 +190,37 @@ async def submit_assessment(request: Request):
             scoring_engine = V4ScoringEngine()
             scoring_result = scoring_engine.score_assessment(enriched_responses)
 
+            # Create fixed mapping for dimension names to T-IDs
+            # Must match frontend TALENT_DEFINITIONS and v4_scoring_engine.dimension_mapping
+            reverse_dim_mapping = {
+                "structured_execution": "t1",
+                "quality_perfectionism": "t2",
+                "exploration_innovation": "t3",
+                "analytical_insight": "t4",
+                "influence_advocacy": "t5",
+                "collaboration_harmony": "t6",
+                "customer_orientation": "t7",
+                "learning_growth": "t8",
+                "discipline_trust": "t9",
+                "pressure_regulation": "t10",
+                "conflict_integration": "t11",
+                "responsibility_accountability": "t12"
+            }
+
+            # Convert dimension_scores to proper t1_xxx format
+            formatted_scores = {}
+            print(f"Debug - Mapping dimension scores to T-IDs:")
+            for dim_name, score in scoring_result["dimension_scores"].items():
+                t_id = reverse_dim_mapping.get(dim_name)
+                print(f"  {dim_name} → {t_id} (score: {score})")
+                if t_id:
+                    formatted_scores[f"{t_id}_{dim_name}"] = score
+            print(f"Debug - Formatted scores keys: {list(formatted_scores.keys())[:4]}")
+
             # Store scores
             score_data = {
                 "session_id": session_id,
-                **{f"t{i+1}_{dim}": score for i, (dim, score) in enumerate(scoring_result["dimension_scores"].items())},
+                **formatted_scores,
                 "theta_estimates": json.dumps(scoring_result.get("theta_estimates", {})),
                 "standard_errors": json.dumps(scoring_result.get("standard_errors", {})),
                 "percentiles": json.dumps(scoring_result["dimension_scores"]),
