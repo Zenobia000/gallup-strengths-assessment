@@ -142,42 +142,43 @@ def create_access_token(
     return token
 
 
-def create_refresh_token(member_id: str, token_family: str) -> Tuple[str, str]:
+def create_refresh_token(member_id: str, email: str, additional_claims: Optional[Dict] = None) -> str:
     """
     創建 Refresh Token
 
     Args:
         member_id: 會員 ID
-        token_family: Token 家族 ID (用於防重放攻擊)
+        email: 會員 Email
+        additional_claims: 額外的 Payload 資料 (optional)
 
     Returns:
-        Tuple[str, str]: (JWT Token, Token Hash)
+        str: JWT Refresh Token
 
     Note:
-        - 返回的 Token Hash 需存入資料庫
-        - 原始 Token 僅返回給客戶端一次
+        - Refresh Token 有效期為 30 天
+        - Token 應搭配 AuthToken 資料庫記錄使用
     """
     now = datetime.utcnow()
     expires_at = now + timedelta(minutes=JWT_REFRESH_TOKEN_EXPIRE_MINUTES)
 
-    # 生成隨機 JTI (JWT ID)
+    # 生成隨機 JTI (JWT ID) 用於撤銷追蹤
     jti = secrets.token_urlsafe(32)
 
     payload = {
         "sub": member_id,
+        "email": email,
         "type": "refresh",
         "jti": jti,
-        "family": token_family,
         "iat": now,
         "exp": expires_at,
     }
 
+    # 加入額外的 Claims
+    if additional_claims:
+        payload.update(additional_claims)
+
     token = jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-
-    # 雜湊 JTI 用於資料庫存儲
-    token_hash = hashlib.sha256(jti.encode()).hexdigest()
-
-    return token, token_hash
+    return token
 
 
 def verify_token(token: str, token_type: str = "access") -> Optional[Dict]:
