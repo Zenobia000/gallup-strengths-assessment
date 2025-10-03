@@ -154,6 +154,11 @@ static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+# Mount assessment resources (JSON configs)
+assessment_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "assessment")
+if os.path.exists(assessment_dir):
+    app.mount("/assessment", StaticFiles(directory=assessment_dir), name="assessment")
+
 
 # Application startup event
 @app.on_event("startup")

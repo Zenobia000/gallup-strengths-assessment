@@ -1,0 +1,158 @@
+{
+  "analysis_metadata": {
+    "version": "1.0",
+    "created_date": "2025-10-03",
+    "author": "Claude Code AI",
+    "source_document": "docs/design/archetype-talent-mapping-analysis.md",
+    "description": "分析四大才幹領域如何映射到四種Keirsey氣質原型，並提供基於主導領域的原型可能性分析。"
+  },
+  "domain_to_archetype_potential": {
+    "EXECUTING": {
+      "description": "高執行力人才可能對應的原型",
+      "possible_archetypes": [
+        {
+          "archetype_id": "ARCHITECT",
+          "archetype_name": "系統建構者",
+          "rationale": "結構化執行(T1)與分析能力(T4)的結合，形成重視流程與系統的執行型建構者。",
+          "triggering_talents": {
+            "primary": ["T4", "T1"],
+            "secondary": ["T3", "T8", "T12"]
+          }
+        },
+        {
+          "archetype_id": "GUARDIAN",
+          "archetype_name": "組織守護者",
+          "rationale": "責任當責(T12)與紀律信任(T9)的結合，形成可靠的執行者。",
+          "triggering_talents": {
+            "primary": ["T12", "T9"],
+            "secondary": ["T2", "T1", "T6"]
+          }
+        }
+      ],
+      "unlikely_archetypes": ["IDEALIST", "ARTISAN"]
+    },
+    "STRATEGIC_THINKING": {
+      "description": "高戰略思維人才可能對應的原型",
+      "possible_archetypes": [
+        {
+          "archetype_id": "ARCHITECT",
+          "archetype_name": "系統建構者",
+          "rationale": "分析洞察(T4)與探索創新(T3)的結合，形成策略規劃者。",
+          "triggering_talents": {
+            "primary": ["T4", "T1"],
+            "secondary": ["T3", "T8", "T12"]
+          }
+        },
+        {
+          "archetype_id": "IDEALIST",
+          "archetype_name": "人文關懷家",
+          "rationale": "學習成長(T8)與協作共好(T6)的結合，形成賦能教練型角色。",
+          "triggering_talents": {
+            "primary": ["T6", "T8"],
+            "secondary": ["T5", "T11", "T7"]
+          }
+        }
+      ],
+      "unlikely_archetypes": ["GUARDIAN", "ARTISAN"]
+    },
+    "INFLUENCING": {
+      "description": "高影響力人才可能對應的原型",
+      "possible_archetypes": [
+        {
+          "archetype_id": "ARTISAN",
+          "archetype_name": "推廣實踐家",
+          "rationale": "影響倡議(T5)與客戶導向(T7)的結合，形成推廣行動者。",
+          "triggering_talents": {
+            "primary": ["T5", "T10"],
+            "secondary": ["T3", "T7", "T11"]
+          }
+        },
+        {
+          "archetype_id": "IDEALIST",
+          "archetype_name": "人文關懷家",
+          "rationale": "協作共好(T6)與影響倡議(T5)的結合，形成團隊催化劑。",
+          "triggering_talents": {
+            "primary": ["T6", "T8"],
+            "secondary": ["T5", "T11", "T7"]
+          }
+        }
+      ],
+      "unlikely_archetypes": ["ARCHITECT", "GUARDIAN"]
+    },
+    "RELATIONSHIP_BUILDING": {
+      "description": "高關係建立人才可能對應的原型",
+      "possible_archetypes": [
+        {
+          "archetype_id": "GUARDIAN",
+          "archetype_name": "組織守護者",
+          "rationale": "紀律信任(T9)與責任當責(T12)的結合，形成團隊的穩定後盾。",
+          "triggering_talents": {
+            "primary": ["T12", "T9"],
+            "secondary": ["T2", "T1", "T6"]
+          }
+        },
+        {
+          "archetype_id": "IDEALIST",
+          "archetype_name": "人文關懷家",
+          "rationale": "協作共好(T6)與學習成長(T8)的結合，形成關係賦能者。",
+          "triggering_talents": {
+            "primary": ["T6", "T8"],
+            "secondary": ["T5", "T11", "T7"]
+          }
+        },
+        {
+          "archetype_id": "ARTISAN",
+          "archetype_name": "推廣實踐家",
+          "rationale": "壓力調節(T10)與影響倡議(T5)的結合，形成危機處理者。",
+          "triggering_talents": {
+            "primary": ["T5", "T10"],
+            "secondary": ["T3", "T7", "T11"]
+          }
+        }
+      ],
+      "unlikely_archetypes": ["ARCHITECT"]
+    }
+  },
+  "archetype_subtypes": {
+    "ARCHITECT": [
+      {
+        "subtype_id": "ARCHITECT_PROCESS",
+        "name": "系統建構者 - 流程型",
+        "dominant_domain": "EXECUTING",
+        "trigger_condition": "T1 in Top 3 AND T4 in Top 6",
+        "description": "重視流程與系統的執行型建構者。",
+        "career_suggestions": ["專案經理", "流程工程師", "品質經理", "ERP顧問"],
+        "development_focus": "強化策略思維，學習從執行到規劃的思維躍遷。"
+      },
+      {
+        "subtype_id": "ARCHITECT_STRATEGY",
+        "name": "系統建構者 - 策略型",
+        "dominant_domain": "STRATEGIC_THINKING",
+        "trigger_condition": "T4 in Top 3 AND T3 in Top 6",
+        "description": "重視策略與創新的思考型建構者。",
+        "career_suggestions": ["策略顧問", "產品經理", "系統架構師"],
+        "development_focus": "強化執行能力，將策略落地為可操作的步驟。"
+      }
+    ],
+    "IDEALIST": [
+      {
+        "subtype_id": "IDEALIST_HARMONY",
+        "name": "人文關懷家 - 和諧型",
+        "dominant_domain": "RELATIONSHIP_BUILDING",
+        "trigger_condition": "T6 in Top 3 AND T8 in Top 6",
+        "description": "重視和諧與賦能的關係型理想家。",
+        "career_suggestions": ["HR 夥伴", "團隊教練", "組織發展顧問"],
+        "development_focus": "學習建設性衝突處理，避免為了和諧而犧牲決策品質。"
+      },
+      {
+        "subtype_id": "IDEALIST_GROWTH",
+        "name": "人文關懷家 - 成長型",
+        "dominant_domain": "STRATEGIC_THINKING",
+        "trigger_condition": "T8 in Top 3 AND T5 in Top 6",
+        "description": "重視成長與影響的教育型理想家。",
+        "career_suggestions": ["講師", "企業培訓師", "教育創業家"],
+        "development_focus": "將個人成長的熱情轉化為組織層面的影響力。"
+      }
+    ]
+  }
+}

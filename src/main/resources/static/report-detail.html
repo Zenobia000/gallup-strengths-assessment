@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深度優勢分析報告 - 優勢天賦評測系統</title>
+    <title>團隊角色與協作潛力分析報告 - 優勢天賦評測系統</title>
     <style>
         * {
             margin: 0;
@@ -12,63 +12,66 @@
         }
 
         :root {
-            /* 領域色彩（主要） */
-            --executing: #7C3AED;        /* 執行力 - 紫色 */
-            --influencing: #F59E0B;      /* 影響力 - 橙色 */
-            --relationship: #0EA5E9;     /* 關係建立 - 藍色 */
-            --strategic: #10B981;        /* 戰略思維 - 綠色 */
-
-            /* 中性色調 */
-            --neutral-50: #F9FAFB;
-            --neutral-100: #F3F4F6;
-            --neutral-200: #E5E7EB;
-            --neutral-500: #6B7280;
-            --neutral-600: #4B5563;
-            --neutral-700: #374151;
-            --neutral-900: #111827;
-
-            /* 功能色彩 */
-            --emerald-500: #10B981;
-            --emerald-600: #059669;
-            --red-500: #EF4444;
-            --amber-500: #F59E0B;
-
-            /* 語義色彩 */
-            --success: var(--emerald-500);
-            --warning: var(--amber-500);
-            --error: var(--red-500);
-            --info: var(--relationship);
-
-            /* 陰影系統 */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --mckinsey-navy: #001F3F;
+            --mckinsey-deep-blue: #003D73;
+            --mckinsey-blue: #0066A6;
+            --mckinsey-bright-blue: #0080D9;
+            --mckinsey-light-blue: #E6F2FF;
+            --consultant-gold: #D4AF37;
+            --insight-teal: #008080;
+            --data-orange: #FF6B35;
+            --success-green: #2D8659;
+            --alert-red: #C1272D;
+            --gray-900: #1A1A1A;
+            --gray-800: #333333;
+            --gray-700: #4D4D4D;
+            --gray-600: #666666;
+            --gray-500: #7A7A7A;
+            --gray-400: #999999;
+            --gray-300: #CCCCCC;
+            --gray-200: #E5E5E5;
+            --gray-100: #F2F2F2;
+            --gray-50: #F8F8F8;
+            --white: #FFFFFF;
+            --radius-sm: 2px;
+            --radius-md: 4px;
+            --radius-lg: 8px;
+            --radius-full: 9999px;
+            --border-thin: 1px;
+            --border-medium: 2px;
+            --border-thick: 3px;
+            --executing: #7C3AED;
+            --influencing: #F59E0B;
+            --relationship: #0EA5E9;
+            --strategic: #10B981;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background: var(--neutral-50);
-            color: var(--neutral-900);
+            margin: 0;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
             line-height: 1.6;
         }
 
         /* 導航欄 */
         .navbar {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow-sm);
+            background: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 12px rgba(0, 31, 63, 0.06);
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid var(--neutral-200);
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 24px;
         }
 
         .logo {
@@ -77,13 +80,13 @@
             gap: 0.75rem;
             font-size: 1.25rem;
             font-weight: 600;
-            color: var(--neutral-900);
+            color: var(--mckinsey-navy);
             cursor: pointer;
             text-decoration: none;
         }
 
         .logo::before {
-            content: "🎯";
+            content: "👥";
             font-size: 1.5rem;
         }
 
@@ -99,395 +102,455 @@
             justify-content: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--neutral-200);
-            background: white;
-            color: var(--neutral-700);
+            border-radius: var(--radius-md);
+            border: var(--border-medium) solid var(--mckinsey-blue);
+            background: transparent;
+            color: var(--mckinsey-blue);
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 0.875rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
         .nav-btn:hover {
-            background: var(--neutral-50);
-            border-color: var(--neutral-300);
+            background: var(--mckinsey-light-blue);
+            border-color: var(--mckinsey-deep-blue);
         }
 
         .nav-btn.primary {
-            background: var(--neutral-900);
-            color: white;
-            border: none;
+            background: var(--mckinsey-blue);
+            color: #fff;
+            border-color: var(--mckinsey-blue);
         }
 
         .nav-btn.primary:hover {
-            background: var(--neutral-700);
+            background: var(--mckinsey-deep-blue);
         }
 
         /* 主容器 */
         .main-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            max-width: 1280px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+            background: var(--white);
+            border: var(--border-thin) solid var(--gray-200);
+            border-bottom: var(--border-medium) solid var(--mckinsey-navy);
+            border-radius: var(--radius-md);
+            padding: 32px;
         }
 
-        /* 報告頭部 */
-        .report-header {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
+        .page-header h1 {
+            font-size: 28px;
+            color: var(--mckinsey-navy);
+            margin-bottom: 12px;
         }
 
-        .user-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+        .page-header p {
+            font-size: 16px;
+            color: var(--gray-600);
+            max-width: 720px;
+            margin: 0 auto;
         }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 32px;
+        }
+        
+        .main-content {
+            grid-column: span 12 / span 12;
+        }
+        
+        @media (min-width: 1024px) {
+            .main-content {
+                grid-column: span 8 / span 8;
+            }
+            .sidebar {
+                grid-column: span 4 / span 4;
+            }
         }
 
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--strategic);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 600;
+        .analysis-card {
+            background: var(--white);
+            border: var(--border-thin) solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            margin-bottom: 32px;
         }
-
-        .user-details h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
-            color: var(--neutral-900);
-        }
-
-        .user-details p {
-            color: var(--neutral-500);
-            font-size: 0.875rem;
-        }
-
-        .report-meta {
-            display: flex;
-            gap: 2rem;
-            color: var(--neutral-500);
-            font-size: 0.875rem;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* 優勢總覽卡片 */
-        .strength-overview {
-            background: linear-gradient(135deg, var(--strategic) 0%, var(--relationship) 100%);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .strength-overview::before {
+ 
+         .analysis-card::before {
             content: "";
             position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
+             inset: 0;
+             background: var(--gradient-card);
+             opacity: 0.9;
+             pointer-events: none;
+            z-index: 0;
+         }
+ 
+         .analysis-card::after {
+            content: "";
+            position: absolute;
+             top: -60px;
+             right: -40px;
+             width: 200px;
+             height: 200px;
+             background: rgba(11, 154, 165, 0.12);
+             filter: blur(0);
             border-radius: 50%;
+             pointer-events: none;
+            z-index: 0;
         }
 
-        .overview-content {
+        .analysis-card > * {
             position: relative;
             z-index: 1;
         }
 
-        .overview-title {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .top-strengths {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .strength-badge {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            padding: 0.75rem 1.25rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.125rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .strength-badge.primary {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-
-        .overview-summary {
-            font-size: 1rem;
-            line-height: 1.6;
-            opacity: 0.95;
-        }
-
-        /* 內容區塊 */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-        }
-
-        /* 詳細分析區 */
-        .analysis-section {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .section-header {
+        .card-header {
             display: flex;
             align-items: center;
+            gap: 1rem;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid var(--neutral-200);
+            border-bottom: 1px solid var(--gray-200);
         }
-
-        .section-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--strategic);
-            border-radius: 0.5rem;
+ 
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 1rem;
-            font-size: 1.25rem;
-            color: white;
+            font-size: 1.5rem;
+            color: #fff;
+            background: var(--mckinsey-blue);
         }
-
-        .section-title {
-            font-size: 1.25rem;
+ 
+        .card-title {
+            font-size: 20px;
             font-weight: 600;
-            color: var(--neutral-900);
+            color: var(--mckinsey-navy);
+        }
+ 
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--gray-600);
         }
 
-        /* 優勢詳解 */
-        .strength-detail {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: var(--neutral-50);
-            border: 1px solid var(--neutral-200);
-            border-radius: 0.75rem;
-            border-left: 4px solid var(--strategic);
-        }
-
-        .strength-name {
-            font-size: 1.125rem;
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.9rem;
+            border-radius: 999px;
+            background: var(--mckinsey-light-blue);
+            color: var(--mckinsey-blue);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
             font-weight: 600;
-            color: var(--neutral-900);
-            margin-bottom: 0.5rem;
+        }
+ 
+        .badge-pill.gold {
+            background: rgba(212, 175, 55, 0.18);
+            color: var(--consultant-gold);
+        }
+ 
+        .badge-pill.neutral {
+            background: rgba(153, 153, 153, 0.15);
+            color: var(--gray-600);
         }
 
-        .strength-score {
-            display: inline-block;
-            background: var(--strategic);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-left: 0.5rem;
+        .section-footnote {
+            margin-top: 1.25rem;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
         }
 
-        .strength-description {
-            color: var(--neutral-600);
-            margin-bottom: 1rem;
-            line-height: 1.6;
+        .section-footnote::before {
+            content: "ℹ";
+            font-weight: 600;
+            color: var(--mckinsey-blue);
+            font-size: 0.9rem;
         }
 
-        .strength-applications {
-            margin-top: 1rem;
-        }
-
-        .application-list {
-            list-style: none;
-            margin-top: 0.5rem;
-        }
-
-        .application-list li {
-            padding: 0.5rem 0;
-            color: var(--neutral-600);
-            padding-left: 1.5rem;
+        /* 團隊角色羅盤 */
+        #team-compass-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
             position: relative;
         }
 
-        .application-list li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--strategic);
-            font-weight: 600;
+        @media (min-width: 768px) {
+            #team-compass-card {
+                flex-direction: row;
+            }
+        }
+ 
+        .compass-chart-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            flex-shrink: 1;
+            border-radius: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
         }
 
-        /* 職業建議 */
-        .career-recommendations {
+        .compass-chart-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .compass-description {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .compass-description h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: var(--mckinsey-navy);
+        }
+ 
+        .compass-description p {
+            margin-bottom: 12px;
+            color: var(--gray-600);
+        }
+
+        /* 原型儀表板 */
+        .archetype-dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
-
-        .career-card {
-            background: var(--neutral-50);
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            border: 1px solid var(--neutral-200);
-            transition: all 0.2s ease;
+ 
+        .info-item {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            border: var(--border-thin) solid var(--gray-200);
+            border-left: 4px solid;
+            box-shadow: 0 10px 24px rgba(0, 31, 63, 0.08);
         }
-
-        .career-card:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--strategic);
-        }
-
-        .career-title {
-            font-weight: 600;
-            color: var(--neutral-900);
-            margin-bottom: 0.5rem;
-        }
-
-        .career-match {
+ 
+        .info-item h4 {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--mckinsey-navy);
+            letter-spacing: 0.02em;
         }
-
-        .match-bar {
-            flex: 1;
-            height: 6px;
-            background: var(--neutral-200);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .match-fill {
-            height: 100%;
-            background: var(--strategic);
-            border-radius: 3px;
-            transition: width 1s ease;
-        }
-
-        .match-percentage {
+ 
+        .info-item p {
             font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--strategic);
-        }
-
-        .career-description {
-            font-size: 0.875rem;
-            color: var(--neutral-500);
+            color: var(--gray-600);
             line-height: 1.5;
         }
 
-        /* 發展建議 */
-        .development-timeline {
-            margin-top: 1.5rem;
-        }
-
-        .timeline-item {
-            display: flex;
+        /* 理想團隊組合 */
+        .team-composition {
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 1.5rem;
-            margin-bottom: 2rem;
-            position: relative;
         }
-
-        .timeline-item:not(:last-child)::after {
-            content: "";
-            position: absolute;
-            left: 19px;
-            top: 40px;
-            width: 2px;
-            height: calc(100% + 1rem);
-            background: #e2e8f0;
+         
+        @media (min-width: 768px) {
+            .team-composition {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
-
-        .timeline-marker {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border: 2px solid var(--strategic);
+ 
+        .team-member-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: var(--white);
+            border: var(--border-thin) solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 24px rgba(0, 31, 63, 0.08);
+        }
+         
+        .team-member-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 32px rgba(0, 31, 63, 0.12);
+        }
+ 
+        .member-icon {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            color: var(--strategic);
-            flex-shrink: 0;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            box-shadow: 0 8px 16px rgba(0, 31, 63, 0.12);
         }
-
-        .timeline-content {
-            flex: 1;
-            background: var(--neutral-50);
-            border: 1px solid var(--neutral-200);
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-        }
-
-        .timeline-title {
-            font-weight: 600;
-            color: var(--neutral-900);
+ 
+        .team-member-card h4 {
+            font-size: 1.125rem;
             margin-bottom: 0.5rem;
+            color: var(--mckinsey-navy);
+            letter-spacing: 0.02em;
         }
-
-        .timeline-description {
-            color: var(--neutral-600);
+ 
+        .team-member-card p {
             font-size: 0.875rem;
-            line-height: 1.5;
+            color: var(--gray-600);
         }
 
-        .action-items {
-            margin-top: 1rem;
-            padding-left: 1rem;
+        /* 團隊適配性鳥瞰表 */
+        .matrix-grid {
+            display: grid;
+            gap: 24px;
         }
 
-        .action-item {
-            padding: 0.25rem 0;
-            color: var(--neutral-500);
-            font-size: 0.875rem;
+        .matrix-block {
+            background: var(--white);
+            border: var(--border-thin) solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            display: grid;
+            gap: 18px;
+            box-shadow: 0 12px 26px rgba(0, 31, 63, 0.08);
         }
 
-        .action-item::before {
-            content: "✓";
-            color: var(--success);
-            margin-right: 0.5rem;
+        .matrix-stage {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .matrix-stage-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--mckinsey-blue);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 600;
+            font-size: 16px;
+        }
+
+        .matrix-stage-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            border-radius: 999px;
+            background: var(--mckinsey-light-blue);
+            color: var(--mckinsey-blue);
+        }
+
+        .matrix-heading {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--mckinsey-navy);
+            letter-spacing: 0.02em;
+        }
+
+        .matrix-subtitle {
+            margin: 0;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .matrix-columns {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.1rem;
+        }
+
+        .matrix-card {
+            border-radius: var(--radius-md);
+            padding: 16px;
+            border: var(--border-thin) solid var(--gray-200);
+            background: var(--white);
+            box-shadow: 0 6px 16px rgba(0, 31, 63, 0.06);
+            display: grid;
+            gap: 10px;
+        }
+
+        .matrix-card.challenge {
+            background: rgba(255, 235, 235, 0.7);
+            border-color: rgba(193, 39, 45, 0.2);
+        }
+
+        .matrix-card h6 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--mckinsey-navy);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .matrix-card.challenge h6 {
+            color: var(--alert-red);
+        }
+
+        .matrix-card p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.55;
+        }
+
+        .matrix-chip {
+            display: inline-flex;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            background: rgba(45, 134, 89, 0.2);
+            color: var(--success-green);
+            font-size: 0.95rem;
+        }
+
+        .matrix-card.challenge .matrix-chip {
+            background: rgba(193, 39, 45, 0.2);
+            color: var(--alert-red);
+        }
+
+        @media (max-width: 768px) {
+            .matrix-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .matrix-block {
+                padding: 24px;
+            }
         }
 
         /* 側邊欄 */
@@ -498,181 +561,248 @@
         }
 
         .sidebar-card {
-            background: white;
-            border: 1px solid var(--neutral-200);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
+            background: var(--white);
+            border: var(--border-thin) solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: 0 10px 24px rgba(0, 31, 63, 0.08);
         }
 
         .sidebar-title {
             font-size: 1.125rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--neutral-900);
+            margin-bottom: 1.25rem;
+            color: var(--mckinsey-navy);
+            letter-spacing: 0.02em;
+        }
+        
+        .domain-scores-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 1rem;
         }
 
-        /* 學習資源 */
-        .resource-list {
+        .domain-scores-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            padding: 0.5rem 0;
+        }
+        
+        .domain-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+        
+        .domain-color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .domain-bar-container {
+            flex-grow: 1;
+            height: 10px;
+            background: rgba(148, 163, 184, 0.12);
+            border-radius: 999px;
+            margin: 0 1rem;
+            overflow: hidden;
+        }
+        
+        .domain-bar {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 31, 63, 0.12);
+        }
+        
+        .domain-percentage {
+            font-weight: 600;
+            width: 40px;
+            text-align: right;
+            color: var(--mckinsey-navy);
+        }
+
+        .action-buttons {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-        }
-
-        .resource-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--neutral-50);
-            border: 1px solid var(--neutral-200);
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .resource-item:hover {
-            background: var(--neutral-100);
-            transform: translateX(2px);
-            border-color: var(--strategic);
-        }
-
-        .resource-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--strategic);
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .resource-info {
-            flex: 1;
-        }
-
-        .resource-name {
-            font-weight: 500;
-            color: var(--neutral-900);
-            font-size: 0.875rem;
-        }
-
-        .resource-type {
-            font-size: 0.75rem;
-            color: var(--neutral-500);
-        }
-
-        /* 行動按鈕區 */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
+            margin-top: 1.5rem;
         }
 
         .action-btn {
-            flex: 1;
-            padding: 0.75rem 1.5rem;
+            width: 100%;
+            padding: 0.9rem 1rem;
             border-radius: 0.75rem;
-            border: none;
+            border: 1px solid rgba(15, 79, 140, 0.22);
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--gray-700);
+            letter-spacing: 0.02em;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            font-size: 0.875rem;
+            font-size: 14px;
         }
 
         .action-btn.primary {
-            background: var(--neutral-900);
-            color: white;
-        }
-
-        .action-btn.secondary {
-            background: transparent;
-            color: var(--neutral-700);
-            border: 1px solid var(--neutral-200);
-        }
-
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            background: var(--mckinsey-blue);
+            color: #fff;
+            border: none;
+            box-shadow: 0 10px 20px rgba(0, 102, 166, 0.18);
         }
 
         .action-btn.primary:hover {
-            background: var(--neutral-700);
+            background: var(--mckinsey-deep-blue);
         }
 
-        .action-btn.secondary:hover {
-            background: var(--neutral-50);
-            border-color: var(--neutral-300);
+        .action-btn.secondary {
+            background: var(--white);
+            color: var(--mckinsey-blue);
+            border-color: var(--mckinsey-blue);
         }
 
-        /* 響應式設計 */
-        @media (max-width: 968px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .career-recommendations {
-                grid-template-columns: 1fr;
-            }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 24px rgba(0, 27, 46, 0.16);
         }
 
+        /* 響應式 */
         @media (max-width: 640px) {
-            .user-info {
-                flex-direction: column;
-                align-items: start;
-                gap: 1rem;
-            }
-
-            .report-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .top-strengths {
-                flex-direction: column;
-            }
-
             .nav-container {
                 flex-direction: column;
                 gap: 1rem;
+            }
+            .page-header h1 {
+                font-size: 1.75rem;
             }
         }
 
         /* 載入動畫 */
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .fade-in {
-            animation: fadeIn 0.8s ease;
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
         }
+        
+        .fade-in.delay-1 { animation-delay: 0.1s; }
+        .fade-in.delay-2 { animation-delay: 0.2s; }
+        .fade-in.delay-3 { animation-delay: 0.3s; }
+        .fade-in.delay-4 { animation-delay: 0.4s; }
 
         /* 打印樣式 */
         @media print {
-            .navbar, .sidebar, .action-buttons {
-                display: none;
-            }
+            .navbar, .sidebar, .action-buttons { display: none; }
+            .content-grid { grid-template-columns: 1fr; }
+            .analysis-card { box-shadow: none; border: 1px solid #ccc; }
+        }
 
-            .content-grid {
+        .archetype-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .archetype-cards-grid {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .analysis-section {
-                break-inside: avoid;
-            }
+        .archetype-card {
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 31, 63, 0.08);
+        }
+
+        .archetype-card.primary {
+            border-color: var(--mckinsey-blue);
+            box-shadow: 0 16px 28px rgba(0, 102, 166, 0.16);
+        }
+
+        .archetype-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 32px rgba(0, 31, 63, 0.12);
+        }
+
+        .archetype-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .archetype-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0, 31, 63, 0.12);
+            color: #fff;
+        }
+
+        .archetype-card-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .archetype-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--mckinsey-navy);
+            margin: 0 0 8px;
+        }
+
+        .archetype-card-bar {
+            height: 8px;
+            background: rgba(0, 31, 63, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .archetype-card-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+        .archetype-card-desc {
+            font-size: 0.82rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        .archetype-card-badge {
+            position: absolute;
+            top: -10px;
+            right: 12px;
+            background: linear-gradient(135deg, var(--consultant-gold), #F4E4B0);
+            color: var(--gray-900);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            box-shadow: 0 6px 12px rgba(212, 175, 55, 0.3);
         }
     </style>
 </head>
@@ -680,336 +810,121 @@
     <!-- 導航欄 -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo" onclick="window.location.href='landing.html'">
-                優勢天賦評測系統
+            <div class="logo" onclick="backToResults()">
+                ← 返回個人優勢報告
             </div>
             <div class="nav-actions">
                 <button class="nav-btn" onclick="window.print()">
                     📄 下載PDF
                 </button>
-                <button class="nav-btn" onclick="shareReport()">
-                    📤 分享報告
-                </button>
-                <button class="nav-btn primary" onclick="window.location.href='action-plan.html'">
-                    開始行動計劃
-                </button>
+                <button class="nav-btn primary" onclick="shareReport()">📤 分享</button>
             </div>
         </div>
     </nav>
 
     <!-- 主容器 -->
     <div class="main-container">
-        <!-- 報告頭部 -->
-        <div class="report-header fade-in">
-            <div class="user-info">
-                <div class="user-profile">
-                    <div class="avatar">U</div>
-                    <div class="user-details">
-                        <h2>您的深度優勢分析報告</h2>
-                        <p>基於 Thurstonian IRT 模型的科學評測結果</p>
-                    </div>
-                </div>
-                <div class="report-meta">
-                    <div class="meta-item">
-                        📅 生成時間：<span id="report-date">載入中...</span>
-                    </div>
-                    <div class="meta-item">
-                        ⏱️ 完成時長：<span id="completion-time">載入中...</span>
-                    </div>
-                    <div class="meta-item">
-                        📊 準確度：<span id="accuracy">載入中...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 優勢總覽 -->
-        <div class="strength-overview fade-in">
-            <div class="overview-content">
-                <h3 class="overview-title">您的優勢DNA</h3>
-                <div class="top-strengths" id="topStrengthsBadges">
-                    <span class="strength-badge primary">載入中...</span>
-                </div>
-                <p class="overview-summary" id="overviewSummary">
-                    載入中...
-                </p>
-            </div>
-        </div>
-
-        <!-- 內容網格 -->
+        <header class="page-header fade-in">
+            <h1>團隊角色與協作潛力分析報告</h1>
+            <p>本報告基於您的才幹組合，分析您在團隊中的核心角色、協作風格與潛力，並提供構建高效能團隊的建議。</p>
+        </header>
+        
         <div class="content-grid">
-            <!-- 左側：詳細分析 -->
+            <!-- 左側主內容 -->
             <div class="main-content">
-                <!-- 優勢深度解析 -->
-                <div class="analysis-section fade-in">
-                    <div class="section-header">
-                        <div class="section-icon">🌟</div>
-                        <h3 class="section-title">優勢深度解析</h3>
+                <!-- 團隊角色羅盤 -->
+                <div id="team-compass-card" class="analysis-card fade-in delay-1">
+                    <div class="compass-chart-container" id="compass-chart">
+                        <!-- SVG 雷達圖將在此生成 -->
                     </div>
-
-                    <div class="strength-detail">
-                        <div class="strength-name">
-                            戰略思維
-                            <span class="strength-score">95分</span>
-                        </div>
-                        <p class="strength-description">
-                            您擁有出色的全局觀和長遠規劃能力。能夠快速識別模式、預見潛在機會和風險，
-                            並制定有效的策略來達成目標。在複雜環境中，您能保持清晰的方向感。
-                        </p>
-                        <div class="strength-applications">
-                            <strong>實際應用場景：</strong>
-                            <ul class="application-list">
-                                <li>制定企業長期發展戰略</li>
-                                <li>分析市場趨勢和競爭格局</li>
-                                <li>設計產品路線圖和商業模式</li>
-                                <li>領導跨部門重大項目</li>
-                            </ul>
+                    <div class="compass-description" id="compass-main-archetype">
+                        <span class="badge-pill gold">Team Compass</span>
+                        <h3>正在分析您的團隊角色...</h3>
+                        <p>我們將根據您的才幹組合，確定您在團隊中的核心原型定位。</p>
                         </div>
                     </div>
 
-                    <div class="strength-detail">
-                        <div class="strength-name">
-                            創新能力
-                            <span class="strength-score">88分</span>
+                <!-- 您的原型儀表板 -->
+                <div class="analysis-card fade-in delay-2">
+                    <div class="card-header">
+                        <div class="card-icon" id="archetype-icon">👤</div>
+                        <div>
+                            <h2 class="card-title" id="archetype-title">分析中...</h2>
+                            <p class="card-subtitle" id="archetype-subtitle">正在計算您的核心團隊貢獻</p>
                         </div>
-                        <p class="strength-description">
-                            您善於跳出傳統思維框架，產生獨特的想法和解決方案。
-                            對新事物充滿好奇心，樂於嘗試不同的方法和途徑。
-                        </p>
-                        <div class="strength-applications">
-                            <strong>實際應用場景：</strong>
-                            <ul class="application-list">
-                                <li>產品創新和功能設計</li>
-                                <li>流程優化和效率提升</li>
-                                <li>創意營銷策略制定</li>
-                                <li>解決複雜技術挑戰</li>
-                            </ul>
                         </div>
+                    <div class="archetype-dashboard" id="archetype-dashboard-content">
+                        <!-- 動態生成儀表板項目 -->
+                         <div class="info-item" style="border-color: var(--neutral-200);">
+                            <h4>⏳ 核心貢獻</h4>
+                            <p>正在分析...</p>
                     </div>
+                         <div class="info-item" style="border-color: var(--neutral-200);">
+                            <h4>⏳ 協作風格</h4>
+                            <p>正在分析...</p>
                 </div>
-
-                <!-- 職業發展建議 -->
-                <div class="analysis-section fade-in">
-                    <div class="section-header">
-                        <div class="section-icon">💼</div>
-                        <h3 class="section-title">職業發展建議</h3>
+                         <div class="info-item" style="border-color: var(--neutral-200);">
+                            <h4>⏳ 潛在盲點</h4>
+                            <p>正在分析...</p>
                     </div>
-
-                    <div class="career-recommendations">
-                        <div class="career-card">
-                            <div class="career-title">產品經理</div>
-                            <div class="career-match">
-                                <div class="match-bar">
-                                    <div class="match-fill" style="width: 92%"></div>
                                 </div>
-                                <span class="match-percentage">92%</span>
-                            </div>
-                            <p class="career-description">
-                                完美結合您的戰略思維和創新能力，在產品規劃和用戶體驗設計中發揮優勢。
-                            </p>
                         </div>
 
-                        <div class="career-card">
-                            <div class="career-title">管理顧問</div>
-                            <div class="career-match">
-                                <div class="match-bar">
-                                    <div class="match-fill" style="width: 88%"></div>
-                                </div>
-                                <span class="match-percentage">88%</span>
-                            </div>
-                            <p class="career-description">
-                                運用分析能力和溝通技巧，為企業提供戰略建議和解決方案。
-                            </p>
-                        </div>
-
-                        <div class="career-card">
-                            <div class="career-title">創業家</div>
-                            <div class="career-match">
-                                <div class="match-bar">
-                                    <div class="match-fill" style="width: 85%"></div>
-                                </div>
-                                <span class="match-percentage">85%</span>
-                            </div>
-                            <p class="career-description">
-                                發揮您的創新精神和戰略視野，創建並領導自己的事業。
-                            </p>
-                        </div>
-
-                        <div class="career-card">
-                            <div class="career-title">戰略分析師</div>
-                            <div class="career-match">
-                                <div class="match-bar">
-                                    <div class="match-fill" style="width: 83%"></div>
-                                </div>
-                                <span class="match-percentage">83%</span>
-                            </div>
-                            <p class="career-description">
-                                專注於數據分析和市場研究，為決策提供深度洞察。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 個人發展路徑 -->
-                <div class="analysis-section fade-in">
-                    <div class="section-header">
-                        <div class="section-icon">🚀</div>
-                        <h3 class="section-title">個人發展路徑</h3>
-                    </div>
-
-                    <div class="development-timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-marker">30</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">30天 - 基礎強化</div>
-                                <p class="timeline-description">
-                                    建立日常習慣，強化核心優勢的應用
-                                </p>
-                                <div class="action-items">
-                                    <div class="action-item">每日寫戰略思考日記（10分鐘）</div>
-                                    <div class="action-item">閱讀《好策略壞策略》並做筆記</div>
-                                    <div class="action-item">參加一個線上戰略分析課程</div>
+                <!-- 理想團隊組合 -->
+                <div class="analysis-card fade-in delay-3">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: var(--neutral-900);">🤝</div>
+                        <div>
+                            <h2 class="card-title">理想團隊組合建議</h2>
+                            <p class="card-subtitle">圍繞您的優勢，構建一支高效能的夢幻團隊</p>
                                 </div>
                             </div>
+                    <div class="team-composition" id="team-composition-content">
+                        <!-- 動態生成互補隊友卡片 -->
+                        <p>正在為您尋找最佳隊友...</p>
+                        </div>
+                    <div class="section-footnote">建議至少搭配 2 個互補原型，以維持策略、執行、影響、關係四象限的平衡。</div>
                         </div>
 
-                        <div class="timeline-item">
-                            <div class="timeline-marker">60</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">60天 - 技能提升</div>
-                                <p class="timeline-description">
-                                    深化專業技能，建立系統化知識體系
-                                </p>
-                                <div class="action-items">
-                                    <div class="action-item">完成一個實際的策略分析項目</div>
-                                    <div class="action-item">建立個人知識管理系統</div>
-                                    <div class="action-item">與3位行業專家進行深度交流</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="timeline-item">
-                            <div class="timeline-marker">90</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">90天 - 實踐應用</div>
-                                <p class="timeline-description">
-                                    將優勢轉化為實際成果，建立個人品牌
-                                </p>
-                                <div class="action-items">
-                                    <div class="action-item">發表一篇戰略分析文章</div>
-                                    <div class="action-item">主導一個創新項目</div>
-                                    <div class="action-item">建立專業人脈網絡</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右側：側邊欄 -->
-            <div class="sidebar">
-                <!-- 學習資源推薦 -->
-                <div class="sidebar-card fade-in">
-                    <h4 class="sidebar-title">📚 推薦學習資源</h4>
-                    <div class="resource-list">
-                        <div class="resource-item" onclick="openResource('book1')">
-                            <div class="resource-icon">📖</div>
-                            <div class="resource-info">
-                                <div class="resource-name">《好策略壞策略》</div>
-                                <div class="resource-type">必讀書籍</div>
-                            </div>
-                        </div>
-                        <div class="resource-item" onclick="openResource('course1')">
-                            <div class="resource-icon">🎓</div>
-                            <div class="resource-info">
-                                <div class="resource-name">戰略思維訓練營</div>
-                                <div class="resource-type">線上課程</div>
-                            </div>
-                        </div>
-                        <div class="resource-item" onclick="openResource('tool1')">
-                            <div class="resource-icon">🛠️</div>
-                            <div class="resource-info">
-                                <div class="resource-name">SWOT分析模板</div>
-                                <div class="resource-type">實用工具</div>
-                            </div>
-                        </div>
-                        <div class="resource-item" onclick="openResource('community1')">
-                            <div class="resource-icon">👥</div>
-                            <div class="resource-info">
-                                <div class="resource-name">策略思考者社群</div>
-                                <div class="resource-type">學習社群</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 相似優勢名人 -->
-                <div class="sidebar-card fade-in">
-                    <h4 class="sidebar-title">✨ 相似優勢名人</h4>
-                    <div style="padding: 1rem 0;">
-                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                            <div style="width: 50px; height: 50px; background: #f7fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                👤
-                            </div>
+                <!-- 團隊適配性鳥瞰表 -->
+                <div class="analysis-card fade-in delay-4">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: #4A5568;">📈</div>
                             <div>
-                                <strong>史蒂夫·賈伯斯</strong>
-                                <div style="font-size: 0.875rem; color: #718096;">
-                                    戰略遠見 + 創新思維
+                            <h2 class="card-title">團隊適配性鳥瞰表</h2>
+                            <p class="card-subtitle">您在團隊發展不同階段的角色與貢獻</p>
                                 </div>
                             </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                            <div style="width: 50px; height: 50px; background: #f7fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                👤
-                            </div>
-                            <div>
-                                <strong>埃隆·馬斯克</strong>
-                                <div style="font-size: 0.875rem; color: #718096;">
-                                    系統思考 + 突破創新
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 50px; height: 50px; background: #f7fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                👤
-                            </div>
-                            <div>
-                                <strong>雷·達利歐</strong>
-                                <div style="font-size: 0.875rem; color: #718096;">
-                                    原則思維 + 系統分析
-                                </div>
-                            </div>
+                    <div id="team-fitness-matrix-content">
+                        <p>正在生成您的團隊適配性分析...</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- 升級提示 -->
-                <div class="sidebar-card fade-in" style="background: linear-gradient(135deg, #fef5e7 0%, #fff4e6 100%); border: 2px solid #f9c851;">
-                    <h4 class="sidebar-title">🎁 解鎖更多功能</h4>
-                    <p style="font-size: 0.875rem; color: #718096; margin-bottom: 1rem;">
-                        升級至專業版，獲得：
-                    </p>
-                    <ul style="font-size: 0.875rem; color: #4a5568; list-style: none; padding-left: 0;">
-                        <li style="padding: 0.25rem 0;">✓ 1對1職業諮詢</li>
-                        <li style="padding: 0.25rem 0;">✓ 季度優勢追蹤</li>
-                        <li style="padding: 0.25rem 0;">✓ 專屬成長社群</li>
-                        <li style="padding: 0.25rem 0;">✓ AI智能導師</li>
+            <!-- 右側側邊欄 -->
+            <aside class="sidebar">
+                <div class="sidebar-card fade-in delay-4">
+                    <h4 class="sidebar-title">四大才幹領域貢獻度</h4>
+                    <ul class="domain-scores-list" id="domain-scores">
+                        <!-- 動態生成領域分數條 -->
                     </ul>
-                    <button class="action-btn primary" style="width: 100%; margin-top: 1rem;">
-                        立即升級
-                    </button>
-                </div>
-            </div>
         </div>
 
-        <!-- 行動按鈕區 -->
-        <div class="action-buttons fade-in">
-            <button class="action-btn secondary" onclick="window.location.href='results.html'">
-                ← 返回基礎報告
+                <div class="sidebar-card fade-in delay-4">
+                    <h4 class="sidebar-title">下一步行動</h4>
+                    <div class="action-buttons">
+                        <button class="action-btn primary" onclick="backToResults()">
+                            ← 返回個人優勢報告
             </button>
-            <button class="action-btn primary" onclick="window.location.href='action-plan.html'">
-                生成行動方案 →
+                        <button class="action-btn secondary" onclick="window.location.href='landing.html'">
+                            🏠 返回首頁
+                        </button>
+                        <button class="action-btn secondary" onclick="window.location.href='assessment-intro.html'">
+                            🔄 重新評測
             </button>
+                    </div>
+                </div>
+            </aside>
         </div>
     </div>
 
@@ -1017,249 +932,583 @@
         // API Configuration
         const apiBase = window.location.port === '8005' ? '' : `http://${window.location.hostname}:8005`;
 
-        // Talent definitions with detailed info
+        // 才幹定義
         const TALENT_DEFINITIONS = {
-            "T1": { name: "結構化執行", domain: "EXECUTING", icon: "🎯", description: "將目標拆解成步驟，建立流程和追蹤機制" },
-            "T2": { name: "品質與完備", domain: "EXECUTING", icon: "✅", description: "注重細節，追求第一次就把事情做對" },
-            "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING", icon: "🔍", description: "嘗試新方法，從失敗中學習，連結不同概念" },
-            "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING", icon: "📊", description: "界定問題，用數據檢驗假設，辨識因果關係" },
-            "T5": { name: "影響與倡議", domain: "INFLUENCING", icon: "💪", description: "說服他人，表達觀點，推動變革" },
-            "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING", icon: "🤝", description: "建立團隊合作，分享資源，促進和諧" },
-            "T7": { name: "客戶導向", domain: "INFLUENCING", icon: "🎯", description: "理解客戶需求，創造價值，建立長期關係" },
-            "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING", icon: "📚", description: "持續學習，反思改進，培養他人" },
-            "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING", icon: "⚖️", description: "守約守時，維持穩定，建立可靠形象" },
-            "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING", icon: "🧘", description: "在壓力下保持冷靜，穩定團隊情緒" },
-            "T11": { name: "衝突整合", domain: "INFLUENCING", icon: "🎭", description: "處理分歧，尋求共識，促進決策" },
-            "T12": { name: "責任與當責", domain: "EXECUTING", icon: "💼", description: "承擔責任，主動回報，確保交付" }
+            "T1": { name: "結構化執行", domain: "EXECUTING", icon: "🎯", dimension: "structured_execution" },
+            "T2": { name: "品質與完備", domain: "EXECUTING", icon: "✅", dimension: "quality_perfectionism" },
+            "T3": { name: "探索與創新", domain: "STRATEGIC_THINKING", icon: "🔍", dimension: "exploration_innovation" },
+            "T4": { name: "分析與洞察", domain: "STRATEGIC_THINKING", icon: "📊", dimension: "analytical_insight" },
+            "T5": { name: "影響與倡議", domain: "INFLUENCING", icon: "💪", dimension: "influence_advocacy" },
+            "T6": { name: "協作與共好", domain: "RELATIONSHIP_BUILDING", icon: "🤝", dimension: "collaboration_harmony" },
+            "T7": { name: "客戶導向", domain: "INFLUENCING", icon: "🎯", dimension: "customer_orientation" },
+            "T8": { name: "學習與成長", domain: "STRATEGIC_THINKING", icon: "📚", dimension: "learning_growth" },
+            "T9": { name: "紀律與信任", domain: "RELATIONSHIP_BUILDING", icon: "⚖️", dimension: "discipline_trust" },
+            "T10": { name: "壓力調節", domain: "RELATIONSHIP_BUILDING", icon: "🧘", dimension: "pressure_regulation" },
+            "T11": { name: "衝突整合", domain: "INFLUENCING", icon: "🎭", dimension: "conflict_integration" },
+            "T12": { name: "責任與當責", domain: "EXECUTING", icon: "💼", dimension: "responsibility_accountability" }
         };
 
-        // Get session ID from URL
-        function getSessionId() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('session');
-        }
+        // 維度名稱 → 才幹 ID 映射
+        const DIMENSION_TO_TALENT = {
+            "structured_execution": "T1",
+            "quality_perfectionism": "T2",
+            "exploration_innovation": "T3",
+            "analytical_insight": "T4",
+            "influence_advocacy": "T5",
+            "collaboration_harmony": "T6",
+            "customer_orientation": "T7",
+            "learning_growth": "T8",
+            "discipline_trust": "T9",
+            "pressure_regulation": "T10",
+            "conflict_integration": "T11",
+            "responsibility_accountability": "T12"
+        };
+
+        // 團隊原型定義
+        const ARCHETYPES = {
+            ARCHITECT: {
+                name: "系統建構者",
+                temperament: "理性者 (Rational)",
+                icon: "🏗️",
+                color: "var(--architect)",
+                description: "天生的系統思考者與建構者，擅長將複雜的資訊轉化為清晰的藍圖與高效的流程。注重邏輯、效率與長期規劃。",
+                primary_talents: ["T4", "T1"],
+                secondary_talents: ["T3", "T8", "T12"],
+                contribution: "將抽象策略轉化為具體、可執行的步驟，並設計高效的系統與流程。",
+                style: "偏好基於數據和邏輯的溝通，專注於解決問題的根本原因。",
+                blind_spot: "可能因過於專注宏觀策略，而忽略執行過程中的人際動態與細節。",
+                complements: ["GUARDIAN", "IDEALIST"],
+                variants: {
+                    EXECUTING: {
+                        name: "流程導向",
+                        icon: "🏗️",
+                        description: "重視流程與系統的執行型建構者，擅長將目標拆解為可執行步驟，建立高效的工作流程。",
+                        careers: ["專案經理", "流程工程師", "品質經理", "ERP 顧問"],
+                        strength: "將複雜任務分解為清晰步驟，確保每個環節高效運作"
+                    },
+                    STRATEGIC_THINKING: {
+                        name: "策略導向",
+                        icon: "🧠",
+                        description: "重視策略與創新的思考型建構者，擅長分析複雜問題，設計創新的解決方案與系統架構。",
+                        careers: ["策略顧問", "產品經理", "系統架構師", "技術總監"],
+                        strength: "洞察本質問題，設計兼具創新性與可行性的系統方案"
+                    }
+                }
+            },
+            GUARDIAN: {
+                name: "組織守護者",
+                temperament: "守護者 (Guardian)",
+                icon: "🛡️",
+                color: "var(--guardian)",
+                description: "可靠的執行者與維護者，擅長建立和維護穩定的系統，並確保任務按時、按質完成。注重責任、紀律與品質。",
+                primary_talents: ["T12", "T9"],
+                secondary_talents: ["T2", "T1", "T6"],
+                contribution: "確保計劃的穩定落地與高質量交付，是團隊中最可靠的後盾。",
+                style: "溝通務實、直接，重視承諾與截止日期，是團隊的穩定劑。",
+                blind_spot: "可能對突發變化或規則外的創新持保留態度，有時會缺乏靈活性。",
+                complements: ["ARCHITECT", "ARTISAN"],
+                variants: {
+                    EXECUTING: {
+                        name: "品質導向",
+                        icon: "🛡️",
+                        description: "重視品質與交付的執行型守護者，擅長確保每個細節符合標準，按時完成任務。",
+                        careers: ["品質經理", "行政主管", "合規專員", "營運經理"],
+                        strength: "建立完善的品質檢核機制，確保穩定高質量的產出"
+                    },
+                    RELATIONSHIP_BUILDING: {
+                        name: "信任導向",
+                        icon: "🤝",
+                        description: "重視信任與關係的協作型守護者，擅長維護團隊和諧，建立可靠的協作網絡。",
+                        careers: ["HR 夥伴", "團隊協調者", "客戶成功經理", "社群經理"],
+                        strength: "成為團隊的可靠後盾，維護信任與穩定的協作關係"
+                    }
+                }
+            },
+            IDEALIST: {
+                name: "人文關懷家",
+                temperament: "理想主義者 (Idealist)",
+                icon: "❤️",
+                color: "var(--idealist)",
+                description: "以人為本的溝通者與賦能者，擅長理解他人、建立關係並激勵團隊。注重和諧、成長與共同價值。",
+                primary_talents: ["T6", "T8"],
+                secondary_talents: ["T5", "T11", "T7"],
+                contribution: "凝聚團隊共識，激發成員潛力，創造一個積極、互信的協作氛圍。",
+                style: "富有同理心，善於傾聽與鼓舞他人，是團隊關係的催化劑。",
+                blind_spot: "在追求和諧的過程中，有時可能迴避必要的衝突與艱難的決定。",
+                complements: ["ARCHITECT", "GUARDIAN"],
+                variants: {
+                    RELATIONSHIP_BUILDING: {
+                        name: "和諧導向",
+                        icon: "❤️",
+                        description: "重視和諧與賦能的關係型理想家，擅長建立信任氛圍，激發團隊潛力。",
+                        careers: ["HR 夥伴", "組織發展顧問", "團隊教練", "員工關係專員"],
+                        strength: "創造積極的團隊文化，讓每個成員都能發揮潛力"
+                    },
+                    STRATEGIC_THINKING: {
+                        name: "成長導向",
+                        icon: "📚",
+                        description: "重視學習與成長的教育型理想家，擅長設計培訓體系，促進個人與組織發展。",
+                        careers: ["企業培訓師", "教育創業家", "學習發展經理", "講師"],
+                        strength: "建立系統化的學習路徑，幫助他人實現成長目標"
+                    },
+                    INFLUENCING: {
+                        name: "影響導向",
+                        icon: "💡",
+                        description: "重視影響與倡議的推廣型理想家，擅長傳播理念，凝聚共識，推動變革。",
+                        careers: ["變革管理顧問", "DEI 專員", "社會企業家", "企業文化主管"],
+                        strength: "以富有感染力的方式傳播價值觀，激發集體行動"
+                    }
+                }
+            },
+            ARTISAN: {
+                name: "推廣實踐家",
+                temperament: "工匠 (Artisan)",
+                icon: "🚀",
+                color: "var(--artisan)",
+                description: "充滿活力的行動派與連結者，擅長將想法付諸實踐，並在與人互動中獲得能量。注重結果、效率與人際關係。",
+                primary_talents: ["T5", "T10"],
+                secondary_talents: ["T3", "T7", "T11"],
+                contribution: "推動項目進展，靈活應對挑戰，並將團隊成果向外推廣。",
+                style: "溝通直接、富有感染力，善於應對危機，是團隊的「救火隊員」。",
+                blind_spot: "可能因追求快速行動而忽略長期規劃，有時缺乏耐心與細節考量。",
+                complements: ["GUARDIAN", "ARCHITECT"],
+                variants: {
+                    INFLUENCING: {
+                        name: "推廣導向",
+                        icon: "🚀",
+                        description: "重視影響與推廣的行動型實踐家，擅長將成果向外推廣，建立廣泛的影響力。",
+                        careers: ["業務主管", "BD 經理", "市場推廣專員", "公關經理"],
+                        strength: "快速建立人脈，將想法轉化為實際行動與成果"
+                    },
+                    RELATIONSHIP_BUILDING: {
+                        name: "應變導向",
+                        icon: "⚡",
+                        description: "重視應變與危機處理的靈活型實踐家，擅長在壓力下保持冷靜，快速解決問題。",
+                        careers: ["危機處理專員", "客戶成功經理", "現場經理", "專案救火隊"],
+                        strength: "在高壓環境中快速決策，靈活應對突發狀況"
+                    },
+                    STRATEGIC_THINKING: {
+                        name: "創新導向",
+                        icon: "💡",
+                        description: "重視創新與實驗的探索型實踐家，擅長嘗試新方法，快速驗證想法。",
+                        careers: ["產品創新經理", "創業家", "增長駭客", "實驗專案負責人"],
+                        strength: "勇於嘗試創新方法，快速將想法落地並迭代優化"
+                    }
+                }
+            }
+        };
 
         // 頁面初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 設置當前日期
-            const today = new Date();
-            document.getElementById('report-date').textContent =
-                `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-            // 獲取 session ID 並載入報告
-            const sessionId = getSessionId();
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionId = new URLSearchParams(window.location.search).get('session');
             if (sessionId) {
                 loadDetailedReport(sessionId);
             } else {
                 showError('找不到評測會話 ID');
             }
-
-            // 添加滾動動畫
-            observeElements();
-
-            // 載入動畫延遲
-            animateStrengthBars();
         });
 
-        // 載入詳細報告
+        // 載入報告數據
         async function loadDetailedReport(sessionId) {
             try {
-                console.log('Loading detailed report for session:', sessionId);
+                const [resultsResponse, matrixResponse] = await Promise.all([
+                    fetch(`${apiBase}/api/assessment/results/${sessionId}`),
+                    fetch(`${apiBase}/assessment/team_fitness_matrix.json`)
+                ]);
 
-                const response = await fetch(`${apiBase}/api/assessment/results/${sessionId}`);
+                if (!resultsResponse.ok) throw new Error(`HTTP ${resultsResponse.status} for results`);
+                if (!matrixResponse.ok) throw new Error(`HTTP ${matrixResponse.status} for matrix`);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                console.log('Loaded detailed report data:', data);
-
-                updateReportContent(data);
-
+                const data = await resultsResponse.json();
+                const matrixData = await matrixResponse.json();
+                
+                updateReportContent(data, matrixData);
             } catch (error) {
-                console.error('Failed to load detailed report:', error);
-                showError('載入詳細報告失敗: ' + error.message);
+                showError('載入報告失敗: ' + error.message);
             }
         }
 
         // 更新報告內容
-        function updateReportContent(data) {
-            const sessionId = data.session_id;
+        function updateReportContent(data, matrixData) {
             const scores = data.scores || {};
-            const sessionInfo = data.session_info || {};
-            const scoringInfo = data.scoring_info || {};
 
-            // 更新基本資訊
-            document.getElementById('completion-time').textContent = '4分32秒';  // Mock data
-            const accuracy = Math.round((scoringInfo.overall_confidence || 0.85) * 100);
-            document.getElementById('accuracy').textContent = `${accuracy}%`;
+            const talentScores = Object.entries(scores)
+                .map(([key, score]) => {
+                    // Extract dimension name from key (format: t{number}_{dimension_name})
+                    const match = key.match(/^t\d+_(.+)$/);
+                    if (!match) return null;
 
-            // 解析分數並排序
-            const talentScores = [];
-            for (const [key, score] of Object.entries(scores)) {
-                if (key.startsWith('t') && key.includes('_')) {
-                    const talentMatch = key.match(/^t(\d+)_(.+)$/);
-                    if (talentMatch) {
-                        const talentId = `T${talentMatch[1]}`;
-                        const talentDef = TALENT_DEFINITIONS[talentId];
+                    const dimensionName = match[1];
+                    const talentId = DIMENSION_TO_TALENT[dimensionName];
 
-                        if (talentDef) {
-                            talentScores.push({
-                                id: talentId,
-                                name: talentDef.name,
-                                domain: talentDef.domain,
-                                icon: talentDef.icon,
-                                description: talentDef.description,
-                                score: score
-                            });
-                        }
+                    if (!talentId) {
+                        console.warn(`Unknown dimension: ${dimensionName}`);
+                        return null;
                     }
-                }
-            }
 
-            // 按分數排序
-            talentScores.sort((a, b) => b.score - a.score);
+                    const definition = TALENT_DEFINITIONS[talentId];
+                    return definition ? { ...definition, id: talentId, score: score } : null;
+                })
+                .filter(Boolean)
+                .sort((a, b) => b.score - a.score);
 
-            // 更新優勢徽章
-            updateStrengthBadges(talentScores.slice(0, 5));
-
-            // 更新概述
-            updateOverviewSummary(talentScores);
-
-            // 更新詳細分析區域
-            updateDetailedAnalysis(talentScores);
-
-            console.log('Report content updated successfully');
-        }
-
-        // 更新優勢徽章
-        function updateStrengthBadges(topTalents) {
-            const container = document.getElementById('topStrengthsBadges');
-            container.innerHTML = '';
-
-            topTalents.forEach((talent, index) => {
-                const badge = document.createElement('span');
-                badge.className = `strength-badge ${index === 0 ? 'primary' : ''}`;
-                badge.textContent = `${talent.icon} ${talent.name}`;
-                container.appendChild(badge);
-            });
-        }
-
-        // 更新概述文字
-        function updateOverviewSummary(talentScores) {
             if (talentScores.length === 0) {
-                document.getElementById('overviewSummary').textContent = '無法載入優勢分析。';
+                showError('評測分數無效');
                 return;
             }
 
-            const topTalent = talentScores[0];
-            const topDomain = topTalent.domain;
+            const teamProfile = calculateTeamProfile(talentScores);
+            const primaryDomain = getPrimaryDomain(talentScores);
+            const archetypeVariant = getArchetypeVariant(teamProfile.primaryArchetype, primaryDomain);
 
-            const domainDescriptions = {
-                'EXECUTING': '執行型',
-                'INFLUENCING': '影響型',
-                'RELATIONSHIP_BUILDING': '關係建立型',
-                'STRATEGIC_THINKING': '策略思維型'
+            renderDomainScores(talentScores);
+            renderTeamCompass(teamProfile.archetypeScores);
+            renderArchetypeDashboard(archetypeVariant, primaryDomain);
+            renderTeamComposition(teamProfile.primaryArchetype);
+            renderTeamFitnessMatrix(teamProfile.primaryArchetype, matrixData.matrix_data);
+        }
+
+        // 計算團隊畫像
+        function calculateTeamProfile(talentScores) {
+            const top6Talents = talentScores.slice(0, 6).map(t => t.id);
+
+            let archetypeScores = {};
+            for (const key in ARCHETYPES) {
+                archetypeScores[key] = { score: 0, archetype: ARCHETYPES[key] };
+                
+                // 主導才幹計分 (Top 4)
+                ARCHETYPES[key].primary_talents.forEach(talentId => {
+                    if (top6Talents.slice(0, 4).includes(talentId)) {
+                        archetypeScores[key].score += 2;
+                    }
+                });
+                
+                // 輔助才幹計分 (Top 6)
+                ARCHETYPES[key].secondary_talents.forEach(talentId => {
+                    if (top6Talents.includes(talentId)) {
+                        archetypeScores[key].score += 1;
+                    }
+                });
+            }
+            
+            const sortedArchetypes = Object.values(archetypeScores).sort((a, b) => b.score - a.score);
+            const primaryArchetype = sortedArchetypes[0].archetype;
+            const primaryArchetypeKey = Object.keys(ARCHETYPES).find(key => ARCHETYPES[key].name === primaryArchetype.name);
+
+            return { primaryArchetype, archetypeScores, primaryArchetypeKey };
+        }
+
+        // 計算主導領域
+        function getPrimaryDomain(talentScores) {
+            const domainTotals = { EXECUTING: 0, INFLUENCING: 0, RELATIONSHIP_BUILDING: 0, STRATEGIC_THINKING: 0 };
+            const domainCounts = { EXECUTING: 0, INFLUENCING: 0, RELATIONSHIP_BUILDING: 0, STRATEGIC_THINKING: 0 };
+
+            talentScores.forEach(talent => {
+                if (domainTotals.hasOwnProperty(talent.domain)) {
+                    domainTotals[talent.domain] += talent.score;
+                    domainCounts[talent.domain]++;
+                }
+            });
+
+            const domainAverages = {};
+            for (const domain in domainTotals) {
+                domainAverages[domain] = domainTotals[domain] / (domainCounts[domain] || 1);
+            }
+
+            return Object.keys(domainAverages).reduce((a, b) =>
+                domainAverages[a] > domainAverages[b] ? a : b
+            );
+        }
+
+        // 獲取原型子類型
+        function getArchetypeVariant(archetype, primaryDomain) {
+            const variants = archetype.variants;
+
+            if (!variants) {
+                // 沒有子類型，返回基礎原型
+                return {
+                    ...archetype,
+                    variantName: null,
+                    variantDomain: null,
+                    careers: [],
+                    strength: archetype.contribution
+                };
+            }
+
+            // 根據主導領域選擇子類型
+            const variant = variants[primaryDomain];
+
+            if (variant) {
+                return {
+                    ...archetype,
+                    variantName: variant.name,
+                    variantIcon: variant.icon,
+                    variantDescription: variant.description,
+                    variantDomain: primaryDomain,
+                    careers: variant.careers,
+                    strength: variant.strength
+                };
+            }
+
+            // 如果沒有完全匹配的子類型，使用第一個可用的
+            const fallbackDomain = Object.keys(variants)[0];
+            const fallbackVariant = variants[fallbackDomain];
+
+            return {
+                ...archetype,
+                variantName: fallbackVariant.name,
+                variantIcon: fallbackVariant.icon,
+                variantDescription: fallbackVariant.description,
+                variantDomain: fallbackDomain,
+                careers: fallbackVariant.careers,
+                strength: fallbackVariant.strength
+            };
+        }
+
+        // 渲染領域分數
+        function renderDomainScores(talentScores) {
+            const container = document.getElementById('domain-scores');
+            const domainTotals = { EXECUTING: 0, INFLUENCING: 0, RELATIONSHIP_BUILDING: 0, STRATEGIC_THINKING: 0 };
+            const domainCounts = { EXECUTING: 0, INFLUENCING: 0, RELATIONSHIP_BUILDING: 0, STRATEGIC_THINKING: 0 };
+
+            talentScores.forEach(talent => {
+                if (domainTotals.hasOwnProperty(talent.domain)) {
+                    domainTotals[talent.domain] += talent.score;
+                    domainCounts[talent.domain]++;
+                }
+            });
+
+            const domainAverages = {};
+            let totalScore = 0;
+            for(const domain in domainTotals) {
+                domainAverages[domain] = domainTotals[domain] / (domainCounts[domain] || 1);
+                totalScore += domainAverages[domain];
+            }
+            if (totalScore === 0) totalScore = 1;
+
+            const domainPercentages = {};
+            for(const domain in domainAverages) {
+                domainPercentages[domain] = Math.round((domainAverages[domain] / totalScore) * 100);
+            }
+            
+            const domainInfo = {
+                EXECUTING: { name: "執行力", color: "var(--executing)" },
+                INFLUENCING: { name: "影響力", color: "var(--influencing)" },
+                RELATIONSHIP_BUILDING: { name: "關係建立", color: "var(--relationship)" },
+                STRATEGIC_THINKING: { name: "戰略思維", color: "var(--strategic)" }
             };
 
-            const domainDescription = domainDescriptions[topDomain] || '綜合型';
-
-            const summary = `您是一位 ${domainDescription} 的優秀人才，特別擅長 ${topTalent.name}。` +
-                          `您的優勢組合使您在需要 ${topTalent.description} 的工作中表現卓越。` +
-                          `這種獨特的才幹組合使您具備了稀有且有價值的競爭優勢。`;
-
-            document.getElementById('overviewSummary').textContent = summary;
+            container.innerHTML = Object.entries(domainPercentages).map(([domain, percentage]) => `
+                <li>
+                    <span class="domain-name">
+                        <span class="domain-color-dot" style="background-color: ${domainInfo[domain].color};"></span>
+                        ${domainInfo[domain].name}
+                    </span>
+                    <div class="domain-bar-container">
+                        <div class="domain-bar" style="width: ${percentage}%; background-color: ${domainInfo[domain].color};"></div>
+                    </div>
+                    <span class="domain-percentage">${percentage}%</span>
+                </li>
+            `).join('');
         }
 
-        // 更新詳細分析區域
-        function updateDetailedAnalysis(talentScores) {
-            // 這裡可以更新詳細分析區域的內容
-            // 比如動態生成每個優勢的詳細解說
-            console.log('Updating detailed analysis with talent scores:', talentScores);
+        // 渲染團隊羅盤
+        function renderTeamCompass(archetypeScores) {
+             const container = document.getElementById('compass-chart');
+             const primaryArchetype = Object.values(archetypeScores).sort((a,b) => b.score - a.score)[0].archetype;
+ 
+             // 四原型順序與顏色
+             const order = ["ARCHITECT", "GUARDIAN", "IDEALIST", "ARTISAN"];
+             const maxScore = Math.max(...Object.values(archetypeScores).map(s => s.score), 5);
+ 
+            const cardsHTML = order.map(key => {
+                const archetype = ARCHETYPES[key];
+                const score = archetypeScores[key].score;
+                const percentage = Math.round((score / maxScore) * 100);
+                const isPrimary = archetype.name === primaryArchetype.name;
+
+                return `
+                    <div class="archetype-card ${isPrimary ? 'primary' : ''}" style="border-color:${archetype.color};">
+                        <div class="archetype-card-header">
+                            <div class="archetype-card-icon" style="background:${archetype.color};">
+                                ${archetype.icon}
+                            </div>
+                            <div class="archetype-card-score" style="color:${archetype.color};">
+                                ${score}
+                            </div>
+                        </div>
+                        <h4 class="archetype-card-title">${archetype.name}</h4>
+                        <div class="archetype-card-bar">
+                            <div class="archetype-card-bar-fill" style="width:${percentage}%;background:${archetype.color};"></div>
+                        </div>
+                        <p class="archetype-card-desc">${archetype.temperament}</p>
+                        ${isPrimary ? '<div class="archetype-card-badge">主導原型</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="archetype-cards-grid">
+                    ${cardsHTML}
+                </div>
+            `;
+ 
+             const descriptionContainer = document.getElementById('compass-main-archetype');
+             descriptionContainer.innerHTML = `
+                 <span class="badge-pill gold">您的團隊定位</span>
+                 <h3>主導原型：<span style="color:${primaryArchetype.color}">${primaryArchetype.name}</span></h3>
+                 <p>${primaryArchetype.description}</p>
+                 <p style="margin-top:1rem;font-size:0.9375rem;color:var(--slate-600);">💡 您的才幹組合顯示出強烈的 <strong>${primaryArchetype.temperament}</strong> 傾向，這定義了您在團隊中的核心角色與貢獻方式。</p>
+             `;
+         }
+
+        // 渲染原型儀表板
+        function renderArchetypeDashboard(archetypeVariant, primaryDomain) {
+            const icon = archetypeVariant.variantIcon || archetypeVariant.icon;
+            document.getElementById('archetype-icon').textContent = icon;
+            document.getElementById('archetype-icon').style.background = archetypeVariant.color;
+
+            // 顯示原型名稱 + 子類型
+            const titleText = archetypeVariant.variantName
+                ? `${archetypeVariant.name} - ${archetypeVariant.variantName}`
+                : archetypeVariant.name;
+
+            document.getElementById('archetype-title').textContent = titleText;
+            document.getElementById('archetype-subtitle').textContent = archetypeVariant.temperament;
+
+            const container = document.getElementById('archetype-dashboard-content');
+
+            // 使用子類型描述或基礎描述
+            const contributionText = archetypeVariant.variantDescription || archetypeVariant.description;
+
+            container.innerHTML = `
+                <div class="info-item" style="border-color: ${archetypeVariant.color};">
+                    <h4>⭐ 核心優勢</h4>
+                    <p>${archetypeVariant.strength}</p>
+                </div>
+                <div class="info-item" style="border-color: ${archetypeVariant.color};">
+                    <h4>💬 協作風格</h4>
+                    <p>${archetypeVariant.style}</p>
+                </div>
+                <div class="info-item" style="border-color: var(--warning);">
+                    <h4>⚠️ 潛在盲點</h4>
+                    <p>${archetypeVariant.blind_spot}</p>
+                </div>
+                ${archetypeVariant.careers && archetypeVariant.careers.length > 0 ? `
+                <div class="info-item" style="border-color: var(--success); grid-column: 1 / -1;">
+                    <h4>💼 適合職業</h4>
+                    <p>${archetypeVariant.careers.join('、')}</p>
+                </div>
+                ` : ''}
+            `;
         }
+
+        // 渲染理想團隊組合
+        function renderTeamComposition(primaryArchetype) {
+             const container = document.getElementById('team-composition-content');
+             container.innerHTML = primaryArchetype.complements.map(archetypeKey => {
+                 const archetype = ARCHETYPES[archetypeKey];
+                 return `
+                     <div class="team-member-card">
+                        <div class="member-icon" style="background: linear-gradient(135deg, ${archetype.color}, rgba(255,255,255,0.6));">${archetype.icon}</div>
+                        <span class="badge-pill neutral">Complement</span>
+                        <h4>您需要一位「${archetype.name}」</h4>
+                        <p>${archetype.description.split('。')[0]}。</p>
+                    </div>
+                 `;
+             }).join('') || '<p>無法生成團隊建議。</p>';
+         }
+
+        // 渲染團隊適配性鳥瞰表
+        function renderTeamFitnessMatrix(archetype, matrixData) {
+             const container = document.getElementById('team-fitness-matrix-content');
+             const archetypeKey = Object.keys(ARCHETYPES).find(key => ARCHETYPES[key].name === archetype.name);
+             const data = matrixData[archetypeKey];
+
+             if (!data) {
+                 container.innerHTML = '<p>無法載入團隊適配性分析數據。</p>';
+                 return;
+             }
+
+            const timeline = Object.entries(data.stages).map(([stageKey, stageData], index) => {
+                const strengths = stageData.strengths.map(item => `
+                    <div class="matrix-card">
+                        <h6><span class="matrix-chip">🟢</span>${item.trait}</h6>
+                        <p>${item.behavior}</p>
+                    </div>
+                `).join('');
+
+                const challenges = stageData.challenges.map(item => `
+                    <div class="matrix-card challenge">
+                        <h6><span class="matrix-chip">🔴</span>${item.trait}</h6>
+                        <p>${item.behavior}</p>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="matrix-block">
+                        <div class="matrix-stage">
+                            <span class="matrix-stage-number">${index + 1}</span>
+                            <div>
+                                <h4 class="matrix-heading">${stageData.stage_name}</h4>
+                                <p class="matrix-subtitle">重點聚焦：${stageData.stage_focus}</p>
+                            </div>
+                        </div>
+                        <span class="matrix-stage-pill">${stageData.stage_focus}</span>
+                        <div class="matrix-columns">
+                            <div>
+                                <h6 style="margin:0 0 0.65rem;color:var(--success-green);display:flex;align-items:center;gap:0.4rem;font-size:0.9rem;">強勢貢獻</h6>
+                                ${strengths}
+                            </div>
+                            <div>
+                                <h6 style="margin:0 0 0.65rem;color:var(--alert-red);display:flex;align-items:center;gap:0.4rem;font-size:0.9rem;">潛在挑戰</h6>
+                                ${challenges}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="matrix-grid">
+                    ${timeline}
+                </div>
+                <div class="section-footnote">依 Tuckman 團隊發展階段與 Big Five 性格傾向交叉分析。依序檢視四階段，可協助排程對應支持與角色配置。</div>
+            `;
+         }
+
 
         // 顯示錯誤
         function showError(message) {
             console.error('Report error:', message);
+            const container = document.querySelector('.main-container');
+            container.innerHTML = `<div class="analysis-card"><p style="color:var(--error); text-align:center;">${message}</p></div>`;
+        }
 
-            document.getElementById('report-date').textContent = 'Error';
-            document.getElementById('completion-time').textContent = 'Error';
-            document.getElementById('accuracy').textContent = 'Error';
-
-            document.getElementById('topStrengthsBadges').innerHTML = '<span class="strength-badge">載入失敗</span>';
-            document.getElementById('overviewSummary').textContent = '載入詳細報告時發生錯誤，請重新整理頁面。';
-
-            alert('無法載入詳細報告，請檢查網路連線或稍後再試。');
+        // 返回個人優勢報告
+        function backToResults() {
+            const sessionId = new URLSearchParams(window.location.search).get('session');
+            if (sessionId) {
+                window.location.href = `results.html?session=${sessionId}`;
+            } else {
+                window.location.href = 'results.html';
+            }
         }
 
         // 分享報告
         function shareReport() {
             if (navigator.share) {
                 navigator.share({
-                    title: '我的優勢分析報告',
-                    text: '我剛完成了優勢天賦評測，發現了我的獨特優勢組合！',
+                    title: '我的團隊協作潛力分析報告',
+                    text: '我剛完成了優勢天賦評測，這是我在團隊中的角色定位！',
                     url: window.location.href
                 }).catch(console.error);
             } else {
-                // 複製連結
-                navigator.clipboard.writeText(window.location.href);
-                alert('報告連結已複製到剪貼板！');
+                navigator.clipboard.writeText(window.location.href)
+                    .then(() => alert('報告連結已複製到剪貼板！'))
+                    .catch(() => alert('複製失敗，請手動複製連結。'));
             }
         }
-
-        // 打開資源
-        function openResource(resourceId) {
-            // 根據資源ID打開相應的連結
-            const resources = {
-                book1: 'https://example.com/good-strategy-bad-strategy',
-                course1: 'https://example.com/strategic-thinking-course',
-                tool1: 'https://example.com/swot-template',
-                community1: 'https://example.com/strategic-thinkers-community'
-            };
-
-            if (resources[resourceId]) {
-                window.open(resources[resourceId], '_blank');
-            }
-        }
-
-        // 觀察元素進入視窗
-        function observeElements() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '0';
-                        entry.target.style.transform = 'translateY(20px)';
-
-                        setTimeout(() => {
-                            entry.target.style.transition = 'all 0.8s ease';
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, 100);
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('.analysis-section, .sidebar-card').forEach(el => {
-                observer.observe(el);
-            });
-        }
-
-        // 動畫化匹配度條
-        function animateStrengthBars() {
-            setTimeout(() => {
-                document.querySelectorAll('.match-fill').forEach(bar => {
-                    const width = bar.style.width;
-                    bar.style.width = '0';
-                    setTimeout(() => {
-                        bar.style.width = width;
-                    }, 500);
-                });
-            }, 1000);
-        }
-
-        // 追蹤頁面查看
-        localStorage.setItem('lastCheckpoint', 'report_detail_viewed');
     </script>
 </body>
 </html>

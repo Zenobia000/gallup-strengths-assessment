@@ -1,0 +1,239 @@
+{
+  "matrix_metadata": {
+    "version": "1.0",
+    "created_date": "2025-10-03",
+    "author": "Claude Code AI",
+    "description": "團隊適配性鳥瞰表數據源，結合四大原型、BIG FIVE人格特質與Tuckman團隊發展階段理論。",
+    "theoretical_foundation": [
+      "The Big Five (OCEAN) Model - Costa & McCrae",
+      "Keirsey Temperament Sorter - David Keirsey",
+      "Tuckman's Stages of Group Development"
+    ]
+  },
+  "matrix_data": {
+    "ARCHITECT": {
+      "archetype_name": "系統建構者",
+      "big_five_tendencies": {
+        "Openness": "High",
+        "Conscientiousness": "High",
+        "Extraversion": "Low-to-Medium",
+        "Agreeableness": "Low-to-Medium",
+        "Emotional_Stability": "High"
+      },
+      "stages": {
+        "FORMING": {
+          "stage_name": "形成期",
+          "stage_focus": "團隊定位與探索",
+          "strengths": [
+            { "trait": "高盡責性", "behavior": "快速建立目標、範疇和初步計劃框架，為團隊提供方向感。" },
+            { "trait": "高開放性", "behavior": "提出創新的願景和多種可能性，拓寬團隊的思考邊界。" }
+          ],
+          "challenges": [
+            { "trait": "低親和性傾向", "behavior": "可能因過於專注於任務和邏輯，而忽略建立初期的人際關係和團隊信任。" }
+          ]
+        },
+        "STORMING": {
+          "stage_name": "風暴期",
+          "stage_focus": "觀點碰撞與辯論",
+          "strengths": [
+            { "trait": "高情緒穩定性", "behavior": "在激烈的觀點碰撞中，能保持客觀和冷靜，專注於事實而非情緒。" },
+            { "trait": "高盡責性", "behavior": "堅持以數據和邏輯作為解決分歧的基礎，推動建設性的辯論。" }
+          ],
+          "challenges": [
+            { "trait": "低親和性傾向", "behavior": "直接、批判性的溝通風格，有時可能被誤解為對人而非對事，從而加劇團隊衝突。" }
+          ]
+        },
+        "NORMING": {
+          "stage_name": "規範期",
+          "stage_focus": "建立共識與流程",
+          "strengths": [
+            { "trait": "高盡責性", "behavior": "擅長將團隊達成的共識，轉化為具體的、可執行的標準化流程 (SOP)。" },
+            { "trait": "高開放性", "behavior": "設計出既穩定又具備一定靈活性的系統，以適應未來的變化。" }
+          ],
+          "challenges": [
+            { "trait": "完美主義傾向", "behavior": "可能會過度設計流程，追求系統的完美而犧牲了必要的簡易性和靈活性。" }
+          ]
+        },
+        "PERFORMING": {
+          "stage_name": "執行期",
+          "stage_focus": "高效協作與產出",
+          "strengths": [
+            { "trait": "高盡責性", "behavior": "持續監控項目進度與產出品質，確保團隊不偏離長期戰略目標。" },
+            { "trait": "高開放性", "behavior": "在高效執行的同時，仍能保持開放性，持續尋找優化和創新的機會。" }
+          ],
+          "challenges": [
+            { "trait": "目標固着", "behavior": "有時可能因過於專注於既定系統和目標，而對外部環境的突發變化反應不夠迅速。" }
+          ]
+        }
+      }
+    },
+    "GUARDIAN": {
+        "archetype_name": "組織守護者",
+        "big_five_tendencies": {
+          "Openness": "Low-to-Medium",
+          "Conscientiousness": "Very High",
+          "Extraversion": "Varies",
+          "Agreeableness": "Medium-to-High",
+          "Emotional_Stability": "High"
+        },
+        "stages": {
+          "FORMING": {
+            "stage_name": "形成期",
+            "stage_focus": "團隊定位與探索",
+            "strengths": [
+              { "trait": "高盡責性", "behavior": "主動承擔責任，建立清晰的角色分工和團隊規範，提供穩定感。" },
+              { "trait": "高親和性", "behavior": "關心團隊成員，確保每個人都融入團隊，建立和諧的初步關係。" }
+            ],
+            "challenges": [
+              { "trait": "低開放性傾向", "behavior": "可能偏好遵循既有模式，對於過於創新的、不確定的團隊目標感到不安。" }
+            ]
+          },
+          "STORMING": {
+            "stage_name": "風暴期",
+            "stage_focus": "觀點碰撞與辯論",
+            "strengths": [
+              { "trait": "高情緒穩定性", "behavior": "在衝突中充當穩定力量，專注於尋找務實、可行的解決方案。" },
+              { "trait": "高盡責性", "behavior": "堅持以現有的規則和事實為基礎進行討論，防止辯論偏離主題。" }
+            ],
+            "challenges": [
+              { "trait": "迴避衝突傾向", "behavior": "有時為了維護穩定，可能不願正面處理根本性的衝突，導致問題延後。" }
+            ]
+          },
+          "NORMING": {
+            "stage_name": "規範期",
+            "stage_focus": "建立共識與流程",
+            "strengths": [
+              { "trait": "極高盡責性", "behavior": "將團隊共識轉化為可靠、詳細的執行計劃和SOP，是流程的守護者。" },
+              { "trait": "高親和性", "behavior": "確保新規範對所有成員都公平，並幫助團隊成員適應新規則。" }
+            ],
+            "challenges": [
+              { "trait": "規則僵化", "behavior": "制定的流程可能過於僵化，缺乏彈性，難以應對未來的突發狀況。" }
+            ]
+          },
+          "PERFORMING": {
+            "stage_name": "執行期",
+            "stage_focus": "高效協作與產出",
+            "strengths": [
+              { "trait": "極高盡責性", "behavior": "是團隊中最可靠的執行者，確保任務按時、按質、按預算完成。" },
+              { "trait": "高穩定性", "behavior": "在長期、重複性的工作中保持高度的專注力和品質標準。" }
+            ],
+            "challenges": [
+              { "trait": "抗拒變更", "behavior": "對於在執行階段中途出現的重大變更或方向調整，可能表現出較強的抗拒心理。" }
+            ]
+          }
+        }
+      },
+      "IDEALIST": {
+        "archetype_name": "人文關懷家",
+        "big_five_tendencies": {
+          "Openness": "High",
+          "Conscientiousness": "Medium-to-High",
+          "Extraversion": "High",
+          "Agreeableness": "Very High",
+          "Emotional_Stability": "Medium"
+        },
+        "stages": {
+          "FORMING": {
+            "stage_name": "形成期",
+            "stage_focus": "團隊定位與探索",
+            "strengths": [
+              { "trait": "極高親和性", "behavior": "積極建立團隊成員間的連結，創造一個包容、信任的心理安全環境。" },
+              { "trait": "高外向性", "behavior": "擅長溝通團隊的共同願景和目標，激勵成員投入。" }
+            ],
+            "challenges": [
+              { "trait": "理想主義", "behavior": "可能設定過於理想化的團隊目標，而忽略了現實的限制和挑戰。" }
+            ]
+          },
+          "STORMING": {
+            "stage_name": "風暴期",
+            "stage_focus": "觀點碰撞與辯論",
+            "strengths": [
+              { "trait": "極高親和性", "behavior": "是天生的調解者，能在衝突中找到共識，修復受損的團隊關係。" },
+              { "trait": "高開放性", "behavior": "鼓勵並接納不同的觀點，將衝突轉化為團隊成長的機會。" }
+            ],
+            "challenges": [
+              { "trait": "過度追求和諧", "behavior": "為了避免衝突，有時可能壓抑必要的辯論，導致問題未能根本解決。" }
+            ]
+          },
+          "NORMING": {
+            "stage_name": "規範期",
+            "stage_focus": "建立共識與流程",
+            "strengths": [
+              { "trait": "高親和性", "behavior": "確保團隊規範體現了共同的價值觀，並得到每個成員的認同。" },
+              { "trait": "高外向性", "behavior": "擅長組織團隊活動，鞏固團隊共識和文化。" }
+            ],
+            "challenges": [
+              { "trait": "流程與人情", "behavior": "在建立規範時，可能過於考慮個人感受而犧牲了流程的效率和客觀性。" }
+            ]
+          },
+          "PERFORMING": {
+            "stage_name": "執行期",
+            "stage_focus": "高效協作與產出",
+            "strengths": [
+              { "trait": "高外向性", "behavior": "是團隊的啦啦隊長，持續激勵團隊士氣，慶祝每個階段性勝利。" },
+              { "trait": "高親和性", "behavior": "關注團隊成員的福祉和個人成長，維持長期的高效協作氛圍。" }
+            ],
+            "challenges": [
+              { "trait": "目標與關係", "behavior": "當績效目標與團隊關係產生衝突時，可能會難以做出決斷。" }
+            ]
+          }
+        }
+      },
+      "ARTISAN": {
+        "archetype_name": "推廣實踐家",
+        "big_five_tendencies": {
+          "Openness": "Medium-to-High",
+          "Conscientiousness": "Low-to-Medium",
+          "Extraversion": "High",
+          "Agreeableness": "Medium",
+          "Emotional_Stability": "High"
+        },
+        "stages": {
+          "FORMING": {
+            "stage_name": "形成期",
+            "stage_focus": "團隊定位與探索",
+            "strengths": [
+              { "trait": "高外向性", "behavior": "充滿活力，能快速打破僵局，為團隊注入初步的動力和熱情。" },
+              { "trait": "高開放性傾向", "behavior": "樂於嘗試各種可能性，為團隊帶來多樣化的想法。" }
+            ],
+            "challenges": [
+              { "trait": "低盡責性傾向", "behavior": "可能對建立詳細的長期計劃缺乏耐心，偏好立即行動。" }
+            ]
+          },
+          "STORMING": {
+            "stage_name": "風暴期",
+            "stage_focus": "觀點碰撞與辯論",
+            "strengths": [
+              { "trait": "高情緒穩定性", "behavior": "在壓力下保持靈活，擅長在混亂中找到務實的、快速見效的解決方案。" },
+              { "trait": "高外向性", "behavior": "是務實的談判者，能將辯論引導向具體的行動方案。" }
+            ],
+            "challenges": [
+              { "trait": "缺乏耐心", "behavior": "對於冗長的理論辯論可能感到不耐煩，希望盡快得出結論並行動。" }
+            ]
+          },
+          "NORMING": {
+            "stage_name": "規範期",
+            "stage_focus": "建立共識與流程",
+            "strengths": [
+              { "trait": "高開放性傾向", "behavior": "擅長推動建立靈活、有彈性的團隊規範，而非僵化的規則。" },
+              { "trait": "高外向性", "behavior": "能快速將團隊共識轉化為初步的行動試驗，以驗證規範的有效性。" }
+            ],
+            "challenges": [
+              { "trait": "低盡責性傾向", "behavior": "可能不注重流程的細節和文檔化，導致規範難以長期維持。" }
+            ]
+          },
+          "PERFORMING": {
+            "stage_name": "執行期",
+            "stage_focus": "高效協作與產出",
+            "strengths": [
+              { "trait": "高外向性", "behavior": "是團隊的「救火隊員」，擅長處理突發狀況和危機，推動項目克服障礙。" },
+              { "trait": "高情緒穩定性", "behavior": "在 deadline 壓力下保持高效，並能激勵團隊衝刺。" }
+            ],
+            "challenges": [
+              { "trait": "一致性不足", "behavior": "可能因追求新奇和變化，而難以在長期、重複性的任務中保持一致的表現。" }
+            ]
+          }
+        }
+      }
+  }
+}
