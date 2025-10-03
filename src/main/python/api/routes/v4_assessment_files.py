@@ -182,11 +182,6 @@ async def submit_assessment(request: Request):
                 enriched_response["statement_ids"] = statement_ids
                 enriched_responses.append(enriched_response)
 
-            # Debug: show first enriched response
-            if enriched_responses:
-                print(f"Debug - First enriched response: {enriched_responses[0]}")
-                print(f"Debug - Total blocks mapped: {len(block_to_statement_ids)}")
-
             scoring_engine = V4ScoringEngine()
             scoring_result = scoring_engine.score_assessment(enriched_responses)
 
@@ -209,13 +204,10 @@ async def submit_assessment(request: Request):
 
             # Convert dimension_scores to proper t1_xxx format
             formatted_scores = {}
-            print(f"Debug - Mapping dimension scores to T-IDs:")
             for dim_name, score in scoring_result["dimension_scores"].items():
                 t_id = reverse_dim_mapping.get(dim_name)
-                print(f"  {dim_name} → {t_id} (score: {score})")
                 if t_id:
                     formatted_scores[f"{t_id}_{dim_name}"] = score
-            print(f"Debug - Formatted scores keys: {list(formatted_scores.keys())[:4]}")
 
             # Store scores
             score_data = {
