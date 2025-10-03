@@ -42,7 +42,7 @@ class V4ScoringEngine:
         try:
             from core.file_storage import get_file_storage
             storage = get_file_storage()
-            statements_data = storage.get_table("v4_statements")
+            statements_data = storage.select_all("v4_statements")
 
             # Create lookup dict for statement to dimension mapping
             statement_to_dim = {}
@@ -52,12 +52,18 @@ class V4ScoringEngine:
                 if stmt_id and dimension:
                     statement_to_dim[stmt_id] = dimension
 
+            print(f"Debug - Loaded {len(statement_to_dim)} statement mappings")
+            # Show first 5 mappings
+            sample_mappings = list(statement_to_dim.items())[:5]
+            print(f"Debug - Sample mappings: {sample_mappings}")
+
         except Exception as e:
             print(f"Warning: Could not load statement data for accurate scoring: {e}")
             statement_to_dim = {}
 
         # Process responses with accurate statement-to-dimension mapping
-        for response in responses:
+        debug_mappings = []  # Track first 3 mappings for debugging
+        for idx, response in enumerate(responses):
             if "most_like_index" in response and "least_like_index" in response:
                 # New format: get actual statement IDs from block
                 block_id = response.get("block_id", -1)
@@ -76,6 +82,15 @@ class V4ScoringEngine:
                         if dim_index is not None:
                             dimension_counts[self.dimensions[dim_index]] += 2.0
 
+                            # Debug first 3 mappings
+                            if idx < 3:
+                                debug_mappings.append({
+                                    "block": block_id,
+                                    "most_like_stmt": stmt_id,
+                                    "dim": dim,
+                                    "dimension_name": self.dimensions[dim_index]
+                                })
+
                     if 0 <= least_like_index < len(statement_ids):
                         stmt_id = statement_ids[least_like_index]
                         dim = statement_to_dim.get(stmt_id, f"T{(least_like_index % 12) + 1}")
@@ -91,6 +106,7 @@ class V4ScoringEngine:
                     if 0 <= least_like_index < 4:
                         dim_idx = (block_id * 4 + least_like_index) % len(self.dimensions)
                         dimension_counts[self.dimensions[dim_idx]] -= 1.0
+
             else:
                 # Old format: direct statement IDs
                 most_like = response.get("most_like", "")
@@ -108,38 +124,39 @@ class V4ScoringEngine:
                     if dim_index is not None:
                         dimension_counts[self.dimensions[dim_index]] -= 1.0
 
-        # Convert to percentiles with better differentiation based on actual choices
-        total_responses = len(responses)
-        max_possible_score = total_responses * 2  # Maximum if all most_like
-        min_possible_score = total_responses * -1  # Minimum if all least_like
+        # Debug output
+        if debug_mappings:
+            print(f"Debug - First 3 mappings: {debug_mappings}")
+        print(f"Debug - Dimension raw counts: {dimension_counts}")
+
+        # Convert to percentiles using rank-based approach for better differentiation
+        # Sort dimensions by raw count
+        sorted_by_count = sorted(dimension_counts.items(), key=lambda x: x[1], reverse=True)
 
         dimension_scores = {}
         theta_estimates = {}
 
-        # Normalize counts to get raw preference strength
-        normalized_counts = {}
-        for dim, count in dimension_counts.items():
-            # Normalize to 0-1 range, then scale to percentiles
-            if max_possible_score > min_possible_score:
-                normalized = (count - min_possible_score) / (max_possible_score - min_possible_score)
-            else:
-                normalized = 0.5
+        # Assign percentiles based on rank
+        # Top 4 (主導才幹): 75-95
+        # Middle 4 (支援才幹): 45-65
+        # Bottom 4 (待管理): 15-35
+        num_dims = len(sorted_by_count)
 
-            # Convert to percentile with realistic distribution
-            # Use sigmoid transformation for better spread
-            import math
-            sigmoid_input = (normalized - 0.5) * 6  # Scale to -3 to +3
-            sigmoid_output = 1 / (1 + math.exp(-sigmoid_input))
+        for rank, (dim, count) in enumerate(sorted_by_count):
+            if rank < 4:  # Top 4
+                # Map rank 0-3 to percentiles 95-75
+                percentile = 95 - (rank * 5) + random.uniform(-2, 2)
+            elif rank < 8:  # Middle 4
+                # Map rank 4-7 to percentiles 65-45
+                percentile = 65 - ((rank - 4) * 5) + random.uniform(-2, 2)
+            else:  # Bottom 4
+                # Map rank 8-11 to percentiles 35-15
+                percentile = 35 - ((rank - 8) * 5) + random.uniform(-2, 2)
 
-            # Map to percentile range (5-95 to avoid extremes)
-            percentile = 5 + (sigmoid_output * 90)
-
-            # Add small random variation for ties
-            percentile += random.uniform(-2, 2)
-            percentile = min(95, max(5, percentile))
-
-            normalized_counts[dim] = count
+            percentile = min(99, max(1, percentile))
             dimension_scores[dim] = round(percentile, 1)
+
+        print(f"Debug - Percentile scores: {dimension_scores}")
 
         # Generate theta estimates based on actual percentiles
         for i, (dim, percentile) in enumerate(dimension_scores.items()):

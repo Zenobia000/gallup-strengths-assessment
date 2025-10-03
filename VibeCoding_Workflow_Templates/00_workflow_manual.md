@@ -33,15 +33,16 @@
 - PM（產品經理）、TL（技術負責人）、ARCH（架構師）、DEV、QA、SRE、SEC（安全/隱私）、OPS、DATA
 
 **模板路徑：**
-- `VibeCoding_Workflow_Templates/00_development_workflow_cookbook.md`
-- `VibeCoding_Workflow_Templates/01_project_brief_and_prd.md`
-- `VibeCoding_Workflow_Templates/02_bdd_scenarios_guide.md`
-- `VibeCoding_Workflow_Templates/03_architecture_and_design_document.md`
-- `VibeCoding_Workflow_Templates/04_module_specification_and_tests.md`
-- `VibeCoding_Workflow_Templates/05_security_and_readiness_checklists.md`
-- `VibeCoding_Workflow_Templates/06_project_structure_guide.md`
-- `VibeCoding_Workflow_Templates/01_adr_template.md` (附屬)
-- `VibeCoding_Workflow_Templates/04_api_design_specification_template.md` (附屬)
+- `VibeCoding_Workflow_Templates/01_development_workflow_cookbook.md` - 開發流程指南
+- `VibeCoding_Workflow_Templates/02_project_brief_and_prd.md` - 專案簡報與 PRD
+- `VibeCoding_Workflow_Templates/03_behavior_driven_development_guide.md` - BDD 指南
+- `VibeCoding_Workflow_Templates/04_architecture_decision_record_template.md` - ADR 模板
+- `VibeCoding_Workflow_Templates/05_architecture_and_design_document.md` - 架構與設計文檔
+- `VibeCoding_Workflow_Templates/06_api_design_specification.md` - API 設計規範
+- `VibeCoding_Workflow_Templates/07_module_specification_and_tests.md` - 模組規格與測試
+- `VibeCoding_Workflow_Templates/08_project_structure_guide.md` - 專案結構指南
+- `VibeCoding_Workflow_Templates/13_security_and_readiness_checklists.md` - 安全與上線檢查
+- `VibeCoding_Workflow_Templates/14_deployment_and_operations_guide.md` - 部署與運維指南
 
 ---
 
@@ -71,7 +72,7 @@
 ### A1 構想與規劃（PRD）
 - 目標：定義問題、受眾、範圍、成功指標與里程碑
 - 輸入：Kickoff 輸出、商業策略
-- 產出：`01_project_brief_and_prd.md`
+- 產出：`02_project_brief_and_prd.md`
 - 主要活動：價值主張、需求分解、KPI、風險與依賴
 - RACI：PM R/A、TL/ARCH/QA/OPS/SRE/SEC/DATA C、DEV I
 - Gate：PRD 已審核簽核；KPI 可量測且與業務對齊
@@ -80,8 +81,8 @@
 - 目標：確立系統邊界、架構模式、技術選型、NFR；記錄關鍵決策
 - 輸入：PRD、現況系統/資源盤點
 - 產出：
-  - `03_architecture_and_design_document.md`
-  - `01_adr_template.md`（多份，隨決策累積）
+  - `05_architecture_and_design_document.md`
+  - `04_architecture_decision_record_template.md`（多份，隨決策累積）
 - 主要活動：上下文/組件/部署與資料架構、設計權衡、關鍵用戶旅程
 - RACI：ARCH R/A、TL R、PM/SRE/SEC/OPS C、DEV/QA I
 - Gate：核心 ADR 齊備且權衡明確；NFR 可被驗證；風險與緩解策略明列
@@ -90,9 +91,9 @@
 - 目標：把 SA 轉化為可實作規格與契約
 - 輸入：SA、ADR、資料字典
 - 產出：
-  - `04_module_specification_and_tests.md`
-  - `04_api_design_specification_template.md`
-  - `06_project_structure_guide.md`
+  - `07_module_specification_and_tests.md`
+  - `06_api_design_specification.md`
+  - `08_project_structure_guide.md`
 - 主要活動：資料模型與索引策略、內外部介面、流程圖、錯誤與可觀測性方案
 - RACI：TL R/A、DEV/ARCH R、QA/SRE/SEC C、PM I
 - Gate：介面契約穩定、測試策略完整、回滾與相容性考量完備
@@ -108,7 +109,7 @@
 ### A5 安全與上線審查 (Quality Gate)
 - 目標：在上線前消除高風險弱點、隱私風險並確保生產就緒。
 - 輸入：SA/SDD/API、風險登記、掃描報告
-- 產出：`05_security_and_readiness_checklists.md`（完成的審查清單與整改項）
+- 產出：`13_security_and_readiness_checklists.md`（完成的審查清單與整改項）
 - RACI：SEC/SRE R/A、TL/DEV C、PM I
 - Gate：高/中風險已整改或有替代方案；威脅模型、資料保護與可觀測性措施完備。
 
@@ -188,11 +189,11 @@ graph TD
 | 階段 | 模式 A（完整） | 模式 B（MVP） |
 | :-- | :-- | :-- |
 | 啟動 | Kickoff 簡報、里程碑 | 迭代計畫草案 |
-| 規劃 | `01_project_brief_and_prd.md` | Tech Spec 的 PRD 區塊 |
-| 架構與設計 | `03_architecture_and_design_document.md`、`01_adr_template.md` | Tech Spec 的 SA/ADR 區塊 |
-| 規格與開發 | `04_module_specification_and_tests.md`、`04_api_design_specification_template.md` | Tech Spec 的 SDD/API 區塊 |
-| 品質保證 | `05_security_and_readiness_checklists.md` | 簡化安全與上線檢查清單 |
-| 結構規範 | `06_project_structure_guide.md` | Tech Spec 的結構區塊 |
+| 規劃 | `02_project_brief_and_prd.md` | Tech Spec 的 PRD 區塊 |
+| 架構與設計 | `05_architecture_and_design_document.md`、`04_architecture_decision_record_template.md` | Tech Spec 的 SA/ADR 區塊 |
+| 規格與開發 | `07_module_specification_and_tests.md`、`06_api_design_specification.md` | Tech Spec 的 SDD/API 區塊 |
+| 品質保證 | `13_security_and_readiness_checklists.md` | 簡化安全與上線檢查清單 |
+| 結構規範 | `08_project_structure_guide.md` | Tech Spec 的結構區塊 |
 
 ---
 

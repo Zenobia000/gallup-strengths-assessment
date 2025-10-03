@@ -158,10 +158,37 @@ async def submit_assessment(request: Request):
             print(f"Quality check failed: {e}")
             quality_result = {"overall_quality": "acceptable", "issues": []}
 
-        # Run scoring
+        # Run scoring - need to enrich responses with statement_ids from session blocks
         try:
+            # Load the original blocks data from session to get statement_ids
+            blocks_data_str = session.get("blocks_data", "[]")
+            blocks_data = json.loads(blocks_data_str) if isinstance(blocks_data_str, str) else blocks_data_str
+
+            # Create a mapping from block_id to statement_ids
+            block_to_statement_ids = {}
+            for block in blocks_data:
+                block_id = block.get("block_id", -1)
+                statement_ids = block.get("statement_ids", [])
+                block_to_statement_ids[block_id] = statement_ids
+
+            # Enrich responses with statement_ids
+            enriched_responses = []
+            for response in responses:
+                block_id = response.get("block_id", -1)
+                statement_ids = block_to_statement_ids.get(block_id, [])
+
+                # Create enriched response with statement_ids
+                enriched_response = response.copy()
+                enriched_response["statement_ids"] = statement_ids
+                enriched_responses.append(enriched_response)
+
+            # Debug: show first enriched response
+            if enriched_responses:
+                print(f"Debug - First enriched response: {enriched_responses[0]}")
+                print(f"Debug - Total blocks mapped: {len(block_to_statement_ids)}")
+
             scoring_engine = V4ScoringEngine()
-            scoring_result = scoring_engine.score_assessment(responses)
+            scoring_result = scoring_engine.score_assessment(enriched_responses)
 
             # Store scores
             score_data = {
