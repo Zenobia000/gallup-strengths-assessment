@@ -13,9 +13,13 @@ This module centralizes all configuration in one place with proper defaults.
 import os
 from functools import lru_cache
 from typing import List, Optional
+from dotenv import load_dotenv
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class Settings(BaseSettings):
@@ -49,13 +53,35 @@ class Settings(BaseSettings):
     )
 
     allowed_origins: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8000"],
-        description="CORS allowed origins"
+        default_factory=lambda: os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8000").split(","),
+        description="CORS allowed origins (comma-separated in .env)"
+    )
+
+    # Security
+    secret_key: str = Field(
+        default_factory=lambda: os.getenv("SECRET_KEY", "INSECURE-DEFAULT-KEY-CHANGE-ME"),
+        description="Secret key for session management and encryption"
+    )
+
+    # Server
+    host: str = Field(
+        default_factory=lambda: os.getenv("HOST", "0.0.0.0"),
+        description="Server host address"
+    )
+
+    port: int = Field(
+        default_factory=lambda: int(os.getenv("PORT", "8005")),
+        description="Server port"
+    )
+
+    workers: int = Field(
+        default_factory=lambda: int(os.getenv("WORKERS", "4")),
+        description="Number of Gunicorn workers"
     )
 
     # Database Configuration
     database_url: str = Field(
-        default="sqlite:///./data/gallup_assessment.db",
+        default_factory=lambda: os.getenv("DATABASE_URL", "sqlite:///./data/gallup_assessment.db"),
         description="Database connection URL"
     )
 

@@ -32,10 +32,11 @@ isort==5.12.0            # Import sorting
 python-dateutil==2.8.2   # Enhanced date/time handling
 python-jose[cryptography]==3.3.0  # JWT token handling (for future auth)
 
-# Production Dependencies (commented for MVP)
-# gunicorn==21.2.0        # Production WSGI server
-# prometheus-client==0.18.0  # Metrics collection
-# structlog==23.2.0       # Structured logging
+# Production Dependencies
+gunicorn==21.2.0        # Production ASGI server with Uvicorn workers
+python-dotenv==1.0.0    # Environment variable loading from .env file
+# prometheus-client==0.18.0  # Metrics collection (add when needed)
+# structlog==23.2.0       # Structured logging (add when needed)
 
 # Week 2 Dependencies (scoring and ML)
 # numpy==1.24.3           # Numerical computing for psychometric algorithms
@@ -47,8 +48,7 @@ python-jose[cryptography]==3.3.0  # JWT token handling (for future auth)
 # Pillow==10.1.0          # Image processing for PDFs
 
 # Security (for production)
-# python-dotenv==1.0.0    # Environment variable loading
-# passlib[bcrypt]==1.7.4  # Password hashing (for future auth)
+# passlib[bcrypt]==1.7.4  # Password hashing (for future auth when implementing user login)
 
 # Documentation Generation
 # mkdocs==1.5.3          # Documentation generator
