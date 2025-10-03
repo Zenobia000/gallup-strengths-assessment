@@ -1172,7 +1172,42 @@
     // Utility functions
     function downloadPDF() {
         const sessionId = getSessionId();
-        alert(`PDF 下載功能開發中，Session: ${sessionId}`);
+
+        // 使用瀏覽器內建列印功能生成 PDF
+        // 用戶可選擇「另存為 PDF」
+        const originalTitle = document.title;
+        document.title = `優勢天賦評測報告_${sessionId}`;
+
+        // 優化列印樣式
+        const style = document.createElement('style');
+        style.textContent = `
+            @media print {
+                .header, .footer, .no-print { display: none !important; }
+                .report-card { page-break-inside: avoid; }
+                body { background: white; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 觸發列印
+        window.print();
+
+        // 恢復標題
+        setTimeout(() => {
+            document.title = originalTitle;
+            style.remove();
+        }, 100);
+
+        // TODO: 未來可實作伺服器端 PDF 生成
+        // fetch(`/api/reports/generate/${sessionId}`)
+        //   .then(r => r.blob())
+        //   .then(blob => {
+        //     const url = window.URL.createObjectURL(blob);
+        //     const a = document.createElement('a');
+        //     a.href = url;
+        //     a.download = `優勢天賦報告_${sessionId}.pdf`;
+        //     a.click();
+        //   });
     }
 
     function shareReport() {
