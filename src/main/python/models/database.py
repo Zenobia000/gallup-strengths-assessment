@@ -86,6 +86,8 @@ class AssessmentSession(Base):
     consent = relationship("Consent", back_populates="sessions")
     responses = relationship("AssessmentResponse", back_populates="session")
     scores = relationship("Score", back_populates="session")
+    archetype_result = relationship("UserArchetypeResult", back_populates="session", uselist=False)
+    job_recommendations = relationship("JobRecommendation", back_populates="session")
 
     def __repr__(self):
         return f"<AssessmentSession(session_id={self.session_id}, status={self.status})>"
@@ -203,6 +205,186 @@ class Score(Base):
         return percentiles.get(factor, 50.0)
 
 
+# Career Archetype System Models
+class CareerArchetype(Base):
+    """職業原型表 - 基於凱爾西氣質理論的4種原型"""
+    __tablename__ = "career_archetypes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    archetype_id = Column(String(20), unique=True, index=True, nullable=False)
+    archetype_name = Column(String(50), nullable=False)
+    archetype_name_en = Column(String(50), nullable=False)
+    keirsey_temperament = Column(String(50), nullable=False)
+    mbti_correlates = Column(JSON, nullable=False)  # Array of MBTI types
+    description = Column(Text, nullable=False)
+    core_characteristics = Column(JSON, nullable=False)  # Array of characteristics
+    work_environment_preferences = Column(JSON, nullable=False)  # Object
+    leadership_style = Column(Text)
+    decision_making_style = Column(Text)
+    communication_style = Column(Text)
+    stress_indicators = Column(JSON)  # Array
+    development_areas = Column(JSON)  # Array
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    # 關聯
+    archetype_talents = relationship("ArchetypeTalent", back_populates="archetype")
+    job_matches = relationship("ArchetypeJobMatch", back_populates="archetype")
+
+    def __repr__(self):
+        return f"<CareerArchetype(archetype_id={self.archetype_id}, name={self.archetype_name})>"
+
+
+class TalentDimension(Base):
+    """才幹維度表 - 12個核心才幹維度"""
+    __tablename__ = "talent_dimensions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    dimension_id = Column(String(10), unique=True, index=True, nullable=False)  # T1-T12
+    dimension_name = Column(String(50), nullable=False)
+    dimension_name_en = Column(String(50), nullable=False)
+    category = Column(String(20), nullable=False)  # executing, influencing, relationship, strategic
+    description = Column(Text, nullable=False)
+    behavioral_indicators = Column(JSON)  # Array
+    development_strategies = Column(JSON)  # Array
+    assessment_questions = Column(JSON)  # Array
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+
+    # 關聯
+    archetype_talents = relationship("ArchetypeTalent", back_populates="dimension")
+
+    def __repr__(self):
+        return f"<TalentDimension(dimension_id={self.dimension_id}, name={self.dimension_name})>"
+
+
+class ArchetypeTalent(Base):
+    """原型與才幹關聯表 - 多對多關係，包含權重"""
+    __tablename__ = "archetype_talents"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    archetype_id = Column(String(20), ForeignKey("career_archetypes.archetype_id"), nullable=False)
+    dimension_id = Column(String(10), ForeignKey("talent_dimensions.dimension_id"), nullable=False)
+    talent_type = Column(String(20), nullable=False)  # primary, secondary, neutral, avoid
+    weight = Column(Float, default=1.0, nullable=False)
+    importance_level = Column(Integer, default=3, nullable=False)  # 1-5 scale
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+
+    # 關聯
+    archetype = relationship("CareerArchetype", back_populates="archetype_talents")
+    dimension = relationship("TalentDimension", back_populates="archetype_talents")
+
+    def __repr__(self):
+        return f"<ArchetypeTalent(archetype={self.archetype_id}, dimension={self.dimension_id}, type={self.talent_type})>"
+
+
+class JobRole(Base):
+    """職位角色表 - 具體職位定義"""
+    __tablename__ = "job_roles"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    role_id = Column(String(20), unique=True, index=True, nullable=False)
+    role_name = Column(String(100), nullable=False)
+    role_name_en = Column(String(100))
+    industry_sector = Column(String(50), nullable=False)
+    job_family = Column(String(50), nullable=False)
+    seniority_level = Column(String(20), nullable=False)  # entry, mid, senior, executive
+    description = Column(Text, nullable=False)
+    key_responsibilities = Column(JSON, nullable=False)  # Array
+    required_skills = Column(JSON, nullable=False)  # Array
+    preferred_skills = Column(JSON)  # Array
+    required_talents = Column(JSON, nullable=False)  # Array with weights
+    beneficial_talents = Column(JSON)  # Array with weights
+    education_requirements = Column(Text)
+    experience_requirements = Column(Text)
+    salary_range_min = Column(Integer)
+    salary_range_max = Column(Integer)
+    currency = Column(String(5), default="TWD")
+    work_arrangement = Column(String(20))  # remote, hybrid, onsite
+    career_growth_path = Column(JSON)  # Array
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    # 關聯
+    job_matches = relationship("ArchetypeJobMatch", back_populates="job_role")
+    recommendations = relationship("JobRecommendation", back_populates="job_role")
+
+    def __repr__(self):
+        return f"<JobRole(role_id={self.role_id}, name={self.role_name})>"
+
+
+class ArchetypeJobMatch(Base):
+    """原型與職位關聯表 - 原型適合的職位推薦"""
+    __tablename__ = "archetype_job_matches"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    archetype_id = Column(String(20), ForeignKey("career_archetypes.archetype_id"), nullable=False)
+    role_id = Column(String(20), ForeignKey("job_roles.role_id"), nullable=False)
+    match_score = Column(Float, nullable=False)  # 0.0-1.0
+    match_reasoning = Column(JSON)  # Object with detailed reasoning
+    confidence_level = Column(Float, default=0.8, nullable=False)
+    priority_rank = Column(Integer)  # 1-N ranking
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    # 關聯
+    archetype = relationship("CareerArchetype", back_populates="job_matches")
+    job_role = relationship("JobRole", back_populates="job_matches")
+
+    def __repr__(self):
+        return f"<ArchetypeJobMatch(archetype={self.archetype_id}, role={self.role_id}, score={self.match_score})>"
+
+
+class UserArchetypeResult(Base):
+    """用戶職業原型分析結果表"""
+    __tablename__ = "user_archetype_results"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(String(36), ForeignKey("assessment_sessions.session_id"), nullable=False)
+    primary_archetype_id = Column(String(20), ForeignKey("career_archetypes.archetype_id"), nullable=False)
+    secondary_archetype_id = Column(String(20), ForeignKey("career_archetypes.archetype_id"))
+    archetype_scores = Column(JSON, nullable=False)  # Object with all 4 scores
+    dominant_talents = Column(JSON, nullable=False)  # Array
+    supporting_talents = Column(JSON, nullable=False)  # Array
+    lesser_talents = Column(JSON, nullable=False)  # Array
+    confidence_score = Column(Float, nullable=False)
+    analysis_metadata = Column(JSON)  # Object
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+
+    # 關聯
+    session = relationship("AssessmentSession", back_populates="archetype_result")
+    primary_archetype = relationship("CareerArchetype", foreign_keys=[primary_archetype_id])
+    secondary_archetype = relationship("CareerArchetype", foreign_keys=[secondary_archetype_id])
+
+    def __repr__(self):
+        return f"<UserArchetypeResult(session={self.session_id}, primary={self.primary_archetype_id})>"
+
+
+class JobRecommendation(Base):
+    """職位推薦結果表"""
+    __tablename__ = "job_recommendations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(String(36), ForeignKey("assessment_sessions.session_id"), nullable=False)
+    role_id = Column(String(20), ForeignKey("job_roles.role_id"), nullable=False)
+    recommendation_type = Column(String(20), nullable=False)  # primary, stretch, development
+    match_score = Column(Float, nullable=False)
+    strength_alignment = Column(JSON, nullable=False)  # Object
+    development_gaps = Column(JSON)  # Array
+    recommendation_reasoning = Column(JSON, nullable=False)  # Object
+    priority_rank = Column(Integer, nullable=False)
+    confidence_level = Column(Float, nullable=False)
+    is_featured = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+
+    # 關聯
+    session = relationship("AssessmentSession", back_populates="job_recommendations")
+    job_role = relationship("JobRole", back_populates="recommendations")
+
+    def __repr__(self):
+        return f"<JobRecommendation(session={self.session_id}, role={self.role_id}, score={self.match_score})>"
+
+
 class ReportGeneration(Base):
     """報告生成記錄表"""
     __tablename__ = "report_generations"
@@ -286,7 +468,15 @@ def get_table_names():
         "assessment_sessions",
         "assessment_responses",
         "scores",
-        "report_generations"
+        "report_generations",
+        # Career Archetypes System Tables
+        "career_archetypes",
+        "talent_dimensions",
+        "archetype_talents",
+        "job_roles",
+        "archetype_job_matches",
+        "user_archetype_results",
+        "job_recommendations"
     ]
 
 

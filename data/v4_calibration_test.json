@@ -1,0 +1,467 @@
+{
+  "item_parameters": {
+    "BEL001": {
+      "discrimination": 2.7678236950331976,
+      "difficulty": 0.07322309886875536,
+      "guessing": 0,
+      "dimension": "Belief",
+      "factor_loading": 0.78
+    },
+    "ACH001": {
+      "discrimination": 2.0386404681896204,
+      "difficulty": -1.0408414916866304,
+      "guessing": 0,
+      "dimension": "Achiever",
+      "factor_loading": 0.75
+    },
+    "CST001": {
+      "discrimination": 1.7096504135686952,
+      "difficulty": 0.9003519846703807,
+      "guessing": 0,
+      "dimension": "Consistency",
+      "factor_loading": 0.78
+    },
+    "ACT001": {
+      "discrimination": 3.0,
+      "difficulty": 0.14488842091915205,
+      "guessing": 0,
+      "dimension": "Activator",
+      "factor_loading": 0.76
+    },
+    "ANA001": {
+      "discrimination": 3.0,
+      "difficulty": 0.029351662321753076,
+      "guessing": 0,
+      "dimension": "Analytical",
+      "factor_loading": 0.77
+    },
+    "CTX001": {
+      "discrimination": 3.0,
+      "difficulty": 0.029634162117745107,
+      "guessing": 0,
+      "dimension": "Context",
+      "factor_loading": 0.75
+    },
+    "ARR001": {
+      "discrimination": 3.0,
+      "difficulty": -0.483571455692039,
+      "guessing": 0,
+      "dimension": "Arranger",
+      "factor_loading": 0.79
+    },
+    "ADA001": {
+      "discrimination": 2.3252216998704656,
+      "difficulty": -0.15362946622236598,
+      "guessing": 0,
+      "dimension": "Adaptability",
+      "factor_loading": 0.72
+    },
+    "CMP001": {
+      "discrimination": 3.0,
+      "difficulty": -0.21426908611371492,
+      "guessing": 0,
+      "dimension": "Competition",
+      "factor_loading": 0.7
+    },
+    "CMD001": {
+      "discrimination": 3.0,
+      "difficulty": -0.09614025910517558,
+      "guessing": 0,
+      "dimension": "Command",
+      "factor_loading": 0.77
+    },
+    "CON001": {
+      "discrimination": 3.0,
+      "difficulty": -0.03638222882559702,
+      "guessing": 0,
+      "dimension": "Connectedness",
+      "factor_loading": 0.71
+    },
+    "COM001": {
+      "discrimination": 3.0,
+      "difficulty": 0.11713163466569496,
+      "guessing": 0,
+      "dimension": "Communication",
+      "factor_loading": 0.8
+    }
+  },
+  "dimension_parameters": {
+    "Belief": {
+      "items": [
+        {
+          "discrimination": 2.7678236950331976,
+          "difficulty": 0.07322309886875536,
+          "guessing": 0,
+          "dimension": "Belief",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 2.7678236950331976,
+          "difficulty": 0.07322309886875536,
+          "guessing": 0,
+          "dimension": "Belief",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 2.7678236950331976,
+          "difficulty": 0.07322309886875536,
+          "guessing": 0,
+          "dimension": "Belief",
+          "factor_loading": 0.78
+        }
+      ],
+      "mean_discrimination": 2.7678236950331976,
+      "mean_difficulty": 0.07322309886875536,
+      "reliability": 1.3268067978072702
+    },
+    "Achiever": {
+      "items": [
+        {
+          "discrimination": 2.0386404681896204,
+          "difficulty": -1.0408414916866304,
+          "guessing": 0,
+          "dimension": "Achiever",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 2.0386404681896204,
+          "difficulty": -1.0408414916866304,
+          "guessing": 0,
+          "dimension": "Achiever",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 2.0386404681896204,
+          "difficulty": -1.0408414916866304,
+          "guessing": 0,
+          "dimension": "Achiever",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 2.0386404681896204,
+          "difficulty": -1.0408414916866304,
+          "guessing": 0,
+          "dimension": "Achiever",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 2.0386404681896204,
+          "difficulty": -1.0408414916866304,
+          "guessing": 0,
+          "dimension": "Achiever",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 2.0386404681896204,
+          "difficulty": -1.0408414916866304,
+          "guessing": 0,
+          "dimension": "Achiever",
+          "factor_loading": 0.75
+        }
+      ],
+      "mean_discrimination": 2.03864046818962,
+      "mean_difficulty": -1.0408414916866304,
+      "reliability": 0.9672639237461302
+    },
+    "Consistency": {
+      "items": [
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        },
+        {
+          "discrimination": 1.7096504135686952,
+          "difficulty": 0.9003519846703807,
+          "guessing": 0,
+          "dimension": "Consistency",
+          "factor_loading": 0.78
+        }
+      ],
+      "mean_discrimination": 1.7096504135686952,
+      "mean_difficulty": 0.9003519846703808,
+      "reliability": 0.8382226926504396
+    },
+    "Activator": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.14488842091915205,
+          "guessing": 0,
+          "dimension": "Activator",
+          "factor_loading": 0.76
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.14488842091915205,
+          "guessing": 0,
+          "dimension": "Activator",
+          "factor_loading": 0.76
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.14488842091915205,
+          "guessing": 0,
+          "dimension": "Activator",
+          "factor_loading": 0.76
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": 0.14488842091915205,
+      "reliability": 1.35
+    },
+    "Analytical": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.029351662321753076,
+          "guessing": 0,
+          "dimension": "Analytical",
+          "factor_loading": 0.77
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.029351662321753076,
+          "guessing": 0,
+          "dimension": "Analytical",
+          "factor_loading": 0.77
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": 0.029351662321753076,
+      "reliability": 1.8
+    },
+    "Context": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.029634162117745107,
+          "guessing": 0,
+          "dimension": "Context",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.029634162117745107,
+          "guessing": 0,
+          "dimension": "Context",
+          "factor_loading": 0.75
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.029634162117745107,
+          "guessing": 0,
+          "dimension": "Context",
+          "factor_loading": 0.75
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": 0.029634162117745107,
+      "reliability": 1.35
+    },
+    "Arranger": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.483571455692039,
+          "guessing": 0,
+          "dimension": "Arranger",
+          "factor_loading": 0.79
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.483571455692039,
+          "guessing": 0,
+          "dimension": "Arranger",
+          "factor_loading": 0.79
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.483571455692039,
+          "guessing": 0,
+          "dimension": "Arranger",
+          "factor_loading": 0.79
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": -0.483571455692039,
+      "reliability": 1.35
+    },
+    "Adaptability": {
+      "items": [
+        {
+          "discrimination": 2.3252216998704656,
+          "difficulty": -0.15362946622236598,
+          "guessing": 0,
+          "dimension": "Adaptability",
+          "factor_loading": 0.72
+        },
+        {
+          "discrimination": 2.3252216998704656,
+          "difficulty": -0.15362946622236598,
+          "guessing": 0,
+          "dimension": "Adaptability",
+          "factor_loading": 0.72
+        },
+        {
+          "discrimination": 2.3252216998704656,
+          "difficulty": -0.15362946622236598,
+          "guessing": 0,
+          "dimension": "Adaptability",
+          "factor_loading": 0.72
+        },
+        {
+          "discrimination": 2.3252216998704656,
+          "difficulty": -0.15362946622236598,
+          "guessing": 0,
+          "dimension": "Adaptability",
+          "factor_loading": 0.72
+        }
+      ],
+      "mean_discrimination": 2.3252216998704656,
+      "mean_difficulty": -0.15362946622236598,
+      "reliability": 1.1252164400584834
+    },
+    "Competition": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.21426908611371492,
+          "guessing": 0,
+          "dimension": "Competition",
+          "factor_loading": 0.7
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.21426908611371492,
+          "guessing": 0,
+          "dimension": "Competition",
+          "factor_loading": 0.7
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": -0.21426908611371492,
+      "reliability": 1.8
+    },
+    "Command": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.09614025910517558,
+          "guessing": 0,
+          "dimension": "Command",
+          "factor_loading": 0.77
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.09614025910517558,
+          "guessing": 0,
+          "dimension": "Command",
+          "factor_loading": 0.77
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": -0.09614025910517558,
+      "reliability": 1.8
+    },
+    "Connectedness": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.03638222882559702,
+          "guessing": 0,
+          "dimension": "Connectedness",
+          "factor_loading": 0.71
+        },
+        {
+          "discrimination": 3.0,
+          "difficulty": -0.03638222882559702,
+          "guessing": 0,
+          "dimension": "Connectedness",
+          "factor_loading": 0.71
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": -0.03638222882559702,
+      "reliability": 1.8
+    },
+    "Communication": {
+      "items": [
+        {
+          "discrimination": 3.0,
+          "difficulty": 0.11713163466569496,
+          "guessing": 0,
+          "dimension": "Communication",
+          "factor_loading": 0.8
+        }
+      ],
+      "mean_discrimination": 3.0,
+      "mean_difficulty": 0.11713163466569496,
+      "reliability": 0.7
+    }
+  },
+  "model_fit": {
+    "log_likelihood": -433.1973587676492,
+    "aic": 2114.3947175352982,
+    "bic": 3307.4970729224615,
+    "rmsea": 0.0,
+    "cfi": 0.5164559013556838,
+    "n_parameters": 624
+  },
+  "sample_size": 50,
+  "calibration_date": "2025-09-30T22:25:56.454203",
+  "convergence": false,
+  "iterations": 20,
+  "model_version": "4.0-calibrated"
+}

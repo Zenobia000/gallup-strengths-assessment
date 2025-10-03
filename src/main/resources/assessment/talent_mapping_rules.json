@@ -1,0 +1,336 @@
+{
+  "talent_mapping_metadata": {
+    "version": "1.0",
+    "created_date": "2025-10-02",
+    "author": "Claude Code AI",
+    "description": "Talent mapping rule engine，基於才幹組合模式映射到職業原型",
+    "theoretical_foundation": [
+      "Keirsey 四大氣質理論",
+      "MBTI 認知功能理論",
+      "Holland RIASEC 職業興趣理論",
+      "Gallup CliftonStrengths 領域架構"
+    ]
+  },
+
+  "archetype_definitions": {
+    "ARCHITECT": {
+      "id": "ARCHITECT",
+      "name": "系統建構者",
+      "keirsey_temperament": "理性者 (Rational)",
+      "mbti_correlates": ["INTJ", "INTP", "ENTJ"],
+      "description": "天生的系統思考者與建構者，擅長將複雜的資訊轉化為清晰的藍圖與高效的流程。注重邏輯、效率與長期規劃。",
+      "core_drive": "理解宇宙的法則，並利用這些法則來設計和建構高效、創新的系統",
+      "primary_talents": ["T4", "T1"],
+      "secondary_talents": ["T3", "T8", "T12"],
+      "domain_preference": "STRATEGIC_THINKING + EXECUTING",
+      "career_suggestions": [
+        "軟體架構師", "策略顧問", "數據科學家", "研發工程師",
+        "經濟學家", "大學教授", "發明家", "系統分析師"
+      ],
+      "work_environment": "自主性高、挑戰性強、創新導向的環境",
+      "leadership_style": "願景型領導，重視邏輯和效率"
+    },
+
+    "GUARDIAN": {
+      "id": "GUARDIAN",
+      "name": "組織守護者",
+      "keirsey_temperament": "守護者 (Guardian)",
+      "mbti_correlates": ["ISTJ", "ISFJ", "ESTJ", "ESFJ"],
+      "description": "可靠的執行者與維護者，擅長建立和維護穩定的系統，並確保任務按時、按質完成。注重責任、紀律與品質。",
+      "core_drive": "維護社會與組織的穩定，確保流程的可靠性，並履行自己的職責",
+      "primary_talents": ["T12", "T9"],
+      "secondary_talents": ["T2", "T1", "T6"],
+      "domain_preference": "EXECUTING + RELATIONSHIP_BUILDING",
+      "career_suggestions": [
+        "專案經理", "會計師/審計師", "供應鏈經理", "法務人員",
+        "公共行政人員", "品質保證(QA)工程師", "數據庫管理員", "財務分析師"
+      ],
+      "work_environment": "結構化、穩定、重視規範和流程的環境",
+      "leadership_style": "服務型領導，重視責任和團隊穩定"
+    },
+
+    "IDEALIST": {
+      "id": "IDEALIST",
+      "name": "人文關懷家",
+      "keirsey_temperament": "理想主義者 (Idealist)",
+      "mbti_correlates": ["INFJ", "INFP", "ENFJ", "ENFP"],
+      "description": "以人為本的溝通者與賦能者，擅長理解他人、建立關係並激勵團隊。注重和諧、成長與共同價值。",
+      "core_drive": "理解並幫助他人成長，激勵團隊追求更高的共同目標，並尋求工作與個人價值的統一",
+      "primary_talents": ["T6", "T8"],
+      "secondary_talents": ["T5", "T11", "T7"],
+      "domain_preference": "RELATIONSHIP_BUILDING + STRATEGIC_THINKING",
+      "career_suggestions": [
+        "人力資源經理", "企業教練/導師", "教師/教育顧問", "諮商心理師/社工",
+        "非營利組織負責人", "公共關係專家", "作家/藝術家", "組織發展顧問"
+      ],
+      "work_environment": "協作性強、價值驅動、注重人文關懷的環境",
+      "leadership_style": "變革型領導，重視啟發和員工發展"
+    },
+
+    "ARTISAN": {
+      "id": "ARTISAN",
+      "name": "推廣實踐家",
+      "keirsey_temperament": "工匠 (Artisan)",
+      "mbti_correlates": ["ESTP", "ESFP", "ISTP", "ISFP"],
+      "description": "充滿活力的行動派與連結者，擅長將想法付諸實踐，並在與人互動中獲得能量。注重結果、效率與人際關係。",
+      "core_drive": "抓住當下，靈活應對挑戰，並透過實際行動來解決問題，享受過程中的自由與刺激",
+      "primary_talents": ["T5", "T10"],
+      "secondary_talents": ["T3", "T7", "T11"],
+      "domain_preference": "INFLUENCING + RELATIONSHIP_BUILDING",
+      "career_suggestions": [
+        "市場行銷專家", "銷售總監", "創業者/企業家", "危機管理專家",
+        "活動策劃人", "運動員/表演者", "急診科醫生", "客戶經理"
+      ],
+      "work_environment": "動態變化、人際互動頻繁、結果導向的環境",
+      "leadership_style": "魅力型領導，重視團隊士氣和快速反應"
+    }
+  },
+
+  "mapping_rules": {
+    "primary_classification": {
+      "description": "基於主導才幹（Top 4）的組合模式進行分類",
+      "algorithm": "weighted_pattern_matching",
+      "weight_distribution": {
+        "rank_1": 0.4,
+        "rank_2": 0.3,
+        "rank_3": 0.2,
+        "rank_4": 0.1
+      }
+    },
+
+    "domain_preference_scoring": {
+      "EXECUTING": {
+        "talents": ["T1", "T2", "T12"],
+        "archetype_affinity": {
+          "ARCHITECT": 0.7,
+          "GUARDIAN": 0.9,
+          "IDEALIST": 0.3,
+          "ARTISAN": 0.4
+        }
+      },
+      "INFLUENCING": {
+        "talents": ["T5", "T7", "T11"],
+        "archetype_affinity": {
+          "ARCHITECT": 0.4,
+          "GUARDIAN": 0.5,
+          "IDEALIST": 0.7,
+          "ARTISAN": 0.9
+        }
+      },
+      "RELATIONSHIP_BUILDING": {
+        "talents": ["T6", "T9", "T10"],
+        "archetype_affinity": {
+          "ARCHITECT": 0.3,
+          "GUARDIAN": 0.8,
+          "IDEALIST": 0.9,
+          "ARTISAN": 0.7
+        }
+      },
+      "STRATEGIC_THINKING": {
+        "talents": ["T3", "T4", "T8"],
+        "archetype_affinity": {
+          "ARCHITECT": 0.9,
+          "GUARDIAN": 0.4,
+          "IDEALIST": 0.8,
+          "ARTISAN": 0.5
+        }
+      }
+    },
+
+    "specific_talent_indicators": {
+      "ARCHITECT_indicators": {
+        "must_have": ["T4", "T1"],
+        "strong_indicators": ["T3", "T8", "T12"],
+        "pattern": "STRATEGIC_THINKING主導 + EXECUTING支撐",
+        "threshold": 0.75
+      },
+      "GUARDIAN_indicators": {
+        "must_have": ["T12", "T9"],
+        "strong_indicators": ["T2", "T1", "T6"],
+        "pattern": "EXECUTING主導 + RELATIONSHIP_BUILDING支撐",
+        "threshold": 0.75
+      },
+      "IDEALIST_indicators": {
+        "must_have": ["T6", "T8"],
+        "strong_indicators": ["T5", "T11", "T7"],
+        "pattern": "RELATIONSHIP_BUILDING主導 + 人際影響力",
+        "threshold": 0.70
+      },
+      "ARTISAN_indicators": {
+        "must_have": ["T5", "T10"],
+        "strong_indicators": ["T3", "T7", "T11"],
+        "pattern": "INFLUENCING主導 + 壓力適應力",
+        "threshold": 0.70
+      }
+    },
+
+    "balance_profile_modifiers": {
+      "balanced_profile": {
+        "condition": "DBI > 0.70 AND entropy > 0.70",
+        "effect": "降低極端原型分類，傾向混合型",
+        "modifier": 0.8
+      },
+      "specialized_profile": {
+        "condition": "DBI < 0.50 AND entropy < 0.50",
+        "effect": "強化主導原型特徵",
+        "modifier": 1.3
+      },
+      "complementary_profile": {
+        "condition": "0.50 <= DBI <= 0.70",
+        "effect": "保持正常分類邏輯",
+        "modifier": 1.0
+      }
+    }
+  },
+
+  "classification_algorithm": {
+    "step_1_talent_scoring": {
+      "description": "計算每個原型的才幹匹配分數",
+      "formula": "Σ(talent_weight × rank_weight × affinity_score)",
+      "inputs": ["user_top_talents", "talent_rankings", "archetype_affinities"]
+    },
+
+    "step_2_domain_scoring": {
+      "description": "計算領域偏好匹配分數",
+      "formula": "Σ(domain_percentile × domain_affinity)",
+      "inputs": ["user_domain_scores", "archetype_domain_preferences"]
+    },
+
+    "step_3_pattern_matching": {
+      "description": "檢查特定原型指標模式",
+      "logic": "IF must_have_talents THEN apply_pattern_bonus",
+      "bonus_multiplier": 1.5
+    },
+
+    "step_4_balance_adjustment": {
+      "description": "根據均衡度調整分類",
+      "logic": "apply balance_profile_modifiers",
+      "final_adjustment": "normalize_to_probabilities"
+    },
+
+    "step_5_confidence_calculation": {
+      "description": "計算分類信心度",
+      "factors": [
+        "highest_score_margin",
+        "pattern_match_strength",
+        "domain_consistency",
+        "talent_ranking_clarity"
+      ],
+      "confidence_levels": {
+        "high": "> 0.80",
+        "medium": "0.60 - 0.80",
+        "low": "< 0.60"
+      }
+    }
+  },
+
+  "output_format": {
+    "primary_archetype": {
+      "archetype_id": "ARCHITECT",
+      "archetype_name": "系統建構者",
+      "probability": 0.75,
+      "confidence": "high",
+      "key_supporting_talents": ["T4", "T1", "T3"],
+      "domain_alignment": "STRATEGIC_THINKING主導"
+    },
+
+    "secondary_archetype": {
+      "archetype_id": "GUARDIAN",
+      "archetype_name": "組織守護者",
+      "probability": 0.18,
+      "explanation": "執行力才幹較強，但缺乏守護者核心特質"
+    },
+
+    "archetype_scores": {
+      "ARCHITECT": 0.75,
+      "GUARDIAN": 0.18,
+      "IDEALIST": 0.05,
+      "ARTISAN": 0.02
+    },
+
+    "classification_details": {
+      "talent_contribution": {
+        "T4": {"weight": 0.4, "archetype_support": "ARCHITECT"},
+        "T1": {"weight": 0.3, "archetype_support": "ARCHITECT"},
+        "T3": {"weight": 0.2, "archetype_support": "ARCHITECT"}
+      },
+      "domain_contribution": {
+        "STRATEGIC_THINKING": {"score": 85, "archetype_support": "ARCHITECT"},
+        "EXECUTING": {"score": 78, "archetype_support": "ARCHITECT/GUARDIAN"}
+      },
+      "balance_profile": {
+        "type": "specialized",
+        "modifier_applied": 1.3,
+        "impact": "強化主導原型特徵"
+      }
+    },
+
+    "career_recommendations": {
+      "primary_suggestions": [
+        "軟體架構師", "策略顧問", "數據科學家", "研發工程師"
+      ],
+      "alternative_paths": [
+        "技術專案經理", "產品經理", "系統分析師"
+      ],
+      "development_areas": [
+        "加強人際協作技能", "培養團隊領導能力"
+      ]
+    }
+  },
+
+  "validation_rules": {
+    "logical_consistency": {
+      "probability_sum": "所有原型機率總和 = 1.0",
+      "primary_threshold": "主要原型機率 >= 0.40",
+      "pattern_alignment": "must_have才幹與分類結果一致"
+    },
+
+    "psychological_validity": {
+      "archetype_exclusivity": "檢查互斥原型組合",
+      "trait_coherence": "才幹組合的心理學合理性",
+      "cultural_appropriateness": "建議職業的文化適應性"
+    },
+
+    "statistical_robustness": {
+      "sample_adequacy": "分類基於足夠的才幹樣本",
+      "confidence_calibration": "信心度與實際準確度一致",
+      "cross_validation": "與其他評測工具的收斂效度"
+    }
+  },
+
+  "customization_parameters": {
+    "cultural_adjustments": {
+      "asian_context": {
+        "relationship_building_bonus": 1.1,
+        "individual_achievement_penalty": 0.9,
+        "description": "亞洲文化背景的權重調整"
+      }
+    },
+
+    "industry_specific": {
+      "technology": {
+        "strategic_thinking_bonus": 1.2,
+        "execution_bonus": 1.1,
+        "description": "科技業才幹需求調整"
+      },
+      "healthcare": {
+        "relationship_building_bonus": 1.3,
+        "pressure_regulation_bonus": 1.2,
+        "description": "醫療業才幹需求調整"
+      }
+    },
+
+    "experience_level": {
+      "junior": {
+        "learning_growth_bonus": 1.2,
+        "leadership_penalty": 0.8,
+        "description": "初級職位權重調整"
+      },
+      "senior": {
+        "strategic_thinking_bonus": 1.1,
+        "influence_bonus": 1.2,
+        "description": "高級職位權重調整"
+      }
+    }
+  }
+}

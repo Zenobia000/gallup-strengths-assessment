@@ -1,447 +1,109 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="探索您的獨特優勢,開啟職涯新篇章 - Gallup 優勢測驗">
-  <meta name="keywords" content="Gallup, 優勢測驗, 人格測驗, 職涯規劃, Mini-IPIP">
-  <title>Gallup 優勢測驗 - 探索您的獨特優勢</title>
-
-  <!-- Dynamic preconnect will be added by JavaScript -->
-
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="/css/variables.css">
-  <link rel="stylesheet" href="/css/reset.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/animations.css">
-  <link rel="stylesheet" href="/css/responsive.css">
-
-  <style>
-    /* Landing Page Specific Styles */
-    .hero {
-      min-height: 90vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #E8F4FF 0%, #FFFFFF 100%);
-      padding: var(--spacing-2xl) var(--spacing-md);
-      text-align: center;
-    }
-
-    .hero-content {
-      max-width: 800px;
-    }
-
-    .hero-title {
-      font-size: var(--font-size-5xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-      margin-bottom: var(--spacing-lg);
-      line-height: var(--line-height-tight);
-    }
-
-    .hero-subtitle {
-      font-size: var(--font-size-xl);
-      color: var(--text-secondary);
-      margin-bottom: var(--spacing-2xl);
-      line-height: var(--line-height-relaxed);
-    }
-
-    .hero-highlight {
-      color: var(--color-primary);
-      font-weight: var(--font-weight-semibold);
-    }
-
-    .hero-cta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: var(--spacing-md);
-    }
-
-    .trust-bar {
-      background: var(--bg-card);
-      padding: var(--spacing-xl) var(--spacing-md);
-      border-top: 1px solid var(--color-gray-200);
-      border-bottom: 1px solid var(--color-gray-200);
-    }
-
-    .trust-items {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--spacing-lg);
-      max-width: var(--container-lg);
-      margin: 0 auto;
-    }
-
-    .trust-item {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      padding: var(--spacing-md);
-      background: var(--color-gray-50);
-      border-radius: var(--radius-md);
-    }
-
-    .trust-icon {
-      font-size: var(--font-size-3xl);
-    }
-
-    .trust-text {
-      flex: 1;
-    }
-
-    .trust-label {
-      font-size: var(--font-size-sm);
-      color: var(--text-tertiary);
-      margin-bottom: var(--spacing-xs);
-    }
-
-    .trust-value {
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      color: var(--text-primary);
-    }
-
-    .social-proof {
-      padding: var(--spacing-3xl) var(--spacing-md);
-      background: var(--bg-page);
-    }
-
-    .section-title {
-      font-size: var(--font-size-3xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--text-primary);
-      text-align: center;
-      margin-bottom: var(--spacing-xl);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--spacing-lg);
-      max-width: var(--container-lg);
-      margin: 0 auto var(--spacing-2xl);
-    }
-
-    .stat-card {
-      text-align: center;
-      padding: var(--spacing-xl);
-      background: var(--bg-card);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      transition: var(--transition-transform);
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .stat-number {
-      font-size: var(--font-size-4xl);
-      font-weight: var(--font-weight-bold);
-      color: var(--color-primary);
-      margin-bottom: var(--spacing-sm);
-    }
-
-    .stat-label {
-      font-size: var(--font-size-base);
-      color: var(--text-secondary);
-    }
-
-    .process-section {
-      padding: var(--spacing-3xl) var(--spacing-md);
-      background: var(--bg-card);
-    }
-
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: var(--spacing-xl);
-      max-width: var(--container-lg);
-      margin: 0 auto;
-    }
-
-    .process-step {
-      position: relative;
-      padding: var(--spacing-xl);
-      text-align: center;
-    }
-
-    .process-step::after {
-      content: '→';
-      position: absolute;
-      top: 50%;
-      right: -20px;
-      transform: translateY(-50%);
-      font-size: var(--font-size-2xl);
-      color: var(--color-gray-300);
-    }
-
-    .process-step:last-child::after {
-      display: none;
-    }
-
-    .process-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 60px;
-      height: 60px;
-      background: var(--gradient-progress);
-      color: var(--text-inverse);
-      border-radius: 50%;
-      font-size: var(--font-size-2xl);
-      font-weight: var(--font-weight-bold);
-      margin-bottom: var(--spacing-md);
-    }
-
-    .process-title {
-      font-size: var(--font-size-lg);
-      font-weight: var(--font-weight-semibold);
-      color: var(--text-primary);
-      margin-bottom: var(--spacing-sm);
-    }
-
-    .process-desc {
-      font-size: var(--font-size-sm);
-      color: var(--text-secondary);
-      line-height: var(--line-height-relaxed);
-    }
-
-    .footer {
-      padding: var(--spacing-xl) var(--spacing-md);
-      background: var(--color-gray-800);
-      color: var(--color-gray-300);
-      text-align: center;
-    }
-
-    .footer-text {
-      font-size: var(--font-size-sm);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .hero-title {
-        font-size: var(--font-size-3xl);
-      }
-
-      .hero-subtitle {
-        font-size: var(--font-size-lg);
-      }
-
-      .process-step::after {
-        display: none;
-      }
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .hero-content {
-      animation: fadeInUp 0.8s ease-out;
-    }
-
-    .stat-card {
-      animation: fadeInUp 0.8s ease-out;
-      animation-fill-mode: backwards;
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.1s; }
-    .stat-card:nth-child(2) { animation-delay: 0.2s; }
-    .stat-card:nth-child(3) { animation-delay: 0.3s; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>入口 | Strength DNA Lab</title>
+  <meta name="description" content="Strength DNA Lab 的 FileStorage 版本導覽。快速連結至顧問式 UX 的各個頁面與 API。" />
+  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <!-- Skip to main content (Accessibility) -->
-  <a href="#main-content" class="skip-to-main">跳到主要內容</a>
-
-  <!-- Hero Section -->
-  <section class="hero" id="main-content">
-    <div class="hero-content">
-      <h1 class="hero-title">
-        探索您的 <span class="hero-highlight">獨特優勢</span><br>
-        開啟職涯新篇章
-      </h1>
-      <p class="hero-subtitle">
-        基於科學驗證的 Mini-IPIP 人格測驗,<br>
-        僅需 <strong>5 分鐘</strong>,即可獲得專業的優勢分析報告
-      </p>
-      <div class="hero-cta">
-        <button class="btn btn-primary btn-lg" onclick="startAssessment()">
-          開始測驗
-        </button>
-        <p class="text-muted" style="font-size: var(--font-size-sm);">
-          完全免費 · 隱私保護 · 立即取得報告
-        </p>
-      </div>
+  <header class="global-header">
+    <div class="layout">
+      <a href="landing.html" class="brand">Strength DNA Lab</a>
+      <nav>
+        <ul class="nav-list">
+          <li><a class="nav-link" href="landing.html">首頁</a></li>
+          <li><a class="nav-link" href="assessment-intro.html">評測準備</a></li>
+          <li><a class="nav-link" href="assessment.html">進入評測</a></li>
+          <li><a class="nav-link" href="results.html">成果示意</a></li>
+          <li><a class="nav-link" href="report-detail.html">詳細報告</a></li>
+        </ul>
+      </nav>
     </div>
-  </section>
+  </header>
 
-  <!-- Trust Bar -->
-  <section class="trust-bar">
-    <div class="container">
-      <div class="trust-items">
-        <div class="trust-item">
-          <div class="trust-icon">🔒</div>
-          <div class="trust-text">
-            <div class="trust-label">資料保護</div>
-            <div class="trust-value">GDPR 合規</div>
+  <main class="page">
+    <section class="layout hero">
+      <div class="hero__grid">
+        <div class="hero__content">
+          <p class="eyebrow">FileStorage Edition Hub</p>
+          <h1>快速導覽 · 一鍵進入顧問式體驗</h1>
+          <p class="lead">這裡整合新版資訊架構與設計文件，幫你在開發或測試時快速抵達關鍵頁面。</p>
+          <div class="hero__ctas">
+            <a class="button button--primary" href="landing.html">查看新版 Landing</a>
+            <a class="button button--secondary" href="docs/webpage/results.html">預覽靜態成果</a>
           </div>
         </div>
-        <div class="trust-item">
-          <div class="trust-icon">🎓</div>
-          <div class="trust-text">
-            <div class="trust-label">科學驗證</div>
-            <div class="trust-value">Mini-IPIP 量表</div>
-          </div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">⚡</div>
-          <div class="trust-text">
-            <div class="trust-label">快速完成</div>
-            <div class="trust-value">僅需 5 分鐘</div>
-          </div>
-        </div>
+        <aside class="hero__panel">
+          <h3>快速指引</h3>
+          <ul>
+            <li>依照 IA v2 → Landing → Intro → Assessment → Results。</li>
+            <li>檢視 docs/design 了解資訊架構與前端風格。</li>
+            <li>使用 API 端點驗證 FileStorage 版本功能。</li>
+          </ul>
+        </aside>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Social Proof Section -->
-  <section class="social-proof">
-    <div class="container">
-      <h2 class="section-title">超過 12,450 位用戶已完成測驗</h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number">12,450+</div>
-          <div class="stat-label">已完成測驗</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">4.8/5</div>
-          <div class="stat-label">用戶滿意度</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">92%</div>
-          <div class="stat-label">推薦採納率</div>
-        </div>
+    <section class="layout section">
+      <div class="section__header">
+        <p class="eyebrow">Primary Links</p>
+        <h2>核心頁面入口</h2>
+        <p class="section__intro">按照用戶旅程排序：從建立信任到洞察輸出。</p>
       </div>
-    </div>
-  </section>
+      <div class="grid grid--2">
+        <a class="card" href="landing.html">
+          <h3 class="card__title">Landing · 建立信任</h3>
+          <p class="card__body">瀏覽 McKinsey 顧問式首頁，理解價值主張與用戶旅程。</p>
+        </a>
+        <a class="card" href="assessment-intro.html">
+          <h3 class="card__title">Intro · 評測準備</h3>
+          <p class="card__body">進入行為心理學設計的前導頁，完成準備清單。</p>
+        </a>
+        <a class="card" href="assessment.html">
+          <h3 class="card__title">Assessment · 評測執行</h3>
+          <p class="card__body">啟動 11 題組評測，體驗強迫選擇與進度引導。</p>
+        </a>
+        <a class="card" href="results.html">
+          <h3 class="card__title">Results · 顧問式摘要</h3>
+          <p class="card__body">查看 KPI 摘要、優勢原型與行動建議示意。</p>
+        </a>
+      </div>
+    </section>
 
-  <!-- Process Section -->
-  <section class="process-section">
-    <div class="container">
-      <h2 class="section-title">簡單四步驟,了解您的優勢</h2>
-      <div class="process-steps">
-        <div class="process-step">
-          <div class="process-number">1</div>
-          <div class="process-title">同意條款</div>
-          <div class="process-desc">閱讀並同意隱私政策與使用條款,保障您的權益</div>
-        </div>
-        <div class="process-step">
-          <div class="process-number">2</div>
-          <div class="process-title">作答測驗</div>
-          <div class="process-desc">回答 20 道簡單問題,誠實作答以獲得準確結果</div>
-        </div>
-        <div class="process-step">
-          <div class="process-number">3</div>
-          <div class="process-title">分析優勢</div>
-          <div class="process-desc">系統自動計算您的 12 項優勢面向與排名</div>
-        </div>
-        <div class="process-step">
-          <div class="process-number">4</div>
-          <div class="process-title">取得報告</div>
-          <div class="process-desc">查看詳細分析與職涯建議,下載 PDF 報告</div>
+    <section class="layout section">
+      <div class="section__header">
+        <p class="eyebrow">For Developers</p>
+        <h2>開發者資源與 API</h2>
+        <p class="section__intro">支援 FileStorage 架構的快速測試與佈署。</p>
+      </div>
+      <div class="grid grid--2">
+        <a class="card" href="/api/docs" target="_blank" rel="noopener">
+          <h3 class="card__title">📚 API Docs</h3>
+          <p class="card__body">FastAPI 自動文件，檢視所有端點與 Schema。</p>
+        </a>
+        <div class="card">
+          <h3 class="card__title">🔐 健康檢查</h3>
+          <p class="card__body">GET /api/system/health — 確認 FileStorage 版本狀態。</p>
+          <p class="caption">本機測試：確保 data/file_storage 資料可讀寫。</p>
         </div>
       </div>
-      <div style="text-align: center; margin-top: var(--spacing-2xl);">
-        <button class="btn btn-primary btn-lg" onclick="startAssessment()">
-          立即開始
-        </button>
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- Footer -->
   <footer class="footer">
-    <p class="footer-text">
-      &copy; 2025 Gallup 優勢測驗. 基於 Mini-IPIP 公領域量表開發.
-    </p>
-    <p class="footer-text" style="margin-top: var(--spacing-sm);">
-      本測驗僅供參考,不作為醫療或心理診斷依據.
-    </p>
+    <div class="layout">
+      <div class="footer__meta">
+        <strong class="brand">Strength DNA Lab</strong>
+        <span>FileStorage 版本 · 對應 IA v2 與 McKinsey UX 指南</span>
+        <div class="footer__links">
+          <a href="docs/design/information-architecture-v2.md">資訊架構 v2</a>
+          <a href="docs/design/frontend-architecture-mckinsey-style.md">前端設計指南</a>
+          <a href="docs/webpage/results.html">靜態頁面預覽</a>
+        </div>
+      </div>
+    </div>
   </footer>
-
-  <!-- Scripts -->
-  <script type="module">
-    import { storage } from '/js/storage.js';
-    import { api } from '/js/api.js';
-    import { config } from '/js/config.js';
-
-    // Global function to start assessment
-    window.startAssessment = async function() {
-      try {
-        // Check if user has valid session
-        if (storage.hasValidSession()) {
-          const sessionId = storage.getSession();
-
-          // Check if user has consent
-          if (storage.hasConsent()) {
-            // Check if answers exist
-            const answers = storage.getAnswers();
-            if (answers.length > 0) {
-              // Resume assessment
-              if (confirm('您有尚未完成的測驗,是否繼續?')) {
-                window.location.href = '/pages/assessment.html';
-                return;
-              } else {
-                // Start new session
-                storage.clearSession();
-              }
-            } else {
-              // Go to assessment
-              window.location.href = '/pages/assessment.html';
-              return;
-            }
-          }
-        }
-
-        // Go to consent page for new assessment
-        window.location.href = '/pages/consent.html';
-      } catch (error) {
-        console.error('Start assessment error:', error);
-        alert('發生錯誤,請稍後再試');
-      }
-    };
-
-    // Initialize on page load
-    window.addEventListener('DOMContentLoaded', async () => {
-      try {
-        // Add dynamic preconnect for API
-        const apiUrl = new URL(config.getApiBaseURL());
-        const preconnectLink = document.createElement('link');
-        preconnectLink.rel = 'preconnect';
-        preconnectLink.href = apiUrl.origin;
-        document.head.appendChild(preconnectLink);
-
-        // Check API health
-        await api.healthCheck();
-        console.log('API health check: OK');
-      } catch (error) {
-        console.warn('API health check failed:', error);
-        // Show warning banner (optional)
-      }
-    });
-  </script>
 </body>
 </html>

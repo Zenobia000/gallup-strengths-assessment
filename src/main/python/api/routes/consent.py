@@ -22,11 +22,11 @@ from models.schemas import (
     ConsentResponse,
     APIResponse
 )
-from utils.database import get_database_manager
+from database.engine import get_session
 from core.config import get_settings
 
 
-router = APIRouter()
+router = APIRouter(prefix="/privacy")
 
 
 def get_client_ip(request: Request) -> str:

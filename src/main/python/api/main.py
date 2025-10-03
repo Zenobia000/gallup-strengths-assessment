@@ -32,8 +32,11 @@ from models.schemas import (
 # NOTE: AssessmentService temporarily disabled - uses legacy MiniIPIPScorer
 # TODO: Refactor AssessmentService to use ScoringEngine (Task: future)
 # from services.assessment import AssessmentService
-from utils.database import get_db_connection
-from api.routes import consent, sessions, scoring, recommendations
+from database.engine import get_session
+# Import new SQLAlchemy-based V4 assessment
+from api.routes import reports_v4_only
+from api.routes import v4_assessment_sqlalchemy
+# from api.routes import consent, v4_data_collection
 from api.middleware.error_handler import register_error_handlers
 
 
@@ -42,9 +45,9 @@ app = FastAPI(
     title="Gallup Strengths Assessment API",
     description="心理測量與決策支援系統 - 將公領域人格量表轉化為可執行的決策建議",
     version="1.0.0",
-    docs_url="/api/v1/docs",
-    openapi_url="/api/v1/openapi.json",
-    redoc_url="/api/v1/redoc"
+    docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
+    redoc_url="/api/redoc"
 )
 
 # Configure CORS for development - following MVP pragmatism
@@ -74,7 +77,7 @@ async def add_request_metadata(request: Request, call_next):
     # Add metadata headers for traceability
     response.headers["X-Request-ID"] = request.state.request_id
     response.headers["X-Timestamp"] = request.state.timestamp.isoformat()
-    response.headers["X-API-Version"] = "v1.0.0"
+    response.headers["X-API-Version"] = "1.0.0"
 
     return response
 
@@ -84,7 +87,7 @@ register_error_handlers(app)
 
 
 # Enhanced Questions Endpoint - Database Driven with Situational Support
-@app.get("/api/v1/questions", tags=["Assessment"])
+@app.get("/api/assessment/questions", tags=["Assessment"])
 async def get_questions(include_situational: bool = True):
     """
     Get assessment questions from database.
@@ -92,83 +95,38 @@ async def get_questions(include_situational: bool = True):
     Supports both traditional Mini-IPIP and situational questions.
     """
     try:
-        from utils.database import get_database_manager
+        from database.engine import get_session
+        from models.v4_models import V4Statement
         import json
 
-        db_manager = get_database_manager()
-        raw_items = db_manager.get_assessment_items("mini_ipip_v1.0")
-
         questions = []
-        for item in raw_items:
-            # Skip situational questions if not requested
-            if not include_situational and item.get("question_type") == "situational":
-                continue
+        with get_session() as session:
+            raw_items = session.query(V4Statement).all()
 
-            question_data = {
-                "id": item["item_id"],
-                "text": item["text_chinese"],
-                "dimension": item["dimension"],
-                "reverse": bool(item["reverse_scored"]),
-                "question_type": item.get("question_type", "traditional")
-            }
+            for item in raw_items:
+                # V4 statements are all for Thurstonian IRT
+                # Access all attributes while session is active
+                question_data = {
+                    "id": item.statement_id,
+                    "text": item.text,
+                    "dimension": item.dimension,
+                    "context": item.context,
+                    "social_desirability": item.social_desirability,
+                    "question_type": "thurstonian_irt"
+                }
+                questions.append(question_data)
 
-            # Add situational question specific fields
-            if item.get("question_type") == "situational":
-                scenario_id = item.get("scenario_context")
-                scenario_description = None
-
-                # Get full scenario description from database
-                if scenario_id:
-                    try:
-                        with db_manager.get_connection() as conn:
-                            cursor = conn.cursor()
-                            cursor.execute(
-                                "SELECT description FROM situational_scenarios WHERE scenario_id = ?",
-                                (scenario_id,)
-                            )
-                            result = cursor.fetchone()
-                            if result:
-                                scenario_description = result[0]
-                    except Exception as e:
-                        print(f"Error fetching scenario description: {e}")
-
-                question_data["scenario_context"] = scenario_description or scenario_id
-
-                # Parse custom response options
-                if item.get("response_options"):
-                    try:
-                        response_options = json.loads(item["response_options"])
-                        question_data["response_options"] = response_options
-                    except json.JSONDecodeError:
-                        pass
-
-                # Parse dimension weights
-                if item.get("dimension_weights"):
-                    try:
-                        dimension_weights = json.loads(item["dimension_weights"])
-                        question_data["dimension_weights"] = dimension_weights
-                    except json.JSONDecodeError:
-                        pass
-
-            questions.append(question_data)
-
-        # Sort by item order
-        questions.sort(key=lambda x: int(x["id"].split("_")[-1]) if "_" in x["id"] else int(x["id"]))
+        # Sort by dimension and statement ID
+        questions.sort(key=lambda x: (x["dimension"], x["id"]))
 
         return {
             "questions": questions,
             "total_count": len(questions),
-            "traditional_count": len([q for q in questions if q.get("question_type", "traditional") == "traditional"]),
-            "situational_count": len([q for q in questions if q.get("question_type") == "situational"]),
-            "version": "mini_ipip_v1.0_enhanced",
-            "instructions": "請根據您的真實感受，選擇最符合您情況的答案。",
-            "scale": [
-                {"value": 1, "label": "非常不同意"},
-                {"value": 2, "label": "不同意"},
-                {"value": 3, "label": "中立"},
-                {"value": 4, "label": "同意"},
-                {"value": 5, "label": "非常同意"}
-            ]
+            "dimensions": list(set(q["dimension"] for q in questions)),
+            "version": "v4_thurstonian_irt",
+            "instructions": "這些是用於四選二強制選擇評測的語句，將組成評測題組。",
+            "assessment_type": "thurstonian_irt",
+            "response_format": "forced_choice_quartet"
         }
 
     except Exception as e:
@@ -179,7 +137,7 @@ async def get_questions(include_situational: bool = True):
         )
 
 # Health Check Endpoint - Simple and focused
-@app.get("/api/v1/health", response_model=HealthResponse, tags=["System"])
+@app.get("/api/system/health", response_model=HealthResponse, tags=["System"])
 async def health_check() -> HealthResponse:
     """
     System health check endpoint.
@@ -189,9 +147,12 @@ async def health_check() -> HealthResponse:
     """
     try:
         # Test database connection
-        with get_db_connection() as conn:
-            cursor = conn.execute("SELECT 1")
-            cursor.fetchone()
+        from database.engine import get_database_engine
+        engine = get_database_engine()
+        health = engine.health_check()
+
+        if health["status"] != "healthy":
+            raise Exception(health.get("error", "Database unhealthy"))
 
         return HealthResponse(
             status="healthy",
@@ -201,7 +162,8 @@ async def health_check() -> HealthResponse:
             services={
                 "assessment": "ready",
                 "scoring": "ready",
-                "reporting": "ready"
+                "reporting": "ready",
+                "v4_engine": "ready"
             }
         )
 
@@ -215,19 +177,11 @@ async def health_check() -> HealthResponse:
         )
 
 
-# Include route modules - Clean separation of concerns
-app.include_router(consent.router, prefix="/api/v1", tags=["Consent"])
-app.include_router(sessions.router, prefix="/api/v1", tags=["Sessions"])
-app.include_router(scoring.router, tags=["Scoring"])
-app.include_router(recommendations.router, tags=["Recommendations"])
-
-# Report generation routes
-from api.routes import reports
-app.include_router(reports.router, prefix="/api/v1", tags=["Reports"])
-
-# Cache administration routes
-from api.routes import cache_admin
-app.include_router(cache_admin.router, prefix="/api/v1", tags=["Cache"])
+# Include route modules - Functional grouping
+# app.include_router(consent.router, prefix="/api", tags=["Privacy"])
+app.include_router(reports_v4_only.router, prefix="/api", tags=["Reports"])
+app.include_router(v4_assessment_sqlalchemy.router, prefix="/api", tags=["V4 Assessment"])
+# app.include_router(v4_data_collection.router, prefix="/api", tags=["Data Collection"])
 
 # Mount static files for frontend
 import os
@@ -246,13 +200,14 @@ async def startup_event():
     Follows fail-fast principle.
     """
     try:
-        # Validate database schema
-        with get_db_connection() as conn:
-            conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        # Initialize file storage (skipping database for now)
+        from core.file_storage import get_file_storage
+        storage = get_file_storage()
 
         print("FastAPI application started successfully")
-        print(f"Psychometric assessment system ready")
-        print(f"API documentation: http://localhost:8004/api/v1/docs")
+        print("V4 File storage version ready")
+        print(f"API documentation: http://localhost:8005/api/docs")
+        print("File storage initialized")
 
     except Exception as e:
         print(f"Startup failed: {e}")
@@ -274,15 +229,172 @@ async def assessment_page():
     else:
         raise HTTPException(status_code=404, detail="Assessment page not found")
 
+# V4 Pilot test frontend endpoint
+@app.get("/v4-pilot", include_in_schema=False)
+async def v4_pilot_page():
+    """Serve the v4 pilot test frontend page."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    pilot_file = os.path.join(static_dir, "v4_pilot_test.html")
+
+    if os.path.exists(pilot_file):
+        return FileResponse(pilot_file)
+    else:
+        raise HTTPException(status_code=404, detail="V4 pilot test page not found")
+
+# Frontend UI endpoints - 基於 API 端點設計
+@app.get("/ui/assessment/start", include_in_schema=False)
+async def assessment_start_ui():
+    """評測開始頁面 - 對應 /api/assessment/blocks API"""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    assessment_file = os.path.join(static_dir, "assessment.html")
+
+    if os.path.exists(assessment_file):
+        return FileResponse(assessment_file)
+    else:
+        raise HTTPException(status_code=404, detail="Assessment page not found")
+
+@app.get("/ui/assessment/results/{session_id}", include_in_schema=False)
+async def assessment_results_ui(session_id: str):
+    """評測結果頁面 - 對應 /api/assessment/results/{session_id} API"""
+    from fastapi.responses import FileResponse
+    import os
+
+    # 先驗證 session 是否存在
+    with get_session() as db_session:
+        from models.v4_models import V4Score
+        score = db_session.query(V4Score).filter(V4Score.session_id == session_id).first()
+        if not score:
+            raise HTTPException(status_code=404, detail=f"Assessment results not found for session {session_id}")
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    results_file = os.path.join(static_dir, "results.html")
+
+    if os.path.exists(results_file):
+        return FileResponse(results_file)
+    else:
+        raise HTTPException(status_code=404, detail="Results page not found")
+
+@app.get("/ui/reports/{session_id}", include_in_schema=False)
+async def reports_ui(session_id: str):
+    """詳細報告頁面 - 對應 /api/reports/generate/{session_id} API"""
+    from fastapi.responses import FileResponse
+    import os
+
+    # 先驗證 session 是否存在
+    with get_session() as db_session:
+        from models.v4_models import V4Score
+        score = db_session.query(V4Score).filter(V4Score.session_id == session_id).first()
+        if not score:
+            raise HTTPException(status_code=404, detail=f"Report not available for session {session_id}")
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    report_file = os.path.join(static_dir, "report-detail.html")
+
+    if os.path.exists(report_file):
+        return FileResponse(report_file)
+    else:
+        raise HTTPException(status_code=404, detail="Report page not found")
+
+@app.get("/ui/home", include_in_schema=False)
+async def home_ui():
+    """首頁 - 系統入口點"""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    landing_file = os.path.join(static_dir, "landing.html")
+
+    if os.path.exists(landing_file):
+        return FileResponse(landing_file)
+    else:
+        raise HTTPException(status_code=404, detail="Home page not found")
+
+# Additional static page endpoints
+@app.get("/results.html", include_in_schema=False)
+async def results_page():
+    """Serve the results page directly."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    results_file = os.path.join(static_dir, "results.html")
+
+    if os.path.exists(results_file):
+        return FileResponse(results_file)
+    else:
+        raise HTTPException(status_code=404, detail="Results page not found")
+
+@app.get("/landing.html", include_in_schema=False)
+async def landing_page():
+    """Serve the landing page directly."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    landing_file = os.path.join(static_dir, "landing.html")
+
+    if os.path.exists(landing_file):
+        return FileResponse(landing_file)
+    else:
+        raise HTTPException(status_code=404, detail="Landing page not found")
+
+@app.get("/report-detail.html", include_in_schema=False)
+async def report_detail_page():
+    """Serve the report detail page directly."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    report_file = os.path.join(static_dir, "report-detail.html")
+
+    if os.path.exists(report_file):
+        return FileResponse(report_file)
+    else:
+        raise HTTPException(status_code=404, detail="Report detail page not found")
+
+@app.get("/assessment.html", include_in_schema=False)
+async def assessment_html_page():
+    """Serve the assessment page directly as HTML."""
+    from fastapi.responses import FileResponse
+    import os
+
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "resources", "static")
+    assessment_file = os.path.join(static_dir, "assessment.html")
+
+    if os.path.exists(assessment_file):
+        return FileResponse(assessment_file)
+    else:
+        raise HTTPException(status_code=404, detail="Assessment HTML page not found")
+
 # Root endpoint redirect
 @app.get("/", include_in_schema=False)
 async def root():
-    """Redirect root to API documentation."""
+    """系統根目錄 - 提供 API 和 UI 端點資訊"""
     return JSONResponse({
-        "message": "Gallup Strengths Assessment API",
-        "documentation": "/api/v1/docs",
-        "health_check": "/api/v1/health",
-        "assessment": "/assessment"
+        "message": "Gallup Strengths Assessment System v4.0",
+        "api": {
+            "documentation": "/api/docs",
+            "health_check": "/api/system/health",
+            "assessment_blocks": "/api/assessment/blocks",
+            "assessment_submit": "/api/assessment/submit",
+            "assessment_results": "/api/assessment/results/{session_id}",
+            "reports": "/api/reports/generate/{session_id}"
+        },
+        "ui": {
+            "home": "/ui/home",
+            "assessment_start": "/ui/assessment/start",
+            "assessment_results": "/ui/assessment/results/{session_id}",
+            "detailed_reports": "/ui/reports/{session_id}",
+            "legacy_assessment": "/assessment",
+            "v4_pilot": "/v4-pilot"
+        },
+        "architecture": "API-first design with corresponding UI endpoints"
     })
 
 
