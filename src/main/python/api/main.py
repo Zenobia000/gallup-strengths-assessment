@@ -19,6 +19,9 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from core.config import get_settings
 from models.schemas import (
@@ -50,6 +53,12 @@ app = FastAPI(
     redoc_url="/api/redoc"
 )
 
+# Initialize Rate Limiter
+# Rate limit: 60 requests per minute per IP address
+limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # Configure CORS for development - following MVP pragmatism
 settings = get_settings()
 app.add_middleware(
@@ -78,6 +87,55 @@ async def add_request_metadata(request: Request, call_next):
     response.headers["X-Request-ID"] = request.state.request_id
     response.headers["X-Timestamp"] = request.state.timestamp.isoformat()
     response.headers["X-API-Version"] = "1.0.0"
+
+    return response
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """
+    Add security headers following OWASP recommendations.
+
+    Implements defense-in-depth security:
+    - Prevent XSS attacks
+    - Prevent clickjacking
+    - Enforce HTTPS (in production)
+    - Control content type sniffing
+    """
+    response = await call_next(request)
+
+    # Prevent XSS attacks
+    response.headers["X-Content-Type-Options"] = "nosniff"
+
+    # Prevent clickjacking
+    response.headers["X-Frame-Options"] = "DENY"
+
+    # XSS Protection (legacy browsers)
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+
+    # Content Security Policy (restrictive but allows API usage)
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "font-src 'self' data:; "
+        "connect-src 'self'"
+    )
+
+    # Referrer Policy
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    # Permissions Policy (limit browser features)
+    response.headers["Permissions-Policy"] = (
+        "geolocation=(), "
+        "microphone=(), "
+        "camera=()"
+    )
+
+    # HTTPS enforcement (commented for local development)
+    # Uncomment in production behind HTTPS reverse proxy
+    # response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
 
     return response
 

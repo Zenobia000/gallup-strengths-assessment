@@ -11,7 +11,12 @@ import json
 import uuid
 
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+# Initialize limiter for this router
+limiter = Limiter(key_func=get_remote_address)
 
 from database.engine import get_session
 from models.v4_models import V4Statement, V4Session, V4Response, V4ResponseItem, V4Score
@@ -69,17 +74,55 @@ class BlocksResponse(BaseModel):
 
 class Response(BaseModel):
     """單題回應"""
-    block_id: int
-    most_like_index: int = Field(..., ge=0, le=3)
-    least_like_index: int = Field(..., ge=0, le=3)
-    response_time_ms: Optional[int] = Field(None, ge=0)
+    block_id: int = Field(..., ge=1, description="題組 ID (必須 >= 1)")
+    most_like_index: int = Field(..., ge=0, le=3, description="最像的選項索引 (0-3)")
+    least_like_index: int = Field(..., ge=0, le=3, description="最不像的選項索引 (0-3)")
+    response_time_ms: Optional[int] = Field(None, ge=0, description="回應時間 (毫秒)")
+
+    @model_validator(mode='after')
+    def validate_different_indices(self):
+        """確保 most_like 和 least_like 索引不同"""
+        if self.most_like_index == self.least_like_index:
+            raise ValueError(
+                f"most_like_index ({self.most_like_index}) and least_like_index ({self.least_like_index}) must be different"
+            )
+        return self
 
 
 class SubmitRequest(BaseModel):
     """提交請求"""
-    session_id: str
-    responses: List[Response]
-    completion_time_seconds: Optional[float] = Field(None, ge=0)
+    session_id: str = Field(..., min_length=1, description="評測 session ID")
+    responses: List[Response] = Field(..., min_length=1, description="回應列表 (至少 1 個)")
+    completion_time_seconds: Optional[float] = Field(None, ge=0, description="完成時間 (秒)")
+
+    @model_validator(mode='after')
+    def validate_responses(self):
+        """驗證回應的完整性和一致性"""
+        if not self.responses:
+            raise ValueError("responses cannot be empty")
+
+        # 檢查重複的 block_id
+        block_ids = [r.block_id for r in self.responses]
+        if len(block_ids) != len(set(block_ids)):
+            raise ValueError("Duplicate block_id found in responses")
+
+        # 驗證完成時間合理性 (如果提供)
+        if self.completion_time_seconds is not None:
+            min_time = len(self.responses) * 2  # 至少每題 2 秒
+            max_time = len(self.responses) * 60  # 最多每題 60 秒
+
+            if self.completion_time_seconds < min_time:
+                raise ValueError(
+                    f"completion_time_seconds ({self.completion_time_seconds}s) too fast for {len(self.responses)} responses. "
+                    f"Minimum: {min_time}s"
+                )
+            if self.completion_time_seconds > max_time:
+                raise ValueError(
+                    f"completion_time_seconds ({self.completion_time_seconds}s) too slow for {len(self.responses)} responses. "
+                    f"Maximum: {max_time}s"
+                )
+
+        return self
 
 
 class ScoreResponse(BaseModel):
@@ -263,7 +306,8 @@ async def get_assessment_blocks(request: BlockRequest = BlockRequest()):
 
 
 @router.post("/assessment/submit", response_model=ScoreResponse)
-async def submit_assessment(request: SubmitRequest):
+@limiter.limit("10/minute")  # 限制每分鐘 10 次提交 (防止濫用)
+async def submit_assessment(request: Request, submit_request: SubmitRequest):
     """
     提交評測結果並計算 T1-T12 分數
 
@@ -273,26 +317,26 @@ async def submit_assessment(request: SubmitRequest):
         # 驗證 session 存在
         with get_session() as db_session:
             v4_session = db_session.query(V4Session).filter(
-                V4Session.session_id == request.session_id
+                V4Session.session_id == submit_request.session_id
             ).first()
 
             if not v4_session:
                 raise HTTPException(
                     status_code=404,
-                    detail=f"Session {request.session_id} not found"
+                    detail=f"Session {submit_request.session_id} not found"
                 )
 
             # 取得題組資料
             blocks_data = v4_session.blocks_data
 
             # 儲存整體統計 - 更新 session 狀態
-            v4_session.completed_blocks = len(request.responses)
-            if len(request.responses) >= len(blocks_data):
+            v4_session.completed_blocks = len(submit_request.responses)
+            if len(submit_request.responses) >= len(blocks_data):
                 v4_session.status = "COMPLETED"
                 v4_session.completed_at = datetime.utcnow()
 
             # 儲存個別回應
-            for resp in request.responses:
+            for resp in submit_request.responses:
                 # 驗證回應
                 if resp.most_like_index == resp.least_like_index:
                     raise HTTPException(
@@ -317,7 +361,7 @@ async def submit_assessment(request: SubmitRequest):
 
                 # 儲存 V4Response (單個 block 的回應)
                 v4_response = V4Response(
-                    session_id=request.session_id,
+                    session_id=submit_request.session_id,
                     block_id=f"block_{resp.block_id}",
                     block_index=resp.block_id,
                     most_like_index=resp.most_like_index,
@@ -387,8 +431,8 @@ async def submit_assessment(request: SubmitRequest):
                     dimension_counts[dimension] = dimension_counts.get(dimension, 0) - 0.5
 
         # 標準化分數 (0-100)
-        max_score = len(request.responses) * 1.0
-        min_score = len(request.responses) * -0.5
+        max_score = len(submit_request.responses) * 1.0
+        min_score = len(submit_request.responses) * -0.5
 
         t_scores = {}
         for i in range(1, 13):
@@ -406,7 +450,7 @@ async def submit_assessment(request: SubmitRequest):
         # 儲存分數 - 使用正確的 V4Score 欄位名稱
         with get_session() as db_session:
             v4_score = V4Score(
-                session_id=request.session_id,
+                session_id=submit_request.session_id,
                 t1_structured_execution=t_scores.get("t1_talent", 50.0),
                 t2_quality_perfectionism=t_scores.get("t2_talent", 50.0),
                 t3_exploration_innovation=t_scores.get("t3_talent", 50.0),
@@ -424,14 +468,14 @@ async def submit_assessment(request: SubmitRequest):
                 standard_errors={f"t{i}": 0.3 + (0.2 * abs(t_scores.get(f"t{i}_talent", 50.0) - 50.0) / 50.0) for i in range(1, 13)},
                 percentiles={f"t{i}": t_scores.get(f"t{i}_talent", 50.0) for i in range(1, 13)},
                 dimension_reliability={f"t{i}": max(V4_CONFIG["min_reliability"],
-                                                   V4_CONFIG["base_reliability"] - (len(request.responses) / 100.0))
+                                                   V4_CONFIG["base_reliability"] - (len(submit_request.responses) / 100.0))
                                      for i in range(1, 13)},
                 # 品質指標 - 基於實際回應數量計算
                 overall_confidence=max(V4_CONFIG["min_confidence"],
                                      min(V4_CONFIG["max_confidence"],
-                                         0.5 + (len(request.responses) / 20.0))),
+                                         0.5 + (len(submit_request.responses) / 20.0))),
                 response_consistency=max(0.7,
-                                       min(0.98, V4_CONFIG["base_response_consistency"] + (len(request.responses) / 50.0))),
+                                       min(0.98, V4_CONFIG["base_response_consistency"] + (len(submit_request.responses) / 50.0))),
                 # 才幹分層 - 基於分數計算
                 dominant_talents=[f"t{i}" for i in range(1, 13)
                                 if t_scores.get(f"t{i}_talent", 50.0) >= V4_CONFIG["dominant_threshold"]],
@@ -441,14 +485,14 @@ async def submit_assessment(request: SubmitRequest):
                               if t_scores.get(f"t{i}_talent", 50.0) < V4_CONFIG["lesser_threshold"]],
                 # 計分元資料
                 algorithm_version=V4_CONFIG["algorithm_version"],
-                computation_time_ms=len(request.responses) * V4_CONFIG["computation_ms_per_response"],
+                computation_time_ms=len(submit_request.responses) * V4_CONFIG["computation_ms_per_response"],
                 calibration_version=V4_CONFIG["calibration_version"]
             )
             db_session.add(v4_score)
             db_session.commit()
 
         return ScoreResponse(
-            session_id=request.session_id,
+            session_id=submit_request.session_id,
             scores={
                 "t1_structured_execution": t_scores.get("t1_talent", 50.0),
                 "t2_quality_perfectionism": t_scores.get("t2_talent", 50.0),

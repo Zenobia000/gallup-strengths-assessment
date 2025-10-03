@@ -35,6 +35,7 @@ python-jose[cryptography]==3.3.0  # JWT token handling (for future auth)
 # Production Dependencies
 gunicorn==21.2.0        # Production ASGI server with Uvicorn workers
 python-dotenv==1.0.0    # Environment variable loading from .env file
+slowapi==0.1.9          # Rate limiting for FastAPI
 # prometheus-client==0.18.0  # Metrics collection (add when needed)
 # structlog==23.2.0       # Structured logging (add when needed)
 
