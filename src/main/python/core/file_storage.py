@@ -17,10 +17,17 @@ from dataclasses import dataclass, asdict
 @dataclass
 class StorageConfig:
     """Configuration for file storage system"""
-    base_path: str = "/mnt/d/python_workspace/github/gallup-strengths-assessment/data/file_storage"
+    base_path: str = None
     backup_enabled: bool = True
     auto_save: bool = True
     format_preference: str = "json"  # "json" or "csv"
+
+    def __post_init__(self):
+        if self.base_path is None:
+            # Use relative path from project root
+            # file_storage.py is in src/main/python/core/, need to go up 5 levels
+            project_root = Path(__file__).parent.parent.parent.parent.parent
+            self.base_path = str(project_root / "data" / "file_storage")
 
 
 class FileStorageManager:
